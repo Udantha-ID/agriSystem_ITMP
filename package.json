@@ -12,6 +12,7 @@
   "dependencies": {
     "@heroicons/react": "^2.2.0",
     "@tailwindcss/vite": "^4.0.17",
+    "date-fns": "^4.1.0",
     "framer-motion": "^12.6.2",
     "konva": "^9.3.20",
     "lucide-react": "^0.485.0",
