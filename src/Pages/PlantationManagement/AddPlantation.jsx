@@ -4,7 +4,6 @@ import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 import PlantationSidebar from '../../Components/PlantationSidebar';
 import { format, addMonths } from 'date-fns';
 
-// Plantation growth periods in months
 const growthPeriods = {
   coconut: 12,
   mango: 6,
@@ -13,7 +12,6 @@ const growthPeriods = {
   tea: 9,
 };
 
-// Hardcoded land area options (from other members)
 const landAreaOptions = [
   '1 core',
   '2 cores',
@@ -52,7 +50,6 @@ export default function AddPlantation() {
     const validationErrors = validateForm();
     
     if (Object.keys(validationErrors).length === 0) {
-      // Submit logic here (API call, etc.)
       console.log('Form submitted:', formData);
       navigate('/plantations');
     } else {
@@ -78,147 +75,259 @@ export default function AddPlantation() {
   };
 
   return (
-    <div>
+    <div className="min-h-screen bg-emerald-50">
       <PlantationSidebar />
       <div className="md:pl-64 p-6">
-        <div className="max-w-3xl mx-auto mt-20">
-
-          <h1 className="text-2xl font-bold text-gray-900 mb-8">Add New Plantation</h1>
-
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Project Name */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Project Name
-                </label>
-                <input
-                  type="text"
-                  name="projectName"
-                  value={formData.projectName}
-                  onChange={handleChange}
-                  className={`block w-full rounded-md border ${errors.projectName ? 'border-red-500' : 'border-gray-300'} p-2 focus:border-emerald-500 focus:ring-emerald-500`}
-                />
-                {errors.projectName && <p className="text-red-500 text-sm mt-1">{errors.projectName}</p>}
-              </div>
-
-              {/* Plantation Type */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Plantation Type
-                </label>
-                <select
-                  name="type"
-                  value={formData.type}
-                  onChange={handleChange}
-                  className={`block w-full rounded-md border ${errors.type ? 'border-red-500' : 'border-gray-300'} p-2 focus:border-emerald-500 focus:ring-emerald-500`}
-                >
-                  <option value="">Select Type</option>
-                  {Object.keys(growthPeriods).map(type => (
-                    <option key={type} value={type}>
-                      {type.charAt(0).toUpperCase() + type.slice(1)}
-                    </option>
-                  ))}
-                </select>
-                {errors.type && <p className="text-red-500 text-sm mt-1">{errors.type}</p>}
-              </div>
-
-              {/* Land Area */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Land Area
-                </label>
-                <select
-                  name="landArea"
-                  value={formData.landArea}
-                  onChange={handleChange}
-                  className={`block w-full rounded-md border ${errors.landArea ? 'border-red-500' : 'border-gray-300'} p-2 focus:border-emerald-500 focus:ring-emerald-500`}
-                >
-                  <option value="">Select Land Area</option>
-                  {landAreaOptions.map(area => (
-                    <option key={area} value={area}>{area}</option>
-                  ))}
-                </select>
-                {errors.landArea && <p className="text-red-500 text-sm mt-1">{errors.landArea}</p>}
-              </div>
-
-              {/* Start Date */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Start Date
-                </label>
-                <input
-                  type="date"
-                  name="startDate"
-                  value={formData.startDate}
-                  onChange={handleChange}
-                  className={`block w-full rounded-md border ${errors.startDate ? 'border-red-500' : 'border-gray-300'} p-2 focus:border-emerald-500 focus:ring-emerald-500`}
-                />
-                {errors.startDate && <p className="text-red-500 text-sm mt-1">{errors.startDate}</p>}
-              </div>
-
-              {/* Harvesting Date */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Harvesting Date
-                </label>
-                <input
-                  type="date"
-                  name="harvestingDate"
-                  value={formData.harvestingDate}
-                  readOnly
-                  className="block w-full rounded-md border border-gray-300 p-2 bg-gray-100 cursor-not-allowed"
-                />
-              </div>
-
-              {/* Location */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Location
-                </label>
-                <input
-                  type="text"
-                  name="location"
-                  value={formData.location}
-                  onChange={handleChange}
-                  className={`block w-full rounded-md border ${errors.location ? 'border-red-500' : 'border-gray-300'} p-2 focus:border-emerald-500 focus:ring-emerald-500`}
-                />
-                {errors.location && <p className="text-red-500 text-sm mt-1">{errors.location}</p>}
-              </div>
-
-              {/* Employees */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Number of Employees
-                </label>
-                <input
-                  type="number"
-                  name="employees"
-                  value={formData.employees}
-                  onChange={handleChange}
-                  min="1"
-                  className={`block w-full rounded-md border ${errors.employees ? 'border-red-500' : 'border-gray-300'} p-2 focus:border-emerald-500 focus:ring-emerald-500`}
-                />
-                {errors.employees && <p className="text-red-500 text-sm mt-1">{errors.employees}</p>}
-              </div>
-            </div>
-
-            <div className="flex justify-end gap-4 mt-8">
+        <div className="max-w-4xl mx-auto mt-8">
+          <div className="bg-white rounded-xl shadow-lg p-8">
+            <div className="flex items-center mb-8 pb-6 border-b border-emerald-100">
               <button
-                type="button"
                 onClick={() => navigate(-1)}
-                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                className="flex items-center text-emerald-600 hover:text-emerald-700 mr-4"
               >
-                Cancel
+                <ArrowLeftIcon className="h-5 w-5 mr-2" />
+                <span className="font-medium">Back</span>
               </button>
-              <button
-                type="submit"
-                className="px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700"
-              >
-                Create Plantation
-              </button>
+              <h1 className="text-3xl font-bold text-gray-800 ml-40">Create New Plantation</h1>
             </div>
-          </form>
+
+            <form onSubmit={handleSubmit} className="space-y-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* Project Name */}
+                <div className="relative">
+                  <label className="text-sm font-semibold text-gray-600 mb-2 block">
+                    Project Name <span className="text-red-500 ml-1">*</span>
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                      </svg>
+                    </div>
+                    <input
+                      type="text"
+                      name="projectName"
+                      value={formData.projectName}
+                      onChange={handleChange}
+                      className={`pl-10 pr-4 py-3 w-full rounded-lg border ${
+                        errors.projectName ? 'border-red-500' : 'border-gray-200'
+                      } focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all`}
+                      placeholder="Project Greenfield"
+                    />
+                  </div>
+                  {errors.projectName && (
+                    <p className="text-red-500 text-sm mt-1 flex items-center">
+                      <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
+                      {errors.projectName}
+                    </p>
+                  )}
+                </div>
+
+                {/* Plantation Type */}
+                <div>
+                  <label className="text-sm font-semibold text-gray-600 mb-2 block">
+                    Plantation Type <span className="text-red-500 ml-1">*</span>
+                  </label>
+                  <div className="relative">
+                    <select
+                      name="type"
+                      value={formData.type}
+                      onChange={handleChange}
+                      className={`appearance-none pr-10 py-3 w-full rounded-lg border ${
+                        errors.type ? 'border-red-500' : 'border-gray-200'
+                      } focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all`}
+                    >
+                      <option value="">Select Plantation Type</option>
+                      {Object.keys(growthPeriods).map((type) => (
+                        <option key={type} value={type}>
+                          {type.charAt(0).toUpperCase() + type.slice(1)}
+                        </option>
+                      ))}
+                    </select>
+                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                      <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                      </svg>
+                    </div>
+                  </div>
+                  {errors.type && (
+                    <p className="text-red-500 text-sm mt-1 flex items-center">
+                      <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
+                      {errors.type}
+                    </p>
+                  )}
+                </div>
+
+                {/* Land Area */}
+                <div>
+                  <label className="text-sm font-semibold text-gray-600 mb-2 block">
+                    Land Area <span className="text-red-500 ml-1">*</span>
+                  </label>
+                  <div className="relative">
+                    <select
+                      name="landArea"
+                      value={formData.landArea}
+                      onChange={handleChange}
+                      className={`appearance-none pr-10 py-3 w-full rounded-lg border ${
+                        errors.landArea ? 'border-red-500' : 'border-gray-200'
+                      } focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all`}
+                    >
+                      <option value="">Select Land Area</option>
+                      {landAreaOptions.map(area => (
+                        <option key={area} value={area}>{area}</option>
+                      ))}
+                    </select>
+                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                      <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                      </svg>
+                    </div>
+                  </div>
+                  {errors.landArea && (
+                    <p className="text-red-500 text-sm mt-1 flex items-center">
+                      <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
+                      {errors.landArea}
+                    </p>
+                  )}
+                </div>
+
+                {/* Location */}
+                <div className="relative">
+                  <label className="text-sm font-semibold text-gray-600 mb-2 block">
+                    Location <span className="text-red-500 ml-1">*</span>
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                    </div>
+                    <input
+                      type="text"
+                      name="location"
+                      value={formData.location}
+                      onChange={handleChange}
+                      className={`pl-10 pr-4 py-3 w-full rounded-lg border ${
+                        errors.location ? 'border-red-500' : 'border-gray-200'
+                      } focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all`}
+                      placeholder="Enter location"
+                    />
+                  </div>
+                  {errors.location && (
+                    <p className="text-red-500 text-sm mt-1 flex items-center">
+                      <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
+                      {errors.location}
+                    </p>
+                  )}
+                </div>
+
+                {/* Start Date */}
+                <div>
+                  <label className="text-sm font-semibold text-gray-600 mb-2 block">
+                    Start Date <span className="text-red-500 ml-1">*</span>
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="date"
+                      name="startDate"
+                      value={formData.startDate}
+                      onChange={handleChange}
+                      className={`py-3 w-full rounded-lg border ${
+                        errors.startDate ? 'border-red-500' : 'border-gray-200'
+                      } focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all`}
+                    />
+                  </div>
+                  {errors.startDate && (
+                    <p className="text-red-500 text-sm mt-1 flex items-center">
+                      <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
+                      {errors.startDate}
+                    </p>
+                  )}
+                </div>
+
+                {/* Harvesting Date */}
+                <div>
+                  <label className="text-sm font-semibold text-gray-600 mb-2 block">
+                    Harvesting Date
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="date"
+                      name="harvestingDate"
+                      value={formData.harvestingDate}
+                      readOnly
+                      className="py-3 w-full rounded-lg border border-gray-200 bg-gray-50 cursor-not-allowed"
+                    />
+                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                      <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Employees */}
+                <div>
+                  <label className="text-sm font-semibold text-gray-600 mb-2 block">
+                    Employees <span className="text-red-500 ml-1">*</span>
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                      </svg>
+                    </div>
+                    <input
+                      type="number"
+                      name="employees"
+                      value={formData.employees}
+                      onChange={handleChange}
+                      min="1"
+                      className={`pl-10 pr-4 py-3 w-full rounded-lg border ${
+                        errors.employees ? 'border-red-500' : 'border-gray-200'
+                      } focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all`}
+                      placeholder="Number of employees"
+                    />
+                  </div>
+                  {errors.employees && (
+                    <p className="text-red-500 text-sm mt-1 flex items-center">
+                      <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
+                      {errors.employees}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-4 pt-8 border-t border-emerald-100">
+                <button
+                  type="button"
+                  onClick={() => navigate(-1)}
+                  className="px-6 py-3 border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors font-medium"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium transition-all transform hover:-translate-y-0.5 shadow-md hover:shadow-emerald-200"
+                >
+                  Create Plantation
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     </div>
