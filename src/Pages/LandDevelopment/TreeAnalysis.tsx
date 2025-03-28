@@ -1,5 +1,5 @@
 import React, { useRef, useMemo } from 'react';
-import { Point, TreeSpacing, AnalysisMetrics } from '../types/land';
+import { Point, TreeSpacing, AnalysisMetrics } from '../../types/land';
 import { TreeVisualization } from './TreeVisualization';
 import { BarChart, Activity, Droplets, TreeDeciduous, Download, Image as ImageIcon, FileText } from 'lucide-react';
 import html2canvas from 'html2canvas';
