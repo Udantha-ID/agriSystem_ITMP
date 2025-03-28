@@ -6,6 +6,11 @@ import Inventory from './Pages/Inventory.jsx'
 import About from './Pages/About.jsx'
 import Contact from './Pages/Contact.jsx'
 import PlantationDashboard from './Pages/PlantationManagement/PlantationDashboard.jsx'
+import PlantationManagement from './Pages/PlantationManagement/PlantationManagement.jsx'
+import FarmResourcePlanning from './Pages/PlantationManagement/FarmResourcecePlanning.jsx'
+import PlanningForm from './Pages/PlantationManagement/PlanningForm.jsx'
+import MonitoringReports from './Pages/PlantationManagement/MonitoringReports.jsx'
+import AddPlantation from './Pages/PlantationManagement/AddPlantation.jsx'
 // import LandDevelopment from './Pages/LandDevelopment/LandBoundary.jsx'
 
 function App() {
@@ -15,6 +20,11 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/marketplace" element={<Marketplace />} />
         <Route path="/pmdashboard" element={<PlantationDashboard />} />
+        <Route path="/plantations" element={<PlantationManagement />} />
+        <Route path="/resources" element={<FarmResourcePlanning/>} />
+        <Route path="/planning/:projectId" element={<PlanningForm />} />
+        <Route path="/reports" element={<MonitoringReports/>} />
+        <Route path="/addplant" element={<AddPlantation />} />
         <Route path="/inventory" element={<Inventory />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />

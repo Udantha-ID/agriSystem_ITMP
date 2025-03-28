@@ -10,8 +10,8 @@ function PlantationSidebar() {
       </h2>
       <nav className="flex flex-col mt-4">
         <Link
-          to="/"
-          className="py-4 px-4 hover:bg-amber-800 transition-all"
+          to="/pmdashboard"
+          className="py-4 px-4 hover:bg-gray-700 transition-all"
         >
           Dashboard Overview
         </Link>
