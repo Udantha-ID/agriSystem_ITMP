@@ -1,36 +1,27 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Stage, Layer, Circle, Line, Text, Group } from 'react-konva';
-import { Point, TreeSpacing, TerrainData, TreeData } from '../types/land';
 
-interface TreeVisualizationProps {
-  boundary: Point[];
-  spacing: TreeSpacing;
-  scale: number;
-  width: number;
-  height: number;
-}
 
-export const TreeVisualization: React.FC<TreeVisualizationProps> = ({
+export const TreeVisualization = ({
   boundary,
   spacing,
   scale,
   width,
   height,
 }) => {
-  const [showDetails, setShowDetails] = useState<boolean>(false);
-  const [selectedTree, setSelectedTree] = useState<TreeData | null>(null);
-  const [simulationYear, setSimulationYear] = useState<number>(0);
+  const [showDetails, setShowDetails] = useState(false);
+  const [selectedTree, setSelectedTree] = useState(null);
+  const [simulationYear, setSimulationYear] = useState(0);
 
-  const calculateTerrainData = (point: Point): TerrainData => {
-    // Simulate terrain data based on position
+  const calculateTerrainData = (point) => {
     return {
       elevation: Math.sin(point.x / 50) * Math.cos(point.y / 50) * 10 + 100,
-      soilType: ['clay', 'loam', 'sandy', 'silt'][Math.floor((point.x + point.y) % 4)] as TerrainData['soilType'],
+      soilType: ['clay', 'loam', 'sandy', 'silt'][Math.floor((point.x + point.y) % 4)],
       sunExposure: Math.min(1, Math.max(0, Math.sin(point.x / 100) * 0.5 + 0.5))
     };
   };
 
-  const calculateTreeData = (point: Point): TreeData => {
+  const calculateTreeData = (point) => {
     const terrain = calculateTerrainData(point);
     const soilFactors = {
       clay: 0.7,
@@ -48,7 +39,7 @@ export const TreeVisualization: React.FC<TreeVisualizationProps> = ({
     };
   };
 
-  const calculateTreePositions = (): TreeData[] => {
+  const calculateTreePositions = () => {
     if (boundary.length < 3) return [];
 
     const minX = Math.min(...boundary.map(p => p.x));
@@ -59,7 +50,7 @@ export const TreeVisualization: React.FC<TreeVisualizationProps> = ({
     const pixelSpacingH = spacing.horizontal / scale;
     const pixelSpacingV = spacing.vertical / scale;
 
-    const trees: TreeData[] = [];
+    const trees = [];
     
     for (let x = minX; x <= maxX; x += pixelSpacingH) {
       for (let y = minY; y <= maxY; y += pixelSpacingV) {
@@ -72,7 +63,7 @@ export const TreeVisualization: React.FC<TreeVisualizationProps> = ({
     return trees;
   };
 
-  const isPointInPolygon = (point: Point, polygon: Point[]): boolean => {
+  const isPointInPolygon = (point, polygon) => {
     let inside = false;
     for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
       const intersect = ((polygon[i].y > point.y) !== (polygon[j].y > point.y))
@@ -85,20 +76,13 @@ export const TreeVisualization: React.FC<TreeVisualizationProps> = ({
 
   const treePositions = calculateTreePositions();
 
-  // useEffect(() => {
-  //   const timer = setInterval(() => {
-  //     setSimulationYear(year => (year + 1) % 10);
-  //   }, 2000);
-  //   return () => clearInterval(timer);
-  // }, []);
-
-  const getTreeSize = (tree: TreeData) => {
+  const getTreeSize = (tree) => {
     const age = simulationYear;
     const growth = Math.min(1, age / tree.maturityAge);
     return 3 + (growth * 4);
   };
 
-  const getTreeColor = (tree: TreeData) => {
+  const getTreeColor = (tree) => {
     const healthFactor = tree.soilSuitability * 0.7 + 0.3;
     const baseColor = 120; // Green hue
     return `hsl(${baseColor}, ${Math.round(healthFactor * 100)}%, ${Math.round(healthFactor * 40)}%)`;
