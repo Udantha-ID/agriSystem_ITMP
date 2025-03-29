@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 function PlantationSidebar() {
   return (
-    <div className="h-screen w-60 bg-green-600 text-white fixed">
+    <div className="h-screen w-60 bg-green-500 text-white fixed">
       <h2 className="text-xl font-bold p-4 border-b border-green-700">
       Plantation Dashboard
       </h2>

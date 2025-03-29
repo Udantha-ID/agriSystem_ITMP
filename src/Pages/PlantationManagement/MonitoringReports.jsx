@@ -92,7 +92,7 @@ export default function MonitoringReports() {
                       </div>
                       <div>
                         <div className="flex justify-between mb-1">
-                          <span>Nitrogen Content</span>
+                          <span>Nutrient Level</span>
                           <span className="text-amber-600">{project.soil.nitrogen}</span>
                         </div>
                         <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
