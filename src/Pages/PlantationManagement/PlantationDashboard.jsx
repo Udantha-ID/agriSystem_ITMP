@@ -46,7 +46,7 @@ function PlantationDashboard() {
   return (
     <div className="flex">
       <PlantationSidebar />
-      <div className="ml-60 p-8 min-h-screen w-full bg-gradient-to-br from-gray-50 to-green-50">
+      <div className="ml-60 p-8 min-h-screen w-full bg-gradient-to-br from-green-50 to-cyan-50">
         <div className="max-w-6xl mx-auto">
           {/* Header Section */}
           <div className="flex items-center justify-between mb-8">

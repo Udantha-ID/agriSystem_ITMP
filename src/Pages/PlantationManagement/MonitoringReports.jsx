@@ -21,7 +21,7 @@ const projects = [
 
 export default function MonitoringReports() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-cyan-50">
       <PlantationSidebar/>
       <div className="md:pl-64 p-8">
         <div className="max-w-7xl mx-auto">

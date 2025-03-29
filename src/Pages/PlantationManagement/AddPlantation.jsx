@@ -5,27 +5,19 @@ import PlantationSidebar from '../../Components/PlantationSidebar';
 import { format, addMonths } from 'date-fns';
 
 const growthPeriods = {
-  coconut: 12,
-  mango: 6,
-  rambutan: 8,
-  pineapple: 4,
+  coconut: 120,
+  mango: 12,
+  rambutan: 24,
+  pineapple: 12,
   tea: 9,
 };
-
-const landAreaOptions = [
-  '1 core',
-  '2 cores',
-  '5 cores',
-  '10 cores',
-  '20 cores',
-];
 
 export default function AddPlantation() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     projectName: '',
     type: '',
-    landArea: '',
+    landArea: '1 core', 
     startDate: '',
     harvestingDate: '',
     location: '',
@@ -61,7 +53,6 @@ export default function AddPlantation() {
     const errors = {};
     if (!formData.projectName.trim()) errors.projectName = 'Project name is required';
     if (!formData.type) errors.type = 'Type is required';
-    if (!formData.landArea) errors.landArea = 'Land area is required';
     if (!formData.startDate) errors.startDate = 'Start date is required';
     if (!formData.location.trim()) errors.location = 'Location is required';
     if (!formData.employees || formData.employees < 1) errors.employees = 'Invalid employee count';
@@ -163,38 +154,23 @@ export default function AddPlantation() {
                 </div>
 
                 {/* Land Area */}
-                <div>
+                <div className="relative">
                   <label className="text-sm font-semibold text-gray-600 mb-2 block">
                     Land Area <span className="text-red-500 ml-1">*</span>
                   </label>
                   <div className="relative">
-                    <select
-                      name="landArea"
-                      value={formData.landArea}
-                      onChange={handleChange}
-                      className={`appearance-none pr-10 py-3 w-full rounded-lg border ${
-                        errors.landArea ? 'border-red-500' : 'border-gray-200'
-                      } focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all`}
-                    >
-                      <option value="">Select Land Area</option>
-                      {landAreaOptions.map(area => (
-                        <option key={area} value={area}>{area}</option>
-                      ))}
-                    </select>
-                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                     </div>
+                    <input
+                      type="text"
+                      value="1 core"
+                      readOnly
+                      className="pl-10 pr-4 py-3 w-full rounded-lg border border-gray-200 bg-gray-100 cursor-not-allowed"
+                    />
                   </div>
-                  {errors.landArea && (
-                    <p className="text-red-500 text-sm mt-1 flex items-center">
-                      <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                      </svg>
-                      {errors.landArea}
-                    </p>
-                  )}
                 </div>
 
                 {/* Location */}

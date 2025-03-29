@@ -22,8 +22,8 @@ function PlantationManagement() {
       projectname: "Project1",
       type: "Coconut",
       TotalLandArea: "2 cores",
-      startdate: "2023-01-15",
-      harvestingdate: "2023-01-15",
+      startdate: "2025-10-15",
+      harvestingdate: "2035-01-15",
       location: "Field A",
       employee: 5,
     },
@@ -32,8 +32,8 @@ function PlantationManagement() {
       projectname: "Project2",
       type: "Mango",
       TotalLandArea: "1 cores",
-      startdate: "2023-03-22",
-      harvestingdate: "2023-01-15",
+      startdate: "2025-04-22",
+      harvestingdate: "2026-04-15",
       location: "Field B",
       employee: 3,
     },
@@ -102,7 +102,7 @@ function PlantationManagement() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-cyan-50">
       <PlantationSidebar />
       <div className="md:pl-64 p-6">
         <div className="max-w-7xl mx-auto">
@@ -150,7 +150,7 @@ function PlantationManagement() {
                     ].map((header) => (
                       <th
                         key={header}
-                        className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider"
+                        className="px-6 py-4 text-center text-sm font-semibold text-gray-700 uppercase tracking-wider"
                       >
                         {header}
                       </th>
@@ -160,7 +160,7 @@ function PlantationManagement() {
                 <tbody className="bg-white divide-y divide-gray-200">
                   {plantations.map((plantation) => (
                     <tr key={plantation.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 text-center">
                         {plantation.projectname}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
@@ -196,6 +196,9 @@ function PlantationManagement() {
                           </button>
                           <button className="text-red-600 hover:text-red-800 p-2 rounded-lg hover:bg-red-50">
                             <TrashIcon className="h-5 w-5" />
+                          </button>
+                          <button className="text-blue-600 hover:text-blue-800 p-2 rounded-lg hover:bg-blue-50">
+                            <CheckCircleIcon className="h-5 w-5" />
                           </button>
                           <button 
                             onClick={() => generateReport(plantation)}
