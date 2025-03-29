@@ -15,6 +15,7 @@ import UpdatePlantation from './Pages/PlantationManagement/UpdatePlantation.jsx'
 // import LandDevelopment from './Pages/LandDevelopment/LandBoundary.jsx'
 
 import LandBoundary from './Pages/LandingDevelopment/LandBoundary.jsx';
+import PlantationManagementAbout from './Pages/PlantationManagement/PlantationmanagementAbout.jsx'
 
 
 function App() {
@@ -30,6 +31,7 @@ function App() {
         <Route path="/reports" element={<MonitoringReports/>} />
         <Route path="/addplant" element={<AddPlantation />} />
         <Route path="/updateplant/:plantId" element={<UpdatePlantation />} />
+        <Route path="/plantabout" element={<PlantationManagementAbout />} />
         <Route path="/inventory" element={<Inventory />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
