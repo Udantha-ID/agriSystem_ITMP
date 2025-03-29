@@ -11,6 +11,7 @@ import FarmResourcePlanning from './Pages/PlantationManagement/FarmResourcecePla
 import PlanningForm from './Pages/PlantationManagement/PlanningForm.jsx'
 import MonitoringReports from './Pages/PlantationManagement/MonitoringReports.jsx'
 import AddPlantation from './Pages/PlantationManagement/AddPlantation.jsx'
+import UpdatePlantation from './Pages/PlantationManagement/UpdatePlantation.jsx'
 // import LandDevelopment from './Pages/LandDevelopment/LandBoundary.jsx'
 
 import LandBoundary from './Pages/LandingDevelopment/LandBoundary.jsx';
@@ -28,6 +29,7 @@ function App() {
         <Route path="/planning/:projectId" element={<PlanningForm />} />
         <Route path="/reports" element={<MonitoringReports/>} />
         <Route path="/addplant" element={<AddPlantation />} />
+        <Route path="/updateplant/:plantId" element={<UpdatePlantation />} />
         <Route path="/inventory" element={<Inventory />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />

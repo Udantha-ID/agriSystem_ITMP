@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { 
+import {
   PlusIcon,
   MagnifyingGlassIcon,
   PencilSquareIcon,
@@ -9,7 +9,7 @@ import {
   MapPinIcon,
   UserGroupIcon,
   Square3Stack3DIcon,
-  DocumentArrowDownIcon
+  DocumentArrowDownIcon,
 } from "@heroicons/react/24/outline";
 import PlantationSidebar from "../../Components/PlantationSidebar";
 import jsPDF from "jspdf";
@@ -44,24 +44,24 @@ function PlantationManagement() {
   const generateReport = (plantation) => {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
-    
+
     // Styling
-    const mainColor = '#047857';
-    const secondaryColor = '#064e3b';
-    
+    const mainColor = "#047857";
+    const secondaryColor = "#064e3b";
+
     // Header
     doc.setFontSize(22);
     doc.setTextColor(mainColor);
     doc.setFont("helvetica", "bold");
     doc.text(plantation.projectname + " Report", 20, 20);
-    
+
     // Company Info
     doc.setFontSize(10);
     doc.setTextColor(100);
     doc.setFont("helvetica", "normal");
     doc.text("Green Plantations Co.", 20, 30);
     doc.text("Report Date: " + new Date().toLocaleDateString(), 20, 35);
-    
+
     // Line separator
     doc.setDrawColor(209, 250, 229);
     doc.setLineWidth(0.5);
@@ -71,7 +71,7 @@ function PlantationManagement() {
     doc.setFontSize(12);
     doc.setTextColor(40);
     let yPosition = 50;
-    
+
     const details = [
       { label: "Project Type:", value: plantation.type },
       { label: "Total Land Area:", value: plantation.TotalLandArea },
@@ -92,13 +92,19 @@ function PlantationManagement() {
     // Footer
     doc.setFontSize(10);
     doc.setTextColor(100);
-    doc.text("© 2024 Green Plantations Co. - Confidential Report", 
-      pageWidth/2, doc.internal.pageSize.getHeight() - 10, 
+    doc.text(
+      "© 2024 Green Plantations Co. - Confidential Report",
+      pageWidth / 2,
+      doc.internal.pageSize.getHeight() - 10,
       { align: "center" }
     );
 
     // Save PDF
-    doc.save(`${plantation.projectname}_Report_${new Date().toISOString().split('T')[0]}.pdf`);
+    doc.save(
+      `${plantation.projectname}_Report_${
+        new Date().toISOString().split("T")[0]
+      }.pdf`
+    );
   };
 
   return (
@@ -109,8 +115,12 @@ function PlantationManagement() {
           {/* Header Section */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 ml-100 mt-3">Plantation Management</h1>
-              <p className="mt-2 text-gray-600 ml-101">Manage your plantation projects and activities</p>
+              <h1 className="text-3xl font-bold text-gray-900 ml-100 mt-3">
+                Plantation Management
+              </h1>
+              <p className="mt-2 text-gray-600 ml-101">
+                Manage your plantation projects and activities
+              </p>
             </div>
             <button
               onClick={() => navigate("/addplant")}
@@ -145,8 +155,14 @@ function PlantationManagement() {
                 <thead className="bg-gray-50">
                   <tr>
                     {[
-                      'Project Name', 'Type', 'Land Area', 'Start Date',
-                      'Harvest Date', 'Location', 'Employees', 'Actions'
+                      "Project Name",
+                      "Type",
+                      "Land Area",
+                      "Start Date",
+                      "Harvest Date",
+                      "Location",
+                      "Employees",
+                      "Actions",
                     ].map((header) => (
                       <th
                         key={header}
@@ -159,7 +175,10 @@ function PlantationManagement() {
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {plantations.map((plantation) => (
-                    <tr key={plantation.id} className="hover:bg-gray-50 transition-colors">
+                    <tr
+                      key={plantation.id}
+                      className="hover:bg-gray-50 transition-colors"
+                    >
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 text-center">
                         {plantation.projectname}
                       </td>
@@ -191,7 +210,12 @@ function PlantationManagement() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
                         <div className="flex items-center space-x-4">
-                          <button className="text-emerald-600 hover:text-emerald-800 p-2 rounded-lg hover:bg-emerald-50">
+                          <button
+                            onClick={() =>
+                              navigate(`/updateplant/${plantation.id}`)
+                            }
+                            className="text-emerald-600 hover:text-emerald-800 p-2 rounded-lg hover:bg-emerald-50"
+                          >
                             <PencilSquareIcon className="h-5 w-5" />
                           </button>
                           <button className="text-red-600 hover:text-red-800 p-2 rounded-lg hover:bg-red-50">
@@ -200,7 +224,7 @@ function PlantationManagement() {
                           <button className="text-blue-600 hover:text-blue-800 p-2 rounded-lg hover:bg-blue-50">
                             <CheckCircleIcon className="h-5 w-5" />
                           </button>
-                          <button 
+                          <button
                             onClick={() => generateReport(plantation)}
                             className="text-purple-600 hover:text-purple-800 p-2 rounded-lg hover:bg-purple-50"
                           >
@@ -221,8 +245,12 @@ function PlantationManagement() {
               <div className="text-gray-400 mb-4">
                 <Square3Stack3DIcon className="h-12 w-12 mx-auto" />
               </div>
-              <h3 className="text-gray-900 font-medium">No plantations found</h3>
-              <p className="text-gray-500 mt-1">Create your first plantation project</p>
+              <h3 className="text-gray-900 font-medium">
+                No plantations found
+              </h3>
+              <p className="text-gray-500 mt-1">
+                Create your first plantation project
+              </p>
             </div>
           )}
         </div>
