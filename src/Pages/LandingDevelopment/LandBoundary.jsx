@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { MapPin, Trees } from 'lucide-react';
 import { LandCanvas } from './LandCanvas';
 import { TreeAnalysis } from './TreeAnalysis';
+import Navbar from '../../Components/Navbar';
 
 function LandBoundary() {
   const [boundary, setBoundary] = useState([]);
@@ -29,6 +30,7 @@ function LandBoundary() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* <Navbar/> */}
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
