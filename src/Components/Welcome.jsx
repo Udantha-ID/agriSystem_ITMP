@@ -1,20 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { 
-  ArrowRight,
-  ChevronRight, 
-  CloudRain, 
-  Leaf, 
-  ShoppingCart, 
-  CalendarCheck,
-  Sprout, 
-  Cloud, 
-  Store, 
-  Calendar, 
-  Droplets, 
-  BarChart3, 
-  Tractor
+  ArrowRight, Sprout, Cloud, Store, Calendar, 
+  Droplets, BarChart3, Tractor 
 } from "lucide-react";
+import { Link } from "react-router-dom"; 
+
 import image1 from "../Images/12.jpeg";
 import image2 from "../Images/11.jpg";
 import image3 from "../Images/10.jpg";
@@ -22,7 +13,7 @@ import image4 from "../Images/13.jpg";
 
 const images = [image1, image2, image3, image4];
 
-// New modernized features
+// Features List
 const features = [
   { 
     title: "Smart Farming",
@@ -30,7 +21,8 @@ const features = [
     icon: <Sprout className="w-8 h-8 text-emerald-600" />, 
     bgGradient: "bg-gradient-to-br from-emerald-50 to-green-100", 
     accentColor: "emerald",
-    secondaryIcon: <Droplets className="w-5 h-5 text-emerald-500" />
+    secondaryIcon: <Droplets className="w-5 h-5 text-emerald-500"/>,
+    path: "/smart"
   },
   { 
     title: "Climate Intelligence", 
@@ -38,7 +30,8 @@ const features = [
     icon: <Cloud className="w-8 h-8 text-sky-600" />, 
     bgGradient: "bg-gradient-to-br from-sky-50 to-blue-100",
     accentColor: "sky",
-    secondaryIcon: <BarChart3 className="w-5 h-5 text-sky-500" />
+    secondaryIcon: <BarChart3 className="w-5 h-5 text-sky-500" />,
+    path: "/climate-intelligence" // ✅ Added Path
   },
   { 
     title: "Marketplace Connect", 
@@ -46,7 +39,8 @@ const features = [
     icon: <Store className="w-8 h-8 text-amber-600" />, 
     bgGradient: "bg-gradient-to-br from-amber-50 to-yellow-100",
     accentColor: "amber",
-    secondaryIcon: <Tractor className="w-5 h-5 text-amber-500" />
+    secondaryIcon: <Tractor className="w-5 h-5 text-amber-500" />,
+    path: "/marketplace-connect" // ✅ Added Path
   },
   { 
     title: "Crop Management", 
@@ -54,7 +48,8 @@ const features = [
     icon: <Calendar className="w-8 h-8 text-violet-600" />, 
     bgGradient: "bg-gradient-to-br from-violet-50 to-purple-100",
     accentColor: "violet",
-    secondaryIcon: <Calendar className="w-5 h-5 text-violet-500" />
+    secondaryIcon: <Calendar className="w-5 h-5 text-violet-500" />,
+    path: "/plantabout"
   }
 ];
 
@@ -74,7 +69,7 @@ const Welcome = () => {
 
   return (
     <div>
-      {/* Original Hero Section - Unchanged */}
+      {/* 🌱 Hero Section */}
       <div className="relative mt-0 h-[600px] overflow-hidden">
         {images.map((img, index) => (
           <motion.img
@@ -100,7 +95,7 @@ const Welcome = () => {
         </div>
       </div>
 
-      {/* Modernized Features Section */}
+      {/* 🌍 Smart Solutions Section */}
       <section id="smart-solutions" className="max-w-7xl mx-auto px-6 py-20 relative">
         {/* Background Pattern */}
         <div className="absolute inset-0 overflow-hidden opacity-10 pointer-events-none">
@@ -122,7 +117,7 @@ const Welcome = () => {
           </p>
         </div>
 
-        {/* Features Grid */}
+        {/* 🚀 Features Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {features.map((feature, index) => (
             <motion.div
@@ -154,11 +149,13 @@ const Welcome = () => {
                 </span>
               </div>
               
-              {/* Button */}
-              <button className={`mt-2 text-${feature.accentColor}-600 font-medium flex items-center gap-2 hover:gap-3 transition-all`}>
+              <Link 
+                to={feature.path} 
+                className={`mt-2 text-${feature.accentColor}-600 font-medium flex items-center gap-2 hover:gap-3 transition-all`}
+              >
                 Learn more
                 <ArrowRight className="w-4 h-4" />
-              </button>
+              </Link>
             </motion.div>
           ))}
         </div>

@@ -21,6 +21,7 @@ import PlanningForm from './Pages/PlantationManagement/PlanningForm.jsx'
 import MonitoringReports from './Pages/PlantationManagement/MonitoringReports.jsx'
 import AddPlantation from './Pages/PlantationManagement/AddPlantation.jsx'
 import UpdatePlantation from './Pages/PlantationManagement/UpdatePlantation.jsx'
+import ScrollToTop from './Components/ScrollToTop.js'
 
 // import LandDevelopment from './Pages/LandDevelopment/LandBoundary.jsx'
 
@@ -30,7 +31,8 @@ import PlantationManagementAbout from './Pages/PlantationManagement/Plantationma
 
 function App() {
   return (
-    <BrowserRouter> {/* Wrap the whole app with BrowserRouter */}
+    <BrowserRouter>
+    <ScrollToTop/>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/marketplace" element={<Marketplace />} />
