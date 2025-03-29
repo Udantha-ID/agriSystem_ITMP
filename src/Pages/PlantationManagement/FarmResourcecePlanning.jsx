@@ -11,7 +11,7 @@ function FarmResourcePlanning() {
       name: 'Project 1',
       planning: {
         soilQuality: 'High',
-        harvestingSchedule: '2023-09-15',
+        harvestingSchedule: '2025-09-15',
         fertilizerType: 'Organic',
         pestControl: 'Biological'
       }
@@ -26,8 +26,8 @@ function FarmResourcePlanning() {
   const navigate = useNavigate();
 
   const reminders = [
-    { id: 1, title: 'Fertilization Schedule', date: '2023-08-15', status: 'pending' },
-    { id: 2, title: 'Pest Control Check', date: '2023-08-20', status: 'completed' },
+    { id: 1, title: 'Fertilization Schedule', date: '2025-08-15', status: 'pending' },
+    { id: 2, title: 'Pest Control Check', date: '2025-08-20', status: 'completed' },
   ];
 
   const handleDeleteProject = (projectId) => {

@@ -1,18 +1,18 @@
 // Pages/MonitoringReports.jsx
-import { ChartBarIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
+import { ChartBarIcon } from '@heroicons/react/24/outline';
 import PlantationSidebar from '../../Components/PlantationSidebar';
 
 const projects = [
   {
     id: 1,
-    name: "Palm Oil Plantation",
+    name: "Project 1",
     yield: "1,240 kg/ha",
     soil: { pH: 6.5, nitrogen: "Medium" },
     status: "active"
   },
   {
     id: 2,
-    name: "Cocoa Farm",
+    name: "Project 2",
     yield: "890 kg/ha", 
     soil: { pH: 5.8, nitrogen: "Low" },
     status: "monitoring"
@@ -30,12 +30,12 @@ export default function MonitoringReports() {
             <h1 className="text-3xl font-bold text-gray-800 ml-120 mt-10">Project Monitoring</h1>
             <div className="flex items-center space-x-4">
               <div className="relative">
-                <select className="bg-white pl-4 pr-8 py-2 rounded-lg shadow border border-gray-200 text-gray-600">
+                <select className="bg-white pl-5 pr-3 py-2 rounded-lg shadow border border-gray-200 text-gray-600">
                   <option>All Projects</option>
                   <option>Active</option>
                   <option>Completed</option>
                 </select>
-                <ChevronDownIcon className="h-4 w-4 text-gray-400 absolute right-2 top-3" />
+                
               </div>
             </div>
           </div>

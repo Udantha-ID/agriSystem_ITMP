@@ -8,9 +8,11 @@ import {
   CheckCircleIcon,
   MapPinIcon,
   UserGroupIcon,
-  Square3Stack3DIcon
+  Square3Stack3DIcon,
+  DocumentArrowDownIcon
 } from "@heroicons/react/24/outline";
 import PlantationSidebar from "../../Components/PlantationSidebar";
+import jsPDF from "jspdf";
 
 function PlantationManagement() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -38,6 +40,66 @@ function PlantationManagement() {
   ]);
 
   const navigate = useNavigate();
+
+  const generateReport = (plantation) => {
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    
+    // Styling
+    const mainColor = '#047857';
+    const secondaryColor = '#064e3b';
+    
+    // Header
+    doc.setFontSize(22);
+    doc.setTextColor(mainColor);
+    doc.setFont("helvetica", "bold");
+    doc.text(plantation.projectname + " Report", 20, 20);
+    
+    // Company Info
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.setFont("helvetica", "normal");
+    doc.text("Green Plantations Co.", 20, 30);
+    doc.text("Report Date: " + new Date().toLocaleDateString(), 20, 35);
+    
+    // Line separator
+    doc.setDrawColor(209, 250, 229);
+    doc.setLineWidth(0.5);
+    doc.line(20, 40, pageWidth - 20, 40);
+
+    // Plantation Details
+    doc.setFontSize(12);
+    doc.setTextColor(40);
+    let yPosition = 50;
+    
+    const details = [
+      { label: "Project Type:", value: plantation.type },
+      { label: "Total Land Area:", value: plantation.TotalLandArea },
+      { label: "Start Date:", value: plantation.startdate },
+      { label: "Harvest Date:", value: plantation.harvestingdate },
+      { label: "Location:", value: plantation.location },
+      { label: "Employees Assigned:", value: plantation.employee },
+    ];
+
+    details.forEach(({ label, value }) => {
+      doc.setFont("helvetica", "bold");
+      doc.text(label, 20, yPosition);
+      doc.setFont("helvetica", "normal");
+      doc.text(value.toString(), 70, yPosition);
+      yPosition += 8;
+    });
+
+    // Footer
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text("© 2024 Green Plantations Co. - Confidential Report", 
+      pageWidth/2, doc.internal.pageSize.getHeight() - 10, 
+      { align: "center" }
+    );
+
+    // Save PDF
+    doc.save(`${plantation.projectname}_Report_${new Date().toISOString().split('T')[0]}.pdf`);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -135,8 +197,11 @@ function PlantationManagement() {
                           <button className="text-red-600 hover:text-red-800 p-2 rounded-lg hover:bg-red-50">
                             <TrashIcon className="h-5 w-5" />
                           </button>
-                          <button className="text-blue-600 hover:text-blue-800 p-2 rounded-lg hover:bg-blue-50">
-                            <CheckCircleIcon className="h-5 w-5" />
+                          <button 
+                            onClick={() => generateReport(plantation)}
+                            className="text-purple-600 hover:text-purple-800 p-2 rounded-lg hover:bg-purple-50"
+                          >
+                            <DocumentArrowDownIcon className="h-5 w-5" />
                           </button>
                         </div>
                       </td>

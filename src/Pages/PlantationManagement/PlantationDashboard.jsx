@@ -253,17 +253,7 @@ function PlantationDashboard() {
                     </p>
                   </div>
                   <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-2">
-                      <div className="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-emerald-500 transition-all duration-500"
-                          style={{ width: `${Math.random() * 40 + 60}%` }}
-                        />
-                      </div>
-                      <span className="text-sm font-medium text-emerald-600">
-                        {Math.floor(Math.random() * 40 + 60)}%
-                      </span>
-                    </div>
+                    
                     <div className="flex items-center justify-center w-8 h-8 bg-emerald-100 rounded-full group-hover:bg-emerald-200">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
