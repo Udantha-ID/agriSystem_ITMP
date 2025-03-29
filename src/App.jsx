@@ -5,7 +5,7 @@ import Marketplace from './Pages/MarketPlace.jsx'
 import Inventory from './Pages/Inventory.jsx'
 import About from './Pages/About.jsx'
 import Contact from './Pages/Contact.jsx'
-import LandBoundary from './Pages/LandDevelopment/LandBoundary.jsx';
+import LandBoundary from './Pages/LandingDevelopment/LandBoundary.jsx';
 
 function App() {
   return (
