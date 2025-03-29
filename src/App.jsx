@@ -5,7 +5,6 @@ import Marketplace from './Pages/MarketPlace/MarketPlace.jsx'
 import Inventory from './Pages/MarketPlace/Inventory.jsx'
 import About from './Pages/About.jsx'
 import Contact from './Pages/Contact.jsx'
-
 import UserRegister from "./pages/SmartFarm/UserRegister.jsx";
 import UserLogin from "./pages/SmartFarm/UserLogin.jsx";
 import UserRegPayment from "./pages/SmartFarm/UserRegPayment.jsx";
@@ -22,6 +21,8 @@ import PlanningForm from './Pages/PlantationManagement/PlanningForm.jsx'
 import MonitoringReports from './Pages/PlantationManagement/MonitoringReports.jsx'
 import AddPlantation from './Pages/PlantationManagement/AddPlantation.jsx'
 import UpdatePlantation from './Pages/PlantationManagement/UpdatePlantation.jsx'
+import ScrollToTop from './Components/ScrollToTop.js'
+
 // import LandDevelopment from './Pages/LandDevelopment/LandBoundary.jsx'
 
 import LandBoundary from './Pages/LandingDevelopment/LandBoundary.jsx';
@@ -30,7 +31,8 @@ import PlantationManagementAbout from './Pages/PlantationManagement/Plantationma
 
 function App() {
   return (
-    <BrowserRouter> {/* Wrap the whole app with BrowserRouter */}
+    <BrowserRouter>
+    <ScrollToTop/>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/marketplace" element={<Marketplace />} />
@@ -56,8 +58,8 @@ function App() {
         <Route path="/drone" element={<Drone />} />
         <Route path="/irrigation" element={<Irrigation />} />
         <Route path="/dashboard" element={<UserDashboard />} />
-
         <Route path="/landboundary" element={<LandBoundary />} />
+
       </Routes>
     </BrowserRouter>
   )
