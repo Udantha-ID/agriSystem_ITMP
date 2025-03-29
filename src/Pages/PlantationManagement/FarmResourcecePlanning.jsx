@@ -40,8 +40,7 @@ function FarmResourcePlanning() {
       <div className="md:pl-64 p-6">
         <div className="max-w-7xl mx-auto">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-800 mb-2 ml-100 mt-15">Farm Resource Planning</h1>
-            <div className="h-1 w-70 bg-green-500 rounded-full ml-106 mb-15"></div>
+            <h1 className="text-3xl font-bold text-gray-800 mb-20 ml-100 mt-15">Farm Resource Planning</h1>
           </div>
           
           <div className="grid md:grid-cols-2 gap-8">
