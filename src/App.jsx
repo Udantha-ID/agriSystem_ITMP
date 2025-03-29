@@ -1,8 +1,8 @@
 import React from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import Home from './Pages/Home.jsx'
-import Marketplace from './Pages/MarketPlace.jsx'
-import Inventory from './Pages/Inventory.jsx'
+import Marketplace from './Pages/MarketPlace/MarketPlace.jsx'
+import Inventory from './Pages/MarketPlace/Inventory.jsx'
 import About from './Pages/About.jsx'
 import Contact from './Pages/Contact.jsx'
 import PlantationDashboard from './Pages/PlantationManagement/PlantationDashboard.jsx'
@@ -12,6 +12,9 @@ import PlanningForm from './Pages/PlantationManagement/PlanningForm.jsx'
 import MonitoringReports from './Pages/PlantationManagement/MonitoringReports.jsx'
 import AddPlantation from './Pages/PlantationManagement/AddPlantation.jsx'
 // import LandDevelopment from './Pages/LandDevelopment/LandBoundary.jsx'
+
+import LandBoundary from './Pages/LandingDevelopment/LandBoundary.jsx';
+
 
 function App() {
   return (
@@ -28,6 +31,7 @@ function App() {
         <Route path="/inventory" element={<Inventory />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/landboundary" element={<LandBoundary />} />
       </Routes>
     </BrowserRouter>
   )
