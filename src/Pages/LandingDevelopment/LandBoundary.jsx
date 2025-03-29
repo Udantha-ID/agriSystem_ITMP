@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { MapPin, Trees } from 'lucide-react';
-import { LandCanvas } from '../../Pages/LandDevelopment/LandCanvas';
-import { TreeAnalysis } from '../../Pages/LandDevelopment/TreeAnalysis';
+import { LandCanvas } from './LandCanvas';
+import { TreeAnalysis } from './TreeAnalysis';
 
 function LandBoundary() {
   const [boundary, setBoundary] = useState([]);
