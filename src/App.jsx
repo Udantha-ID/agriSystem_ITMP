@@ -1,8 +1,8 @@
 import React from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import Home from './Pages/Home.jsx'
-import Marketplace from './Pages/MarketPlace.jsx'
-import Inventory from './Pages/Inventory.jsx'
+import Marketplace from './Pages/MarketPlace/MarketPlace.jsx'
+import Inventory from './Pages/MarketPlace/Inventory.jsx'
 import About from './Pages/About.jsx'
 import Contact from './Pages/Contact.jsx'
 import LandBoundary from './Pages/LandingDevelopment/LandBoundary.jsx';

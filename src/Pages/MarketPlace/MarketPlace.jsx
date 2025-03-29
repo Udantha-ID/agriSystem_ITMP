@@ -9,7 +9,7 @@ import {
   PlusIcon, MinusIcon, TrashIcon, HeartIcon as HeartSolidIcon,
   CheckCircleIcon, ChevronDownIcon
 } from '@heroicons/react/24/solid';
-import Navbar from '../Components/Navbar';
+import Navbar from '../../Components/Navbar';
 
 const Marketplace = () => {
   const navigate = useNavigate(); 
