@@ -17,13 +17,16 @@ import {
   ArrowsUpDownIcon,
   ShoppingCartIcon,
   ArrowPathIcon,
-  DocumentArrowDownIcon
+  DocumentArrowDownIcon,
+  ArrowLeftOnRectangleIcon
 } from '@heroicons/react/24/outline';
 import { CheckCircleIcon } from '@heroicons/react/24/solid';
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
+import { useNavigate } from 'react-router-dom';
 
 const Inventory = () => {
+  const navigate = useNavigate();
   const [inventory, setInventory] = useState([
     { id: 1, name: 'Organic Coconut', category: 'coconuts', price: 750, stock: 100, threshold: 20, lastUpdated: '2025-03-15', image: null, sales: 45, supplier: 'Tropical Imports', location: 'Warehouse A', quantityType: 'kg' },
     { id: 2, name: 'Coconut Oil', category: 'oil', price: 3500, stock: 50, threshold: 10, lastUpdated: '2025-03-18', image: null, sales: 78, supplier: 'Natural Oils Co.', location: 'Warehouse B', quantityType: 'liter' },
@@ -81,6 +84,13 @@ const Inventory = () => {
     
     simulateLoading();
   }, [searchTerm, filterCategory, showLowStock, selectedLocation, selectedSupplier, stockRange, priceRange]);
+
+  const handleLogout = () => {
+    // Here you would typically clear authentication tokens or user data
+    // For this example, we'll just navigate to the login page
+    navigate('/login');
+    showNotification('You have been logged out', 'info');
+  };
 
   const showNotification = (message, type = 'success') => {
     setNotification({ message, type });
@@ -665,6 +675,13 @@ const Inventory = () => {
                 >
                   <CheckCircleIcon className="w-5 h-5 mr-2" />
                   Select
+                </button>
+                <button 
+                  onClick={handleLogout}
+                  className="flex items-center px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-900 transition-colors"
+                >
+                  <ArrowLeftOnRectangleIcon className="w-5 h-5 mr-2" />
+                  Logout
                 </button>
               </>
             )}
