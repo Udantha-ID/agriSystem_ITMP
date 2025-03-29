@@ -5,7 +5,7 @@ import Marketplace from './Pages/MarketPlace.jsx'
 import Inventory from './Pages/Inventory.jsx'
 import About from './Pages/About.jsx'
 import Contact from './Pages/Contact.jsx'
-// import LandDevelopment from './Pages/LandDevelopment/LandBoundary.jsx'
+import LandBoundary from './Pages/LandDevelopment/LandBoundary.jsx';
 
 function App() {
   return (
@@ -16,6 +16,7 @@ function App() {
         <Route path="/inventory" element={<Inventory />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/landboundary" element={<LandBoundary />} />
       </Routes>
     </BrowserRouter>
   )
