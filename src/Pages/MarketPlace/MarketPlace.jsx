@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom'; // Added import here
+import { useNavigate } from 'react-router-dom';
 import { 
   ShoppingCartIcon, XMarkIcon, HomeIcon, HeartIcon, ArrowPathIcon,
   CubeIcon, TruckIcon, StarIcon, AdjustmentsHorizontalIcon, MagnifyingGlassIcon,
@@ -9,7 +9,6 @@ import {
   PlusIcon, MinusIcon, TrashIcon, HeartIcon as HeartSolidIcon,
   CheckCircleIcon, ChevronDownIcon
 } from '@heroicons/react/24/solid';
-import Navbar from '../../Components/Navbar';
 
 const Marketplace = () => {
   const navigate = useNavigate(); 
@@ -20,19 +19,24 @@ const Marketplace = () => {
   const [sortBy, setSortBy] = useState('recommended');
   const [searchQuery, setSearchQuery] = useState('');
   const [showFilters, setShowFilters] = useState(false);
-  const [priceRange, setPriceRange] = useState([0, 100]);
+  const [priceRange, setPriceRange] = useState([0, 5000]); // Updated to Rs. range
   const [notification, setNotification] = useState(null);
 
-  // Mock data - expanded
+  // Format price to Rs. with commas
+  const formatPrice = (price) => {
+    return 'Rs. ' + price.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  };
+
+  // Mock data with Rs. prices
   const products = [
-    { id: 1, name: 'Organic Coconut', price: 2.5, category: 'coconuts', stock: 100, rating: 4.5, description: 'Fresh organic coconuts directly from farmers.', image: '🥥', farm: 'Green Valley Farms', organic: true },
-    { id: 2, name: 'Virgin Coconut Oil', price: 10.99, category: 'oil', stock: 50, rating: 4.8, description: 'Cold-pressed virgin coconut oil with no additives.', image: '🧴', farm: 'Tropical Organics', organic: true },
-    { id: 3, name: 'Fresh Spinach', price: 1.99, category: 'vegetables', stock: 200, rating: 4.2, description: 'Locally grown spinach harvested within 24 hours.', image: '🥬', farm: 'River Meadow Farm', organic: true },
-    { id: 4, name: 'Organic Carrots', price: 1.49, category: 'vegetables', stock: 150, rating: 4.0, description: 'Sweet and crunchy organic carrots.', image: '🥕', farm: 'Sunrise Farm', organic: true },
-    { id: 5, name: 'Organic Fertilizer', price: 15.99, category: 'fertilizers', stock: 75, rating: 4.7, description: 'Plant-based organic fertilizer for all crops.', image: '🌱', farm: 'EcoGrow Solutions', organic: true },
-    { id: 6, name: 'Brown Coconut', price: 1.99, category: 'coconuts', stock: 80, rating: 3.9, description: 'Traditional coconuts great for cooking.', image: '🥥', farm: 'Coastal Farms', organic: false },
-    { id: 7, name: 'Coconut Milk', price: 3.49, category: 'oil', stock: 120, rating: 4.3, description: 'Pure coconut milk with no preservatives.', image: '🥛', farm: 'Tropical Delights', organic: true },
-    { id: 8, name: 'NPK Fertilizer', price: 12.99, category: 'fertilizers', stock: 90, rating: 4.4, description: 'Balanced NPK fertilizer for healthy plant growth.', image: '🧪', farm: 'Harvest Boost', organic: false },
+    { id: 1, name: 'Organic Coconut', price: 750, category: 'coconuts', stock: 100, rating: 4.5, description: 'Fresh organic coconuts directly from farmers.', image: '🥥', farm: 'Green Valley Farms', organic: true },
+    { id: 2, name: 'Virgin Coconut Oil (500ml)', price: 3297, category: 'oil', stock: 50, rating: 4.8, description: 'Cold-pressed virgin coconut oil with no additives.', image: '🧴', farm: 'Tropical Organics', organic: true },
+    { id: 3, name: 'Fresh Spinach (1kg)', price: 597, category: 'vegetables', stock: 200, rating: 4.2, description: 'Locally grown spinach harvested within 24 hours.', image: '🥬', farm: 'River Meadow Farm', organic: true },
+    { id: 4, name: 'Organic Carrots (1kg)', price: 447, category: 'vegetables', stock: 150, rating: 4.0, description: 'Sweet and crunchy organic carrots.', image: '🥕', farm: 'Sunrise Farm', organic: true },
+    { id: 5, name: 'Organic Fertilizer (5kg)', price: 4797, category: 'fertilizers', stock: 75, rating: 4.7, description: 'Plant-based organic fertilizer for all crops.', image: '🌱', farm: 'EcoGrow Solutions', organic: true },
+    { id: 6, name: 'Brown Coconut', price: 597, category: 'coconuts', stock: 80, rating: 3.9, description: 'Traditional coconuts great for cooking.', image: '🥥', farm: 'Coastal Farms', organic: false },
+    { id: 7, name: 'Coconut Milk (1L)', price: 1047, category: 'oil', stock: 120, rating: 4.3, description: 'Pure coconut milk with no preservatives.', image: '🥛', farm: 'Tropical Delights', organic: true },
+    { id: 8, name: 'NPK Fertilizer (5kg)', price: 3897, category: 'fertilizers', stock: 90, rating: 4.4, description: 'Balanced NPK fertilizer for healthy plant growth.', image: '🧪', farm: 'Harvest Boost', organic: false },
   ];
 
   const categories = [
@@ -57,7 +61,7 @@ const Marketplace = () => {
       setCart([...cart, { product, quantity: 1 }]);
     }
     
-    showNotification(`Added ${product.name} to cart`);
+    showNotification(`Added ${product.name} to cart for ${formatPrice(product.price)}`);
   };
 
   // Update item quantity
@@ -134,11 +138,11 @@ const Marketplace = () => {
   const displayProducts = filteredAndSortedProducts();
   
   const cartTotal = cart.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
+  const shippingCost = 300; // Rs. 300 flat shipping rate
 
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="bg-gradient-to-r from-green-500 to-green-700 text-white p-8 md:p-12">
-        
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-wrap gap-3 mb-6 justify-end">
             <button 
@@ -171,7 +175,7 @@ const Marketplace = () => {
           </div>
         
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Farm Fresh Products</h1>
-          <p className="text-xl opacity-90 mb-6">Direct from farmers to your doorstep</p>
+          <p className="text-xl opacity-90 mb-6">Direct from Sri Lankan farmers to your doorstep</p>
           
           <div className="relative max-w-2xl">
             <input
@@ -272,13 +276,13 @@ const Marketplace = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Price Range: ${priceRange[0]} - ${priceRange[1]}
+                  Price Range: {formatPrice(priceRange[0])} - {formatPrice(priceRange[1])}
                 </label>
                 <input 
                   type="range" 
                   min="0" 
-                  max="100" 
-                  step="5"
+                  max="5000" 
+                  step="100"
                   value={priceRange[1]}
                   onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
                   className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-green-600"
@@ -291,7 +295,7 @@ const Marketplace = () => {
                     type="checkbox" 
                     className="h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500"
                   />
-                  <span className="text-gray-700">Organic Products Only</span>
+                  <span className="text-gray-700">Certified Organic Products</span>
                 </label>
               </div>
               
@@ -362,7 +366,7 @@ const Marketplace = () => {
                   </div>
                   
                   <div className="flex justify-between items-center mb-3">
-                    <span className="text-xl font-bold text-green-700">${product.price.toFixed(2)}</span>
+                    <span className="text-xl font-bold text-green-700">{formatPrice(product.price)}</span>
                     <span className={`text-sm ${product.stock > 50 ? 'text-green-600' : product.stock > 10 ? 'text-orange-500' : 'text-red-500'}`}>
                       {product.stock > 50 ? 'In stock' : product.stock > 10 ? 'Limited stock' : 'Low stock'}
                     </span>
@@ -387,7 +391,7 @@ const Marketplace = () => {
               onClick={() => {
                 setSelectedCategory('all');
                 setSearchQuery('');
-                setPriceRange([0, 100]);
+                setPriceRange([0, 5000]);
               }}
               className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
             >
@@ -433,7 +437,7 @@ const Marketplace = () => {
                           <h3 className="font-medium">{item.product.name}</h3>
                           <p className="text-gray-500 text-sm">{item.product.farm}</p>
                           <div className="text-green-700 font-bold mt-1">
-                            ${(item.product.price * item.quantity).toFixed(2)}
+                            {formatPrice(item.product.price * item.quantity)}
                           </div>
                         </div>
                         <div className="flex flex-col justify-between items-end">
@@ -482,15 +486,15 @@ const Marketplace = () => {
                   <div className="space-y-3 mb-4">
                     <div className="flex justify-between">
                       <span className="text-gray-600">Subtotal:</span>
-                      <span className="font-medium">${cartTotal.toFixed(2)}</span>
+                      <span className="font-medium">{formatPrice(cartTotal)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Shipping:</span>
-                      <span className="font-medium">$4.99</span>
+                      <span className="font-medium">{formatPrice(shippingCost)}</span>
                     </div>
                     <div className="flex justify-between text-lg font-bold">
                       <span>Total:</span>
-                      <span>${(cartTotal + 4.99).toFixed(2)}</span>
+                      <span>{formatPrice(cartTotal + shippingCost)}</span>
                     </div>
                   </div>
                   <button className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 flex justify-center items-center gap-2">
