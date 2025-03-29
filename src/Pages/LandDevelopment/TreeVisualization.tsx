@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Stage, Layer, Circle, Line, Text, Group } from 'react-konva';
-import { Point, TreeSpacing, TerrainData, TreeData } from '../types/land';
+import { Point, TreeSpacing, TerrainData, TreeData } from '../../types/land';
 
 interface TreeVisualizationProps {
   boundary: Point[];

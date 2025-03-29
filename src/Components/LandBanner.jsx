@@ -1,8 +1,18 @@
 import React from 'react';
 import Image5 from '../Images/14.jpg';
+import { useNavigate } from 'react-router-dom';
 import { MapPin, Leaf, LineChart, Calendar, Phone } from 'lucide-react';
 
 function LandBanner() {
+
+  const navigate = useNavigate();
+
+  // Function to handle button click
+  const handleButtonClick = () => {
+    navigate('/landboundary');
+  };
+
+
   return (
     <div>
      
@@ -29,7 +39,7 @@ function LandBanner() {
             </p>
             
             <div className="flex flex-wrap gap-4">
-              <button className="bg-white text-teal-900 px-6 py-3 rounded-lg font-semibold hover:bg-green-100 transition-colors flex items-center gap-2">
+              <button onClick={handleButtonClick} className="bg-white text-teal-900 px-6 py-3 rounded-lg font-semibold hover:bg-green-100 transition-colors flex items-center gap-2">
                 <Calendar size={20} />
                 Updload Your Land Map
               </button>
