@@ -40,7 +40,7 @@ export default function MonitoringReports() {
             </div>
           </div>
 
-          {/* Projects List */}
+          {/* Projects Lists */}
           <div className="space-y-8">
             {projects.map(project => (
               <div key={project.id} className="space-y-6">
