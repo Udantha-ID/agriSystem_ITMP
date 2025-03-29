@@ -1,31 +1,22 @@
 import React, { useState, useCallback } from 'react';
 import { Stage, Layer, Line, Circle, Image as KonvaImage, Group } from 'react-konva';
-import { Point } from '../../types/land';
 import useImage from 'use-image';
 import { Pencil, MousePointer, Grid, Undo2, Redo2 } from 'lucide-react';
 
-interface LandCanvasProps {
-  width: number;
-  height: number;
-  onBoundaryUpdate: (boundary: Point[]) => void;
-}
-
-type DrawingMode = 'point' | 'freehand';
-
-export const LandCanvas: React.FC<LandCanvasProps> = ({ width, height, onBoundaryUpdate }) => {
-  const [points, setPoints] = useState<Point[]>([]);
-  const [history, setHistory] = useState<Point[][]>([[]]);
-  const [historyIndex, setHistoryIndex] = useState<number>(0);
+export const LandCanvas = ({ width, height, onBoundaryUpdate }) => {
+  const [points, setPoints] = useState([]);
+  const [history, setHistory] = useState([[]]);
+  const [historyIndex, setHistoryIndex] = useState(0);
   const [isDrawing, setIsDrawing] = useState(false);
-  const [mapImage, setMapImage] = useState<string | null>(null);
+  const [mapImage, setMapImage] = useState(null);
   const [imageScale, setImageScale] = useState({ x: 1, y: 1 });
   const [image] = useImage(mapImage || '');
-  const [drawingMode, setDrawingMode] = useState<DrawingMode>('point');
+  const [drawingMode, setDrawingMode] = useState('point');
   const [showGrid, setShowGrid] = useState(true);
   const [gridSize, setGridSize] = useState(20);
-  const [selectedPointIndex, setSelectedPointIndex] = useState<number | null>(null);
+  const [selectedPointIndex, setSelectedPointIndex] = useState(null);
 
-  const addToHistory = useCallback((newPoints: Point[]) => {
+  const addToHistory = useCallback((newPoints) => {
     const newHistory = history.slice(0, historyIndex + 1);
     newHistory.push([...newPoints]);
     setHistory(newHistory);
@@ -48,7 +39,7 @@ export const LandCanvas: React.FC<LandCanvasProps> = ({ width, height, onBoundar
     }
   };
 
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = (event) => {
     const file = event.target.files?.[0];
     if (file) {
       const reader = new FileReader();
@@ -58,14 +49,14 @@ export const LandCanvas: React.FC<LandCanvasProps> = ({ width, height, onBoundar
           const scale = Math.min(width / img.width, height / img.height);
           setImageScale({ x: scale, y: scale });
         };
-        img.src = e.target?.result as string;
-        setMapImage(e.target?.result as string);
+        img.src = e.target?.result;
+        setMapImage(e.target?.result);
       };
       reader.readAsDataURL(file);
     }
   };
 
-  const snapToGrid = (point: Point): Point => {
+  const snapToGrid = (point) => {
     if (!showGrid) return point;
     return {
       x: Math.round(point.x / gridSize) * gridSize,
@@ -73,7 +64,7 @@ export const LandCanvas: React.FC<LandCanvasProps> = ({ width, height, onBoundar
     };
   };
 
-  const handleMouseDown = (e: any) => {
+  const handleMouseDown = (e) => {
     const stage = e.target.getStage();
     const pos = stage.getPointerPosition();
     const snappedPos = snapToGrid(pos);
@@ -97,7 +88,7 @@ export const LandCanvas: React.FC<LandCanvasProps> = ({ width, height, onBoundar
     }
   };
 
-  const handleMouseMove = (e: any) => {
+  const handleMouseMove = (e) => {
     if (!isDrawing || drawingMode === 'point') return;
     const stage = e.target.getStage();
     const pos = stage.getPointerPosition();
@@ -128,13 +119,13 @@ export const LandCanvas: React.FC<LandCanvasProps> = ({ width, height, onBoundar
     setImageScale({ x: 1, y: 1 });
   };
 
-  const handlePointClick = (index: number) => {
+  const handlePointClick = (index) => {
     if (drawingMode === 'point') {
       setSelectedPointIndex(index);
     }
   };
 
-  const handleDeletePoint = (index: number) => {
+  const handleDeletePoint = (index) => {
     const newPoints = points.filter((_, i) => i !== index);
     setPoints(newPoints);
     setSelectedPointIndex(null);

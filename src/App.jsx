@@ -5,8 +5,8 @@ import Marketplace from './Pages/MarketPlace.jsx'
 import Inventory from './Pages/Inventory.jsx'
 import About from './Pages/About.jsx'
 import Contact from './Pages/Contact.jsx'
-// import LandDevelopment from './Pages/LandDevelopment/LandBoundary.jsx'
-import LandBoundary from './Pages/LandDevelopment/LandBoundary.js';
+import LandBoundary from './Pages/LandDevelopment/LandBoundary.jsx';
+
 function App() {
   return (
     <BrowserRouter> {/* Wrap the whole app with BrowserRouter */}
