@@ -75,7 +75,7 @@ const Welcome = () => {
   return (
     <div>
       {/* Original Hero Section - Unchanged */}
-      <div className="relative mt-0 h-[600px] overflow-hidden">
+      <div className="relative mt-0 h-[800px] overflow-hidden">
         {images.map((img, index) => (
           <motion.img
             key={index}
@@ -110,9 +110,7 @@ const Welcome = () => {
 
         {/* Section Header */}
         <div className="text-center relative z-10 mb-16">
-          <div className="inline-block px-4 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium mb-4">
-            Smart Agriculture
-          </div>
+          
           <h2 className="text-4xl font-bold text-gray-900 mb-4">
             Smart Solutions for Modern Agriculture
           </h2>

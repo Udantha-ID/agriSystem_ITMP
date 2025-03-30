@@ -88,11 +88,11 @@ export default function Navbar() {
             <div className="hidden md:flex items-center relative" ref={accountTrayRef}>
               {isLoggedIn ? (
                 <div 
-                  className="flex items-center gap-3 bg-green-50 py-2 px-4 rounded-xl cursor-pointer hover:bg-green-100 transition-colors"
+                  className="flex items-center gap-3 bg-green-500 py-2 px-4 rounded-xl cursor-pointer hover:bg-green-600 transition-colors"
                   onClick={() => setShowAccountTray(!showAccountTray)}
                 >
-                  <UserCircle className="w-6 h-6 text-green-700" />
-                  <span className="text-green-800 font-medium">My Account</span>
+                  <UserCircle className="w-6 h-6 text-black-700" />
+                  <span className="text-black-800 font-medium">My Account</span>
                   
                   {/* Account Tray */}
                   {showAccountTray && (
@@ -104,8 +104,8 @@ export default function Navbar() {
                             <UserCircle className="w-8 h-8 text-green-700" />
                           </div>
                           <div>
-                            <h3 className="font-semibold text-gray-900">John Doe</h3>
-                            <p className="text-sm text-gray-500">john@example.com</p>
+                            <h3 className="font-semibold text-gray-900">Kamil Gunerathne</h3>
+                            <p className="text-sm text-gray-500">Kamil@gmail.com</p>
                           </div>
                         </div>
                       </div>
@@ -220,8 +220,8 @@ export default function Navbar() {
                   <div className="flex items-center gap-3 bg-green-50 py-3 px-4 rounded-xl">
                     <UserCircle className="w-6 h-6 text-green-700" />
                     <div>
-                      <p className="text-green-800 font-medium">John Doe</p>
-                      <p className="text-xs text-green-600">john@example.com</p>
+                      <p className="text-green-800 font-medium">Kamil Gunarathne</p>
+                      <p className="text-xs text-green-600">Kamil@gmail.com</p>
                     </div>
                   </div>
                   
