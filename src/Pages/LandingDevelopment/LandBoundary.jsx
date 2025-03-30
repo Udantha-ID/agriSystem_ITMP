@@ -4,6 +4,7 @@ import { MapPin, Trees, ArrowLeft, Ruler, LayoutGrid, Info, RotateCw, Download }
 import { LandCanvas } from './LandCanvas';
 import { TreeAnalysis } from './TreeAnalysis';
 import Navbar from '../../Components/Navbar';
+import Footer from '../../Components/Footer';
 
 function LandBoundary() {
   const [boundary, setBoundary] = useState([]);
@@ -268,24 +269,7 @@ function LandBoundary() {
       )}
 
       {/* Footer */}
-      <footer className="max-w-8xl mx-auto px-6 py-6 border-t border-gray-200 mt-12">
-        <div className="flex flex-col md:flex-row justify-between items-center">
-          <div className="flex items-center space-x-4">
-            <div className="text-sm text-gray-500">
-              © {new Date().getFullYear()} Land Development Suite
-            </div>
-            <div className="hidden md:block w-px h-4 bg-gray-200"></div>
-            <div className="text-sm text-gray-500">
-              Version 2.1.0
-            </div>
-          </div>
-          <div className="mt-4 md:mt-0 flex space-x-4">
-            <a href="#" className="text-sm text-gray-500 hover:text-blue-600 transition-colors">Terms</a>
-            <a href="#" className="text-sm text-gray-500 hover:text-blue-600 transition-colors">Privacy</a>
-            <a href="#" className="text-sm text-gray-500 hover:text-blue-600 transition-colors">Contact</a>
-          </div>
-        </div>
-      </footer>
+      <Footer/>
     </div>
   );
 }

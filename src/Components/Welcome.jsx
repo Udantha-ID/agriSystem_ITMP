@@ -31,7 +31,7 @@ const features = [
     bgGradient: "bg-gradient-to-br from-sky-50 to-blue-100",
     accentColor: "sky",
     secondaryIcon: <BarChart3 className="w-5 h-5 text-sky-500" />,
-    path: "/climate-intelligence" // ✅ Added Path
+    path: "/climate-intelligence" 
   },
   { 
     title: "Marketplace Connect", 
@@ -40,7 +40,7 @@ const features = [
     bgGradient: "bg-gradient-to-br from-amber-50 to-yellow-100",
     accentColor: "amber",
     secondaryIcon: <Tractor className="w-5 h-5 text-amber-500" />,
-    path: "/marketplace-connect" // ✅ Added Path
+    path: "/marketplace-connect"
   },
   { 
     title: "Crop Management", 
