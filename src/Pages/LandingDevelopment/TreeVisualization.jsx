@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Stage, Layer, Circle, Line, Text, Group } from 'react-konva';
-
 
 export const TreeVisualization = ({
   boundary,
@@ -12,32 +11,40 @@ export const TreeVisualization = ({
   const [showDetails, setShowDetails] = useState(false);
   const [selectedTree, setSelectedTree] = useState(null);
   const [simulationYear, setSimulationYear] = useState(0);
+  const bufferDistance = 2; // 2 meter buffer
 
-  const calculateTerrainData = (point) => {
-    return {
-      elevation: Math.sin(point.x / 50) * Math.cos(point.y / 50) * 10 + 100,
-      soilType: ['clay', 'loam', 'sandy', 'silt'][Math.floor((point.x + point.y) % 4)],
-      sunExposure: Math.min(1, Math.max(0, Math.sin(point.x / 100) * 0.5 + 0.5))
-    };
-  };
+  // Calculate the area where trees can be planted (inside boundary but away from edges)
+  const getPlantableArea = useMemo(() => {
+    if (boundary.length < 3) return boundary;
+    
+    // Calculate centroid
+    let centroid = { x: 0, y: 0 };
+    boundary.forEach(point => {
+      centroid.x += point.x;
+      centroid.y += point.y;
+    });
+    centroid.x /= boundary.length;
+    centroid.y /= boundary.length;
 
-  const calculateTreeData = (point) => {
-    const terrain = calculateTerrainData(point);
-    const soilFactors = {
-      clay: 0.7,
-      loam: 1.0,
-      sandy: 0.8,
-      silt: 0.9
-    };
-
-    return {
-      position: point,
-      growthRate: 0.5 + (terrain.sunExposure * 0.5) * soilFactors[terrain.soilType],
-      maturityAge: 5 + Math.random() * 2,
-      soilSuitability: soilFactors[terrain.soilType],
-      waterRequirement: 50 + (terrain.elevation / 10)
-    };
-  };
+    // Scale points inward to create buffer
+    return boundary.map(point => {
+      const vector = {
+        x: centroid.x - point.x,
+        y: centroid.y - point.y
+      };
+      const length = Math.sqrt(vector.x * vector.x + vector.y * vector.y);
+      const normalized = {
+        x: vector.x / length,
+        y: vector.y / length
+      };
+      
+      const bufferInCanvasUnits = bufferDistance / scale;
+      return {
+        x: point.x + normalized.x * bufferInCanvasUnits,
+        y: point.y + normalized.y * bufferInCanvasUnits
+      };
+    });
+  }, [boundary, scale]);
 
   const calculateTreePositions = () => {
     if (boundary.length < 3) return [];
@@ -54,8 +61,14 @@ export const TreeVisualization = ({
     
     for (let x = minX; x <= maxX; x += pixelSpacingH) {
       for (let y = minY; y <= maxY; y += pixelSpacingV) {
-        if (isPointInPolygon({ x, y }, boundary)) {
-          trees.push(calculateTreeData({ x, y }));
+        const point = { x, y };
+        // Only plant if inside plantable area
+        if (isPointInPolygon(point, getPlantableArea)) {
+          trees.push({
+            position: point,
+            size: 3 + (Math.min(1, simulationYear / 5) * 4),
+            color: `hsl(120, 80%, 40%)`
+          });
         }
       }
     }
@@ -66,9 +79,11 @@ export const TreeVisualization = ({
   const isPointInPolygon = (point, polygon) => {
     let inside = false;
     for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
-      const intersect = ((polygon[i].y > point.y) !== (polygon[j].y > point.y))
-        && (point.x < (polygon[j].x - polygon[i].x) * (point.y - polygon[i].y) 
-            / (polygon[j].y - polygon[i].y) + polygon[i].x);
+      const xi = polygon[i].x, yi = polygon[i].y;
+      const xj = polygon[j].x, yj = polygon[j].y;
+      
+      const intersect = ((yi > point.y) !== (yj > point.y)) &&
+        (point.x < (xj - xi) * (point.y - yi) / (yj - yi) + xi);
       if (intersect) inside = !inside;
     }
     return inside;
@@ -76,39 +91,11 @@ export const TreeVisualization = ({
 
   const treePositions = calculateTreePositions();
 
-  const getTreeSize = (tree) => {
-    const age = simulationYear;
-    const growth = Math.min(1, age / tree.maturityAge);
-    return 3 + (growth * 4);
-  };
-
-  const getTreeColor = (tree) => {
-    const healthFactor = tree.soilSuitability * 0.7 + 0.3;
-    const baseColor = 120; // Green hue
-    return `hsl(${baseColor}, ${Math.round(healthFactor * 100)}%, ${Math.round(healthFactor * 40)}%)`;
-  };
-
   return (
     <div className="relative">
       <Stage width={width} height={height}>
         <Layer>
-          {/* Draw terrain grid */}
-          {Array.from({ length: Math.floor(width / 20) }).map((_, i) =>
-            Array.from({ length: Math.floor(height / 20) }).map((_, j) => {
-              const terrain = calculateTerrainData({ x: i * 20, y: j * 20 });
-              return (
-                <Circle
-                  key={`terrain-${i}-${j}`}
-                  x={i * 20}
-                  y={j * 20}
-                  radius={1}
-                  fill={`rgba(0,0,0,${terrain.elevation / 200})`}
-                />
-              );
-            })
-          )}
-
-          {/* Draw boundary */}
+          {/* Draw only the original boundary line */}
           <Line
             points={boundary.flatMap(p => [p.x, p.y])}
             stroke="#2563eb"
@@ -116,7 +103,7 @@ export const TreeVisualization = ({
             closed={true}
           />
           
-          {/* Draw trees */}
+          {/* Draw trees (automatically avoids edges due to plantable area calculation) */}
           {treePositions.map((tree, index) => (
             <Group
               key={index}
@@ -132,8 +119,8 @@ export const TreeVisualization = ({
               <Circle
                 x={tree.position.x}
                 y={tree.position.y}
-                radius={getTreeSize(tree)}
-                fill={getTreeColor(tree)}
+                radius={tree.size}
+                fill={tree.color}
                 shadowColor="black"
                 shadowBlur={2}
                 shadowOpacity={0.3}
@@ -141,33 +128,33 @@ export const TreeVisualization = ({
             </Group>
           ))}
 
-          {/* Show tree details */}
           {showDetails && selectedTree && (
-            <Group>
-              <Text
-                x={selectedTree.position.x + 10}
-                y={selectedTree.position.y - 40}
-                text={`Growth: ${selectedTree.growthRate.toFixed(2)}m/yr`}
-                fontSize={12}
-                fill="black"
-                padding={2}
-                background="white"
-              />
-              <Text
-                x={selectedTree.position.x + 10}
-                y={selectedTree.position.y - 25}
-                text={`Water: ${selectedTree.waterRequirement.toFixed(0)}L/day`}
-                fontSize={12}
-                fill="black"
-                padding={2}
-                background="white"
-              />
-            </Group>
+            <Text
+              x={selectedTree.position.x + 10}
+              y={selectedTree.position.y - 20}
+              text={`Tree ${simulationYear} yrs`}
+              fontSize={12}
+              fill="black"
+              padding={5}
+              background="white"
+            />
           )}
         </Layer>
       </Stage>
       <div className="absolute bottom-2 left-2 bg-white px-2 py-1 rounded shadow text-sm">
         Year: {simulationYear}
+        <button 
+          onClick={() => setSimulationYear(prev => Math.min(prev + 1, 10))}
+          className="ml-2 px-1 bg-gray-100 rounded"
+        >
+          +
+        </button>
+        <button 
+          onClick={() => setSimulationYear(prev => Math.max(prev - 1, 0))}
+          className="ml-1 px-1 bg-gray-100 rounded"
+        >
+          -
+        </button>
       </div>
     </div>
   );
