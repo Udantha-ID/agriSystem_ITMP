@@ -138,7 +138,8 @@ export const TreeAnalysis = ({ boundary, spacing, scale }) => {
     return (
       <div className="flex justify-center items-center h-screen">
         <BarLoader
-          size={15} 
+          height={8}
+          width={160} 
           color="#36D7B7" />
       </div>
     );
@@ -165,6 +166,34 @@ export const TreeAnalysis = ({ boundary, spacing, scale }) => {
           </button>
         </div>
       </div>
+
+      <div className="bg-white p-6 rounded-lg shadow-lg">
+          <div className="flex items-center space-x-2 mb-4">
+            <Activity className="h-6 w-6 text-green-600" />
+            <h3 className="text-xl font-semibold">Tree Layout Simulation</h3>
+          </div>
+          <div className="border-2 border-gray-200 rounded-lg overflow-hidden">
+            <TreeVisualization
+              boundary={boundary}
+              bufferedBoundary={bufferedBoundary}
+              spacing={spacing}
+              scale={scale}
+              width={800}
+              height={400}
+            />
+          </div>
+          <div className="mt-4 space-y-2">
+            <p className="text-sm text-gray-600">
+              • Green dots represent optimal tree locations based on spacing and terrain
+            </p>
+            <p className="text-sm text-gray-600">
+              • Gray line shows original boundary, green line shows planting area with {metrics.bufferDistance.toFixed(1)}m buffer
+            </p>
+            <p className="text-sm text-gray-600">
+              • The simulation shows projected growth patterns over time
+            </p>
+          </div>
+        </div>
 
       <div ref={reportRef} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -237,34 +266,6 @@ export const TreeAnalysis = ({ boundary, spacing, scale }) => {
                 <span className="font-medium">{metrics.carbonSequestration.toFixed(1)} kg CO₂/year</span>
               </div>
             </div>
-          </div>
-        </div>
-
-        <div className="bg-white p-6 rounded-lg shadow-lg">
-          <div className="flex items-center space-x-2 mb-4">
-            <Activity className="h-6 w-6 text-green-600" />
-            <h3 className="text-xl font-semibold">Tree Layout Simulation</h3>
-          </div>
-          <div className="border-2 border-gray-200 rounded-lg overflow-hidden">
-            <TreeVisualization
-              boundary={boundary}
-              bufferedBoundary={bufferedBoundary}
-              spacing={spacing}
-              scale={scale}
-              width={800}
-              height={400}
-            />
-          </div>
-          <div className="mt-4 space-y-2">
-            <p className="text-sm text-gray-600">
-              • Green dots represent optimal tree locations based on spacing and terrain
-            </p>
-            <p className="text-sm text-gray-600">
-              • Gray line shows original boundary, green line shows planting area with {metrics.bufferDistance.toFixed(1)}m buffer
-            </p>
-            <p className="text-sm text-gray-600">
-              • The simulation shows projected growth patterns over time
-            </p>
           </div>
         </div>
       </div>
