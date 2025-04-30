@@ -1,18 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, Lock, Eye, EyeOff, User } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import Navbar from '../../Components/Navbar';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import Footer from '../../Components/Footer';
+import { useAuth } from '../../context/AuthContext';
 
 const UserLogin = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { login, isAuthenticated, isInitialized } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
+  
+  // Pre-fill email if coming from registration
   const [formData, setFormData] = useState({
-    fullName: '',
-    email: '',
+    email: location.state?.email || '',
     password: '',
   });
+  
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(location.state?.registrationSuccess ? 
+    'Account created successfully! Please log in.' : null);
+  
+  // Only redirect when authentication is initialized and user is authenticated
+  useEffect(() => {
+    if (isInitialized && isAuthenticated) {
+      // Redirect to home page or dashboard instead of login
+      navigate('/', { replace: true });
+    }
+  }, [isInitialized, isAuthenticated, navigate]);
+
+  // Clear location state after consuming it
+  useEffect(() => {
+    if (location.state?.registrationSuccess) {
+      // Clean up the location state
+      window.history.replaceState({}, document.title);
+    }
+  }, [location]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -20,14 +45,27 @@ const UserLogin = () => {
       ...prevData,
       [name]: value,
     }));
+    // Clear error when user starts typing
+    if (error) setError(null);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setIsLoading(false);
+    setError(null);
+    setSuccessMessage(null);
+    
+    try {
+      // Call login from auth context
+      const response = await login(formData.email, formData.password);
+      if (response && response.user) {
+        // Navigate happens in the useEffect after auth state changes
+        navigate('/', { replace: true });
+      }
+    } catch (err) {
+      setError(err.message || 'Invalid credentials. Please try again.');
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -45,29 +83,27 @@ const UserLogin = () => {
           onSubmit={handleSubmit}
           className="bg-white bg-opacity-90 backdrop-blur-sm p-8 rounded-lg shadow-lg w-full max-w-md"
         >
-          {/* Full Name Field */}
-          <motion.div
-            className="mb-6"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-          >
-            <label className="block text-gray-700 text-sm font-semibold mb-2">
-              Full Name
-            </label>
-            <div className="relative group">
-              <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 group-hover:text-green-500 transition-colors h-5 w-5" />
-              <input
-                type="text"
-                name="fullName"
-                value={formData.fullName}
-                onChange={handleChange}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 group-hover:border-green-500"
-                placeholder="Enter your full name"
-                required
-              />
-            </div>
-          </motion.div>
+          {/* Display success message if there is one */}
+          {successMessage && (
+            <motion.div 
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4"
+            >
+              {successMessage}
+            </motion.div>
+          )}
+
+          {/* Display error message if there is one */}
+          {error && (
+            <motion.div 
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4"
+            >
+              {error}
+            </motion.div>
+          )}
 
           {/* Email Field */}
           <motion.div

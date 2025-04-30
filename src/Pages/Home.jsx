@@ -14,9 +14,6 @@ const Home = () => {
       <Welcome />
       <LandBanner />
       <ContactBanner />
-    
-
-
       <Footer />
     </div>
   );
