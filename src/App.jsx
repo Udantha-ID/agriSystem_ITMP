@@ -25,6 +25,7 @@ import Inventory from './Pages/MarketPlace/Inventory.jsx'
 import AddProduct from './Pages/MarketPlace/AddProduct.jsx'
 
 // import LandDevelopment from './Pages/LandDevelopment/LandBoundary.jsx'
+import UpdatePlanning from './Pages/PlantationManagement/UpdatePlanning.jsx'
 
 import LandBoundary from './Pages/LandingDevelopment/LandBoundary.jsx';
 import PlantationManagementAbout from './Pages/PlantationManagement/PlantationmanagementAbout.jsx'
@@ -40,12 +41,13 @@ function App() {
         <Route path="/inventory" element={<Inventory/>} />
         <Route path="addproduct" element={<AddProduct/>}/>
         <Route path="/pmdashboard" element={<PlantationDashboard />} />
-        <Route path="/plantations" element={<PlantationManagement />} />
-        <Route path="/resources" element={<FarmResourcePlanning/>} />
-        <Route path="/planning/:projectId" element={<PlanningForm />} />
-        <Route path="/reports" element={<MonitoringReports/>} />
-        <Route path="/addplant" element={<AddPlantation />} />
-        <Route path="/updateplant/:plantId" element={<UpdatePlantation />} />
+        <Route path="/plantationsmanage" element={<PlantationManagement />} />
+        <Route path="/resourcesplan" element={<FarmResourcePlanning/>} />
+        <Route path="/create-planning/:projectId" element={<PlanningForm />} />
+        <Route path="/update-planning/:id" element={<UpdatePlanning />} />
+        <Route path="/mreports" element={<MonitoringReports/>} />
+        <Route path="/addplantation" element={<AddPlantation />} />
+        <Route path="/updateplantation/:id" element={<UpdatePlantation />} />
         <Route path="/plantabout" element={<PlantationManagementAbout />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />

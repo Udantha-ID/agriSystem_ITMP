@@ -1,106 +1,156 @@
-// Pages/MonitoringReports.jsx
-import { ChartBarIcon } from '@heroicons/react/24/outline';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+import { ChartBarIcon, BeakerIcon, SunIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 import PlantationSidebar from '../../Components/PlantationSidebar';
 
-const projects = [
-  {
-    id: 1,
-    name: "Project 1",
-    yield: "1,240 kg/ha",
-    soil: { pH: 6.5, nitrogen: "Medium" },
-    status: "active"
-  },
-  {
-    id: 2,
-    name: "Project 2",
-    yield: "890 kg/ha", 
-    soil: { pH: 5.8, nitrogen: "Low" },
-    status: "monitoring"
-  },
-];
+const MonitoringReports = () => {
+  const [plantations, setPlantations] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [filter, setFilter] = useState('all');
 
-export default function MonitoringReports() {
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const params = {};
+        if (filter === 'active') params.completed = false;
+        if (filter === 'completed') params.completed = true;
+
+        const [plantationsRes, planningsRes] = await Promise.all([
+          axios.get("http://localhost:5000/plantations", { params }),
+          axios.get("http://localhost:5000/plannings"),
+        ]);
+
+        const mergedData = plantationsRes.data.map(plantation => ({
+          ...plantation,
+          planning: planningsRes.data.find(p => p.projectId === plantation._id)
+        }));
+
+        setPlantations(mergedData);
+      } catch (error) {
+        setError(error.response?.data?.message || "Failed to fetch data");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [filter]);
+
+  const calculateYield = (planning) => {
+    if (!planning) return 'N/A';
+    const baseYield = planning.soilData?.quality === 'High' ? 1200 :
+                     planning.soilData?.quality === 'Medium' ? 900 : 600;
+    const fertilizerBonus = planning.fertilizerSchedules?.length * 50;
+    return `${baseYield + fertilizerBonus} kg/ha`;
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-cyan-50">
+        <PlantationSidebar />
+        <div className="md:pl-64 p-8 flex items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-cyan-50">
-      <PlantationSidebar/>
+      <PlantationSidebar />
       <div className="md:pl-64 p-8">
         <div className="max-w-7xl mx-auto">
-          {/* Header */}
           <div className="flex items-center justify-between mb-8">
-            <h1 className="text-3xl font-bold text-gray-800 ml-120 mt-10">Project Monitoring</h1>
-            <div className="flex items-center space-x-4">
-              <div className="relative">
-                <select className="bg-white pl-5 pr-3 py-2 rounded-lg shadow border border-gray-200 text-gray-600">
-                  <option>All Projects</option>
-                  <option>Active</option>
-                  <option>Completed</option>
-                </select>
-                
-              </div>
-            </div>
+            <h1 className="text-3xl font-bold text-gray-800">Project Monitoring</h1>
+            <select 
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+              className="bg-white px-4 py-2 rounded-lg shadow border border-gray-200"
+            >
+              <option value="all">All Projects</option>
+              <option value="active">Active</option>
+              <option value="completed">Completed</option>
+            </select>
           </div>
 
-          {/* Projects Lists */}
           <div className="space-y-8">
-            {projects.map(project => (
-              <div key={project.id} className="space-y-6">
-                {/* Project Header */}
+            {plantations.map(project => (
+              <div key={project._id} className="space-y-6">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-xl font-semibold text-gray-800">{project.name}</h2>
+                  <h2 className="text-xl font-semibold text-gray-800">{project.projectName}</h2>
                   <span className={`px-3 py-1 rounded-full text-sm ${
-                    project.status === 'active' ? 'bg-emerald-100 text-emerald-700' :
-                    'bg-amber-100 text-amber-700'
+                    project.completed 
+                      ? 'bg-gray-100 text-gray-700' 
+                      : project.planning 
+                        ? 'bg-emerald-100 text-emerald-700' 
+                        : 'bg-amber-100 text-amber-700'
                   }`}>
-                    {project.status.charAt(0).toUpperCase() + project.status.slice(1)}
+                    {project.completed ? 'Completed' : project.planning ? 'Active' : 'No Plan'}
                   </span>
                 </div>
 
-                {/* Original Cards Layout */}
                 <div className="grid md:grid-cols-2 gap-6">
-                  {/* Yield Prediction Card */}
-                  <div className="bg-white p-6 rounded-xl shadow">
+                  <div className="bg-white p-6 rounded-xl shadow-lg">
                     <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-lg font-semibold">📈 Yield Prediction</h3>
-                      <ChartBarIcon className="h-6 w-6 text-indigo-500" />
+                      <h3 className="text-lg font-semibold flex items-center gap-2">
+                        <ChartBarIcon className="w-6 h-6 text-indigo-500" />
+                        Yield Prediction
+                      </h3>
+                      {project.completed && (
+                        <div className="flex items-center gap-1 text-sm text-green-600">
+                          <CheckCircleIcon className="w-4 h-4" />
+                          <span>Completed Project</span>
+                        </div>
+                      )}
                     </div>
                     <div className="h-48 bg-indigo-50 rounded-lg flex flex-col items-center justify-center">
-                      <span className="text-4xl font-bold text-gray-800">{project.yield}</span>
+                      <span className="text-4xl font-bold text-gray-800">
+                        {calculateYield(project.planning)}
+                      </span>
                       <span className="text-gray-500 mt-2">Estimated Harvest</span>
                     </div>
                   </div>
 
-                  {/* Soil Quality Card */}
-                  <div className="bg-white p-6 rounded-xl shadow">
+                  <div className="bg-white p-6 rounded-xl shadow-lg">
                     <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-lg font-semibold">🌱 Soil Quality</h3>
-                      <svg className="h-6 w-6 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
-                      </svg>
+                      <h3 className="text-lg font-semibold flex items-center gap-2">
+                        <SunIcon className="w-6 h-6 text-emerald-500" />
+                        Soil Analysis
+                      </h3>
+                      {project.completed && (
+                        <span className="px-2 py-1 text-sm bg-green-100 text-green-700 rounded-full">
+                          Completed on {new Date(project.completedDate).toLocaleDateString()}
+                        </span>
+                      )}
                     </div>
                     <div className="space-y-4">
                       <div>
-                        <div className="flex justify-between mb-1">
-                          <span>pH Level</span>
-                          <span className="text-emerald-600">{project.soil.pH} (Optimal)</span>
+                        <div className="flex justify-between mb-2">
+                          <span className="text-gray-600">pH Level</span>
+                          <span className="font-medium text-emerald-600">
+                            {project.planning?.soilData?.phLevel || 'N/A'}
+                          </span>
                         </div>
                         <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                           <div 
                             className="h-full bg-gradient-to-r from-emerald-400 to-emerald-600" 
-                            style={{ width: `${(project.soil.pH / 7) * 100}%` }}
+                            style={{ width: `${(project.planning?.soilData?.phLevel / 14) * 100 || 0}%` }}
                           />
                         </div>
                       </div>
                       <div>
-                        <div className="flex justify-between mb-1">
-                          <span>Nutrient Level</span>
-                          <span className="text-amber-600">{project.soil.nitrogen}</span>
+                        <div className="flex justify-between mb-2">
+                          <span className="text-gray-600">Nutrient Level</span>
+                          <span className="font-medium text-amber-600">
+                            {project.planning?.soilData?.nutrients || 'N/A'}
+                          </span>
                         </div>
                         <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                           <div 
                             className="h-full bg-gradient-to-r from-amber-400 to-amber-600" 
                             style={{ 
-                              width: project.soil.nitrogen === 'High' ? '80%' :
-                              project.soil.nitrogen === 'Medium' ? '50%' : '30%' 
+                              width: project.planning?.soilData?.nutrients === 'High' ? '80%' :
+                              project.planning?.soilData?.nutrients === 'Medium' ? '50%' : '30%' 
                             }}
                           />
                         </div>
@@ -115,4 +165,6 @@ export default function MonitoringReports() {
       </div>
     </div>
   );
-}
+};
+
+export default MonitoringReports;
