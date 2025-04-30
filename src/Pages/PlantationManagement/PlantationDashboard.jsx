@@ -12,8 +12,8 @@ import {
   WifiIcon,
   CheckCircleIcon,
   MapPinIcon,
-  DocumentTextIcon,  // Add this
-  BugAntIcon        // Add this
+  DocumentTextIcon,
+  BugAntIcon        
 } from "@heroicons/react/24/outline";
 import PlantationSidebar from "../../Components/PlantationSidebar";
 
