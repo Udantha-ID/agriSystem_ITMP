@@ -2,10 +2,10 @@ import React from 'react';
 import { Phone } from 'lucide-react';
 
 function ContactBanner() {
-  const phoneNumber = "0322051310"; // Replace with the desired phone number
+  const phoneNumber = "0322051310"; 
 
   const handleCallClick = () => {
-    // When clicked, navigate to the phone dialer with the phone number
+    
     window.location.href = `tel:${phoneNumber}`;
   };
 
