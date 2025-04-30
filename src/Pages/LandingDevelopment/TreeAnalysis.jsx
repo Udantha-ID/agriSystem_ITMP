@@ -98,6 +98,32 @@ export const TreeAnalysis = ({ boundary, spacing, scale }) => {
     };
   }, [boundary, bufferedBoundary, spacing, scale]);
 
+  const handleSaveAnalysis = async () => {
+    try {
+      const response = await fetch('/api/analyses', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({
+          totalArea: metrics.totalArea,
+          plantableArea: metrics.plantableArea,
+          spacing,
+          totalTrees: metrics.treeCount
+        })
+      });
+  
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message);
+      
+      alert('Analysis saved successfully!');
+    } catch (error) {
+      console.error('Error saving analysis:', error);
+      alert(`Failed to save analysis: ${error.message}`);
+    }
+  };
+
   const handleDownloadImage = async () => {
     if (reportRef.current) {
       const canvas = await html2canvas(reportRef.current, {

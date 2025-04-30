@@ -4,7 +4,8 @@ import { Mail, Lock, User, Eye, EyeOff, CheckCircle, XCircle, Phone, MapPin, Spr
 import backgroundImage from '../../images/SmartFarm/wallpaper.jpeg';
 import Navbar from '../../Components/Navbar';
 import { useNavigate } from 'react-router-dom';
-import Footer from '../../Components/Footer'
+import Footer from '../../Components/Footer';
+import authService from '../../services/authService';
 
 const UserRegister = () => {
   const navigate = useNavigate();
@@ -16,14 +17,23 @@ const UserRegister = () => {
     address: '',
     phoneNumber: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    paymentInfo: {
+      cardHolderName: '',
+      cardNumber: '',
+      cvc: '',
+      paymentMethod: ''
+    }
   });
   const [isLoading, setIsLoading] = useState(false);
   const [agreed, setAgreed] = useState(false);
   const [errors, setErrors] = useState({
     email: '',
-    phoneNumber: ''
+    phoneNumber: '',
+    password: '',
+    server: ''
   });
+  const [registrationSuccess, setRegistrationSuccess] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -43,6 +53,14 @@ const UserRegister = () => {
       ...prev,
       [name]: value
     }));
+    
+    // Clear errors when typing
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
+    if (errors.server) {
+      setErrors(prev => ({ ...prev, server: '' }));
+    }
   };
 
   const validateEmail = (email) => {
@@ -93,6 +111,7 @@ const UserRegister = () => {
     e.preventDefault();
     if (!agreed) return;
 
+    // Form validation
     if (!validateEmail(formData.email)) {
       setErrors(prev => ({ ...prev, email: 'Email must include @gmail.com' }));
       return;
@@ -103,9 +122,39 @@ const UserRegister = () => {
       return;
     }
 
+    if (formData.password !== formData.confirmPassword) {
+      setErrors(prev => ({ ...prev, password: 'Passwords do not match' }));
+      return;
+    }
+
     setIsLoading(true);
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    setIsLoading(false);
+    
+    try {
+      // Remove confirmPassword as it's not needed in the backend
+      const { confirmPassword, ...userData } = formData;
+      
+      // Call the register API directly instead of using the auth context
+      await authService.registerOnly(userData);
+      
+      // Set registration success state
+      setRegistrationSuccess(true);
+      
+      // Redirect to login page after 2 seconds with a success message
+      setTimeout(() => {
+        navigate('/login', { 
+          state: { 
+            registrationSuccess: true,
+            email: formData.email 
+          }
+        });
+      }, 2000);
+    } catch (error) {
+      setErrors(prev => ({ 
+        ...prev, 
+        server: error.message || 'Registration failed. Please try again.' 
+      }));
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -140,6 +189,28 @@ const UserRegister = () => {
         onSubmit={handleSubmit}
         className="w-full max-w-md bg-white bg-opacity-90 backdrop-blur-sm rounded-lg shadow-lg p-8 space-y-6"
       >
+        {/* Registration success message */}
+        {registrationSuccess && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded"
+          >
+            Account created successfully! Redirecting to login...
+          </motion.div>
+        )}
+
+        {/* Server error message */}
+        {errors.server && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded"
+          >
+            {errors.server}
+          </motion.div>
+        )}
+
         {/* Full Name Field */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
@@ -369,14 +440,14 @@ const UserRegister = () => {
         {/* Submit Button */}
         <motion.button
           type="submit"
-          disabled={isLoading || !agreed || formData.password !== formData.confirmPassword || !strength.isStrong}
+          disabled={isLoading || !agreed || formData.password !== formData.confirmPassword || !strength.isStrong || registrationSuccess}
           className={`w-full bg-green-500 text-white py-3 rounded-lg font-semibold transition-all duration-200 transform hover:bg-green-600 hover:scale-[1.02] active:scale-[0.98] ${
-            (isLoading || !agreed || formData.password !== formData.confirmPassword || !strength.isStrong)
+            (isLoading || !agreed || formData.password !== formData.confirmPassword || !strength.isStrong || registrationSuccess)
               ? 'opacity-75 cursor-not-allowed'
               : ''
           }`}
           initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
+          animate={{ opacity: 1 }}
           transition={{ delay: 0.8 }}
           whileTap={{ scale: 0.98 }}
         >
@@ -386,6 +457,8 @@ const UserRegister = () => {
               animate={{ rotate: 360 }}
               transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
             />
+          ) : registrationSuccess ? (
+            'Account Created!'
           ) : (
             'Create Account'
           )}

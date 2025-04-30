@@ -3,22 +3,25 @@ import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { Home, Info, ShoppingBag, Mail, UserCircle, Menu, X, ChevronRight, Leaf, LogOut, Bell, Settings, HelpCircle } from "lucide-react";
 import SearchBar from '../Components/SearchBar.jsx';
+import { useAuth } from '../context/AuthContext';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [showAccountTray, setShowAccountTray] = useState(false);
   const accountTrayRef = useRef(null);
+  const navigate = useNavigate();
+  const { isAuthenticated, currentUser, logout } = useAuth();
 
-  
-// Inside Navbar component
-const navigate = useNavigate();
+  const handleLogin = () => {
+    navigate("/login");
+  };
 
-const handleLogin = () => {
-  navigate("/login");
-  setIsLoggedIn(true);
-};
+  const handleLogout = () => {
+    logout();
+    setShowAccountTray(false);
+    navigate('/');
+  };
 
   // Handle scroll effect
   useEffect(() => {
@@ -49,11 +52,6 @@ const handleLogin = () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
-
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-    setShowAccountTray(false);
-  };
 
   return (
     <div className="fixed top-2 left-0 right-0 z-50">
@@ -96,7 +94,7 @@ const handleLogin = () => {
 
             {/* User Profile / Login Button */}
             <div className="hidden md:flex items-center relative" ref={accountTrayRef}>
-              {isLoggedIn ? (
+              {isAuthenticated ? (
                 <div 
                   className="flex items-center gap-3 bg-green-50 py-2 px-4 rounded-xl cursor-pointer hover:bg-green-100 transition-colors"
                   onClick={() => setShowAccountTray(!showAccountTray)}
@@ -114,22 +112,9 @@ const handleLogin = () => {
                             <UserCircle className="w-8 h-8 text-green-700" />
                           </div>
                           <div>
-                            <h3 className="font-semibold text-gray-900">John Doe</h3>
-                            <p className="text-sm text-gray-500">john@example.com</p>
+                            <h3 className="font-semibold text-gray-900">{currentUser?.fullName || 'User'}</h3>
+                            <p className="text-sm text-gray-500">{currentUser?.email || ''}</p>
                           </div>
-                        </div>
-                      </div>
-                      
-                      {/* Notifications Section */}
-                      <div className="p-2 border-b border-gray-200">
-                        <div className="flex items-center justify-between px-2 py-1.5 hover:bg-gray-50 rounded-lg cursor-pointer">
-                          <div className="flex items-center gap-3">
-                            <div className="p-2 bg-blue-100 rounded-full">
-                              <Bell className="w-5 h-5 text-blue-600" />
-                            </div>
-                            <span className="text-sm font-medium">Notifications</span>
-                          </div>
-                          <span className="bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full">3</span>
                         </div>
                       </div>
                       
@@ -151,15 +136,6 @@ const handleLogin = () => {
                         >
                           <Settings className="w-5 h-5" />
                           <span className="text-sm font-medium">Account Settings</span>
-                        </Link>
-                        
-                        <Link 
-                          to="/help" 
-                          className="flex items-center gap-3 px-2 py-2.5 hover:bg-gray-50 rounded-lg cursor-pointer text-gray-700"
-                          onClick={() => setShowAccountTray(false)}
-                        >
-                          <HelpCircle className="w-5 h-5" />
-                          <span className="text-sm font-medium">Help Center</span>
                         </Link>
                       </div>
                       
@@ -224,29 +200,19 @@ const handleLogin = () => {
 
             {/* Mobile Login Button */}
             <div className="mt-8 pt-6 border-t border-gray-200">
-              {isLoggedIn ? (
+              {isAuthenticated ? (
                 <div className="space-y-4">
                   {/* Profile Info */}
                   <div className="flex items-center gap-3 bg-green-50 py-3 px-4 rounded-xl">
                     <UserCircle className="w-6 h-6 text-green-700" />
                     <div>
-                      <p className="text-green-800 font-medium">John Doe</p>
-                      <p className="text-xs text-green-600">john@example.com</p>
+                      <p className="text-green-800 font-medium">{currentUser?.fullName || 'User'}</p>
+                      <p className="text-xs text-green-600">{currentUser?.email || ''}</p>
                     </div>
                   </div>
                   
                   {/* Mobile Account Options */}
                   <div className="space-y-2">
-                    <Link 
-                      to="/notifications" 
-                      className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <Bell className="w-5 h-5 text-gray-600" />
-                      <span className="text-sm font-medium">Notifications</span>
-                      <span className="ml-auto bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full">3</span>
-                    </Link>
-                    
                     <Link 
                       to="/profile" 
                       className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg"
@@ -276,10 +242,7 @@ const handleLogin = () => {
                 </div>
               ) : (
                 <button 
-                  onClick={() => {
-                    setIsLoggedIn(true);
-                    setIsOpen(false);
-                  }}
+                  onClick={handleLogin}
                   className="w-full bg-gradient-to-r from-green-600 to-emerald-700 text-white py-3 rounded-xl flex items-center justify-center gap-2"
                 >
                   Login to Your Account
