@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
-import PlantationSidebar from "../Components/PlantationSidebar";
+import PlantationSidebar from "../../Components/PlantationSidebar";
 
 export default function AddPlantation() {
   const navigate = useNavigate();
