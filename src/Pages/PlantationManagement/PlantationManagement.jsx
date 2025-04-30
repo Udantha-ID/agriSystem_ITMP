@@ -1,5 +1,7 @@
-import { useState } from "react";
+// frontend/src/Pages/PlantationManagement.jsx (updated)
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import {
   PlusIcon,
   MagnifyingGlassIcon,
@@ -16,95 +18,174 @@ import jsPDF from "jspdf";
 
 function PlantationManagement() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [plantations] = useState([
-    {
-      id: 1,
-      projectname: "Project1",
-      type: "Coconut",
-      TotalLandArea: "2 cores",
-      startdate: "2025-10-15",
-      harvestingdate: "2035-01-15",
-      location: "Field A",
-      employee: 5,
-    },
-    {
-      id: 2,
-      projectname: "Project2",
-      type: "Mango",
-      TotalLandArea: "1 cores",
-      startdate: "2025-04-22",
-      harvestingdate: "2026-04-15",
-      location: "Field B",
-      employee: 3,
-    },
-  ]);
-
+  const [plantations, setPlantations] = useState([]);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const fetchPlantations = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/plantations");
+        setPlantations(response.data.filter((p) => !p.completed));
+      } catch (error) {
+        console.error("Error fetching plantations:", error);
+      }
+    };
+    fetchPlantations();
+  }, []);
+
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`http://localhost:5000/plantations/${id}`);
+      setPlantations(plantations.filter((plantation) => plantation._id !== id));
+    } catch (error) {
+      console.error("Error deleting plantation:", error);
+    }
+  };
+
+// frontend/src/Pages/PlantationManagement.jsx
+const handleComplete = async (id) => {
+  try {
+    const response = await axios.put(
+      `http://localhost:5000/plantations/${id}/complete`
+    );
+
+    if (response.data?.completed) {
+      // Force refresh by refetching data
+      const updatedResponse = await axios.get("http://localhost:5000/plantations");
+      setPlantations(updatedResponse.data.filter((p) => !p.completed));
+      
+      alert("Project marked as completed successfully!");
+    }
+  } catch (error) {
+    console.error("Error completing plantation:", error);
+    alert(
+      `Error completing project: ${
+        error.response?.data?.error || error.message
+      }`
+    );
+  }
+};
+
   const generateReport = (plantation) => {
-    const doc = new jsPDF();
-    const pageWidth = doc.internal.pageSize.getWidth();
+    try {
+      const doc = new jsPDF();
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const mainColor = "#047857";
+      const secondaryColor = "#064e3b";
 
-    // Styling
-    const mainColor = "#047857";
-    const secondaryColor = "#064e3b";
+      // Add Cover Page
+      doc.setFillColor(232, 253, 245);
+      doc.rect(0, 0, pageWidth, doc.internal.pageSize.getHeight(), "F");
 
-    // Header
-    doc.setFontSize(22);
-    doc.setTextColor(mainColor);
-    doc.setFont("helvetica", "bold");
-    doc.text(plantation.projectname + " Report", 20, 20);
-
-    // Company Info
-    doc.setFontSize(10);
-    doc.setTextColor(100);
-    doc.setFont("helvetica", "normal");
-    doc.text("Green Plantations Co.", 20, 30);
-    doc.text("Report Date: " + new Date().toLocaleDateString(), 20, 35);
-
-    // Line separator
-    doc.setDrawColor(209, 250, 229);
-    doc.setLineWidth(0.5);
-    doc.line(20, 40, pageWidth - 20, 40);
-
-    // Plantation Details
-    doc.setFontSize(12);
-    doc.setTextColor(40);
-    let yPosition = 50;
-
-    const details = [
-      { label: "Project Type:", value: plantation.type },
-      { label: "Total Land Area:", value: plantation.TotalLandArea },
-      { label: "Start Date:", value: plantation.startdate },
-      { label: "Harvest Date:", value: plantation.harvestingdate },
-      { label: "Location:", value: plantation.location },
-      { label: "Employees Assigned:", value: plantation.employee },
-    ];
-
-    details.forEach(({ label, value }) => {
+      // Header
+      doc.setFontSize(28);
+      doc.setTextColor(mainColor);
       doc.setFont("helvetica", "bold");
-      doc.text(label, 20, yPosition);
-      doc.setFont("helvetica", "normal");
-      doc.text(value.toString(), 70, yPosition);
-      yPosition += 8;
-    });
+      doc.text("Green Plantations Co.", pageWidth / 2, 40, { align: "center" });
 
-    // Footer
-    doc.setFontSize(10);
-    doc.setTextColor(100);
-    doc.text(
-      "© 2024 Green Plantations Co. - Confidential Report",
-      pageWidth / 2,
-      doc.internal.pageSize.getHeight() - 10,
-      { align: "center" }
-    );
+      // Project Title
+      doc.setFontSize(22);
+      doc.text(`${plantation.projectName} Report`, pageWidth / 2, 60, {
+        align: "center",
+      });
 
-    // Save PDF
-    doc.save(
-      `${plantation.projectname}_Report_${
-        new Date().toISOString().split("T")[0]
-      }.pdf`
-    );
+      // Report Details
+      doc.setFontSize(12);
+      doc.setTextColor(secondaryColor);
+      doc.text(
+        `Report Generated: ${new Date().toLocaleDateString()}`,
+        pageWidth / 2,
+        170,
+        { align: "center" }
+      );
+
+      // Add Content Page
+      doc.addPage();
+
+      // Content Styling
+      const margin = 20;
+      let yPos = margin;
+
+      // Section Header Function
+      const addSectionHeader = (text, y) => {
+        doc.setFillColor(209, 250, 229);
+        doc.rect(margin - 5, y - 5, 50, 10, "F");
+        doc.setFontSize(14);
+        doc.setTextColor(secondaryColor);
+        doc.text(text, margin, y);
+        return y + 10;
+      };
+
+      // Key Value Pair Function
+      const addKeyValue = (key, value, y) => {
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(secondaryColor);
+        doc.text(`${key}:`, margin, y);
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(40);
+        doc.text(value, margin + 40, y);
+        return y + 8;
+      };
+
+      // Project Overview
+      yPos = addSectionHeader("Project Overview", yPos);
+      yPos += 5;
+
+      const overviewData = [
+        ["Project Type", plantation.type || "N/A"],
+        ["Land Area", `${plantation.landArea || 0} acres`],
+        [
+          "Start Date",
+          new Date(plantation.startDate).toLocaleDateString() || "N/A",
+        ],
+        [
+          "Harvest Date",
+          new Date(plantation.harvestingDate).toLocaleDateString() || "N/A",
+        ],
+        ["Location", plantation.location || "N/A"],
+        ["Employees", plantation.employees?.toString() || "0"],
+      ];
+
+      overviewData.forEach(([key, value]) => {
+        yPos = addKeyValue(key, value, yPos);
+      });
+
+      // Progress Section
+      yPos += 10;
+      yPos = addSectionHeader("Project Progress", yPos);
+      yPos += 5;
+
+      // Progress Bar
+      const progress = 65; // Replace with real data
+      doc.setFillColor(209, 250, 229);
+      doc.rect(margin, yPos, 100, 8, "F");
+      doc.setFillColor(mainColor);
+      doc.rect(margin, yPos, progress, 8, "F");
+      doc.setFontSize(10);
+      doc.setTextColor(mainColor);
+      doc.text(`${progress}% Completed`, margin + 105, yPos + 6);
+      yPos += 15;
+
+      // Footer
+      doc.setFontSize(10);
+      doc.setTextColor(100);
+      doc.text(
+        "© 2024 Green Plantations Co. - Confidential Report",
+        pageWidth / 2,
+        doc.internal.pageSize.getHeight() - 10,
+        { align: "center" }
+      );
+
+      // Save PDF
+      doc.save(
+        `${plantation.projectName}_Report_${
+          new Date().toISOString().split("T")[0]
+        }.pdf`
+      );
+    } catch (error) {
+      console.error("Error generating report:", error);
+      alert("Failed to generate report. Please check the console for details.");
+    }
   };
 
   return (
@@ -115,25 +196,25 @@ function PlantationManagement() {
           {/* Header Section */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 ml-100 mt-3">
+              <h1 className="text-3xl font-bold text-gray-900">
                 Plantation Management
               </h1>
-              <p className="mt-2 text-gray-600 ml-101">
+              <p className="mt-2 text-gray-600">
                 Manage your plantation projects and activities
               </p>
             </div>
             <button
-              onClick={() => navigate("/addplant")}
+              onClick={() => navigate("/addplantation")}
               className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 flex items-center shadow-lg hover:shadow-emerald-200"
             >
-              <PlusIcon className="h-5 w-5 mr-2 bg-emerald-700 p-1 rounded-full" />
+              <PlusIcon className="h-5 w-5 mr-2" />
               New Plantation
             </button>
           </div>
 
-          {/* Search and Table Section */}
+          {/* Table Section */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            {/* Search Bar */}
+            {/* Search and Table */}
             <div className="mb-8">
               <div className="relative max-w-md">
                 <input
@@ -143,15 +224,13 @@ function PlantationManagement() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center">
-                  <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
-                </div>
+                <MagnifyingGlassIcon className="h-5 w-5 text-gray-400 absolute left-4 top-3.5" />
               </div>
             </div>
 
-            {/* Plantation Table */}
             <div className="overflow-x-auto rounded-lg border border-gray-100 ring-1 ring-gray-200">
               <table className="w-full divide-y divide-gray-200">
+                {/* Table Head */}
                 <thead className="bg-gray-50">
                   <tr>
                     {[
@@ -166,93 +245,99 @@ function PlantationManagement() {
                     ].map((header) => (
                       <th
                         key={header}
-                        className="px-6 py-4 text-center text-sm font-semibold text-gray-700 uppercase tracking-wider"
+                        className="px-4 py-4 text-center text-sm font-semibold text-gray-700 uppercase tracking-wider"
                       >
                         {header}
                       </th>
                     ))}
                   </tr>
                 </thead>
+
+                {/* Table Body */}
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {plantations.map((plantation) => (
-                    <tr
-                      key={plantation.id}
-                      className="hover:bg-gray-50 transition-colors"
-                    >
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 text-center">
-                        {plantation.projectname}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                        <span className="px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-medium">
-                          {plantation.type}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                        {plantation.TotalLandArea}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                        {plantation.startdate}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                        {plantation.harvestingdate}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                        <span className="flex items-center">
-                          <MapPinIcon className="h-4 w-4 mr-1 text-gray-400" />
-                          {plantation.location}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                        <span className="flex items-center">
-                          <UserGroupIcon className="h-4 w-4 mr-1 text-gray-400" />
-                          {plantation.employee}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm">
-                        <div className="flex items-center space-x-4">
-                          <button
-                            onClick={() =>
-                              navigate(`/updateplant/${plantation.id}`)
-                            }
-                            className="text-emerald-600 hover:text-emerald-800 p-2 rounded-lg hover:bg-emerald-50"
-                          >
-                            <PencilSquareIcon className="h-5 w-5" />
-                          </button>
-                          <button className="text-red-600 hover:text-red-800 p-2 rounded-lg hover:bg-red-50">
-                            <TrashIcon className="h-5 w-5" />
-                          </button>
-                          <button className="text-blue-600 hover:text-blue-800 p-2 rounded-lg hover:bg-blue-50">
-                            <CheckCircleIcon className="h-5 w-5" />
-                          </button>
-                          <button
-                            onClick={() => generateReport(plantation)}
-                            className="text-purple-600 hover:text-purple-800 p-2 rounded-lg hover:bg-purple-50"
-                          >
-                            <DocumentArrowDownIcon className="h-5 w-5" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                  {plantations
+                    .filter((plantation) =>
+                      plantation.projectName
+                        .toLowerCase()
+                        .includes(searchQuery.toLowerCase())
+                    )
+                    .map((plantation) => (
+                      <tr
+                        key={plantation._id}
+                        className="hover:bg-gray-50 transition-colors"
+                      >
+                        {/* Table Cells */}
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 text-center">
+                          {plantation.projectName}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className="px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-medium text-center">
+                            {plantation.type}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 text-center">
+                          {plantation.landArea} acres
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 text-center">
+                          {new Date(plantation.startDate).toLocaleDateString()}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 text-center">
+                          {new Date(
+                            plantation.harvestingDate
+                          ).toLocaleDateString()}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 ">
+                          <div className="flex items-center justify-center">
+                            <MapPinIcon className="h-4 w-4 mr-1 text-gray-400" />
+                            {plantation.location}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                          <div className="flex items-center justify-center">
+                            <UserGroupIcon className="h-4 w-4 mr-1 text-gray-400" />
+                            {plantation.employees}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center justify-center space-x-4">
+                            <button
+                              onClick={() =>
+                                navigate(`/updateplantation/${plantation._id}`)
+                              }
+                              className="text-emerald-600 hover:text-emerald-800 p-2 rounded-lg hover:bg-emerald-50"
+                              title="Update Plantation"
+                            >
+                              <PencilSquareIcon className="h-5 w-5" />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(plantation._id)}
+                              className="text-red-600 hover:text-red-800 p-2 rounded-lg hover:bg-red-50"
+                              title="Delete Plantation"
+                            >
+                              <TrashIcon className="h-5 w-5" />
+                            </button>
+                            <button
+                              onClick={() => handleComplete(plantation._id)}
+                              className="text-blue-600 hover:text-blue-800 p-2 rounded-lg hover:bg-blue-50"
+                              title="Mark as completed"
+                            >
+                              <CheckCircleIcon className="h-5 w-5" />
+                            </button>
+                            <button
+                              onClick={() => generateReport(plantation)}
+                              className="text-purple-600 hover:text-purple-800 p-2 rounded-lg hover:bg-purple-50"
+                              title="Download Report"
+                            >
+                              <DocumentArrowDownIcon className="h-5 w-5" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
                 </tbody>
               </table>
             </div>
           </div>
-
-          {/* Empty State */}
-          {plantations.length === 0 && (
-            <div className="mt-12 text-center py-12">
-              <div className="text-gray-400 mb-4">
-                <Square3Stack3DIcon className="h-12 w-12 mx-auto" />
-              </div>
-              <h3 className="text-gray-900 font-medium">
-                No plantations found
-              </h3>
-              <p className="text-gray-500 mt-1">
-                Create your first plantation project
-              </p>
-            </div>
-          )}
         </div>
       </div>
     </div>
