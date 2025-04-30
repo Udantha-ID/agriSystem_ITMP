@@ -1,4 +1,3 @@
-// frontend/src/Pages/PlantationDashboard.jsx (updated)
 import { useEffect, useState } from "react";
 import axios from "axios";
 import {
@@ -13,12 +12,12 @@ import {
   CheckCircleIcon,
   MapPinIcon,
   DocumentTextIcon,
-  BugAntIcon        
+  BugAntIcon,
+  ExclamationTriangleIcon
 } from "@heroicons/react/24/outline";
 import PlantationSidebar from "../../Components/PlantationSidebar";
 
 function PlantationDashboard() {
-  const [weatherData, setWeatherData] = useState(null);
   const [allPlantations, setAllPlantations] = useState([]);
   const [totalWorkers] = useState(100);
   const [assignedWorkers, setAssignedWorkers] = useState(0);
@@ -38,34 +37,158 @@ function PlantationDashboard() {
   const [selectedCity, setSelectedCity] = useState("Colombo");
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchPlantations = async () => {
       try {
-        // Fetch weather data
-        const weatherResponse = await axios.get(
-          `http://localhost:5000/api/weather?city=${selectedCity}`
-        );
-        setWeatherData(weatherResponse.data);
-
-        // Fetch plantations data
         const plantationsResponse = await axios.get("http://localhost:5000/plantations");
         setAllPlantations(plantationsResponse.data);
         
-        // Calculate assigned workers
         const activeProjects = plantationsResponse.data.filter(p => !p.completed);
         const assigned = activeProjects.reduce((sum, p) => sum + (p.employees || 0), 0);
         setAssignedWorkers(assigned);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error("Error fetching plantations:", error);
       }
     };
 
-    fetchData();
-    const interval = setInterval(fetchData, 300000); // Refresh every 5 minutes
-    return () => clearInterval(interval);
-  }, [selectedCity]);
+    fetchPlantations();
+  }, []);
 
   const completedPlantations = allPlantations.filter(p => p.completed);
   const activePlantations = allPlantations.filter(p => !p.completed);
+
+  const WeatherSection = ({ city }) => {
+    const [weatherData, setWeatherData] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+      const fetchWeather = async () => {
+        try {
+          setLoading(true);
+          setError(null);
+          
+          const response = await axios.get(
+            `http://localhost:5000/api/weather?city=${city}`
+          );
+          
+          if (response.data.status === 'success') {
+            setWeatherData(response.data.data);
+          } else {
+            setError(response.data.message || 'Failed to fetch weather data');
+          }
+        } catch (err) {
+          if (err.response) {
+            if (err.response.data.code === 'INVALID_CITY') {
+              setError('Please select a valid city from the dropdown');
+            } else {
+              setError(err.response.data.message || 'Weather service error');
+            }
+          } else {
+            setError('Network error - failed to connect to weather service');
+          }
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchWeather();
+      const interval = setInterval(fetchWeather, 300000); // Refresh every 5 minutes
+      return () => clearInterval(interval);
+    }, [city]);
+
+    if (loading) {
+      return (
+        <div className="animate-pulse grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="h-32 bg-gray-100 rounded-2xl"></div>
+          ))}
+        </div>
+      );
+    }
+
+    if (error) {
+      return (
+        <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-lg">
+          <div className="flex items-center">
+            <ExclamationTriangleIcon className="h-5 w-5 text-red-400 mr-2" />
+            <p className="text-red-700">{error}</p>
+          </div>
+          <p className="text-sm text-gray-600 mt-2">
+            Selected city: {city}
+          </p>
+        </div>
+      );
+    }
+
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+        {/* Temperature Card */}
+        <div className="relative bg-orange-50/60 backdrop-blur-sm p-5 rounded-2xl border border-orange-200/50 hover:border-orange-300 transition-all">
+          <div className="absolute top-2 right-2 opacity-30">
+            <SunIcon className="h-16 w-16 text-amber-400" />
+          </div>
+          <div className="relative z-10">
+            <h3 className="text-sm font-medium text-gray-600 mb-2">Temperature</h3>
+            <p className="text-4xl font-bold text-gray-700 mb-2">
+              {Math.round(weatherData.temperature)}°
+              <span className="text-2xl text-gray-600">C</span>
+            </p>
+            <p className="text-sm text-gray-500">
+              Feels like {Math.round(weatherData.feels_like)}°
+            </p>
+          </div>
+        </div>
+
+        {/* Humidity Card */}
+        <div className="relative bg-sky-50/60 backdrop-blur-sm p-5 rounded-2xl border border-sky-200/50 hover:border-sky-300 transition-all">
+          <div className="absolute top-2 right-2 opacity-30">
+            <BeakerIcon className="h-16 w-16 text-sky-400" />
+          </div>
+          <div className="relative z-10">
+            <h3 className="text-sm font-medium text-gray-600 mb-2">Humidity</h3>
+            <p className="text-4xl font-bold text-gray-700 mb-2">
+              {weatherData.humidity}%
+            </p>
+            <p className="text-sm text-gray-500">
+              Conditions: {weatherData.conditions}
+            </p>
+          </div>
+        </div>
+
+        {/* Wind Card */}
+        <div className="relative bg-emerald-50/60 backdrop-blur-sm p-5 rounded-2xl border border-emerald-200/50 hover:border-emerald-300 transition-all">
+          <div className="absolute top-2 right-2 opacity-30">
+            <WifiIcon className="h-16 w-16 text-emerald-400 transform rotate-45" />
+          </div>
+          <div className="relative z-10">
+            <h3 className="text-sm font-medium text-gray-600 mb-2">Wind</h3>
+            <p className="text-4xl font-bold text-gray-700 mb-2">
+              {weatherData.wind.speed}m/s
+            </p>
+            <p className="text-sm text-gray-500">
+              Direction: {weatherData.wind.deg}°
+            </p>
+          </div>
+        </div>
+
+        {/* Visibility Card */}
+        <div className="relative bg-purple-50/60 backdrop-blur-sm p-5 rounded-2xl border border-purple-200/50 hover:border-purple-300 transition-all">
+          <div className="absolute top-2 right-2 opacity-30">
+            <CloudIcon className="h-16 w-16 text-violet-400" />
+          </div>
+          <div className="relative z-10">
+            <h3 className="text-sm font-medium text-gray-600 mb-2">Visibility</h3>
+            <p className="text-4xl font-bold text-gray-700 mb-2">
+              {weatherData.visibility} km
+            </p>
+            <p className="text-sm text-gray-500">
+              Last updated: {new Date(weatherData.timestamp).toLocaleTimeString()}
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   const ProjectModal = ({ project, onClose }) => (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -209,83 +332,7 @@ function PlantationDashboard() {
                 <GlobeAmericasIcon className="h-6 w-6 text-emerald-500/80" />
                 Live Climate Monitoring - {selectedCity}
               </h2>
-              {weatherData && (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-                  {/* Temperature Card */}
-                  <div className="relative bg-orange-50/60 backdrop-blur-sm p-5 rounded-2xl border border-orange-200/50 hover:border-orange-300 transition-all">
-                    <div className="absolute top-2 right-2 opacity-30">
-                      <SunIcon className="h-16 w-16 text-amber-400" />
-                    </div>
-                    <div className="relative z-10">
-                      <h3 className="text-sm font-medium text-gray-600 mb-2">
-                        Temperature
-                      </h3>
-                      <p className="text-4xl font-bold text-gray-700 mb-2">
-                        {Math.round(weatherData.main.temp)}°
-                        <span className="text-2xl text-gray-600">C</span>
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        Feels like {Math.round(weatherData.main.feels_like)}°
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Humidity Card */}
-                  <div className="relative bg-sky-50/60 backdrop-blur-sm p-5 rounded-2xl border border-sky-200/50 hover:border-sky-300 transition-all">
-                    <div className="absolute top-2 right-2 opacity-30">
-                      <BeakerIcon className="h-16 w-16 text-sky-400" />
-                    </div>
-                    <div className="relative z-10">
-                      <h3 className="text-sm font-medium text-gray-600 mb-2">
-                        Humidity
-                      </h3>
-                      <p className="text-4xl font-bold text-gray-700 mb-2">
-                        {weatherData.main.humidity}%
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        Pressure: {weatherData.main.pressure}hPa
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Conditions Card */}
-                  <div className="relative bg-purple-50/60 backdrop-blur-sm p-5 rounded-2xl border border-purple-200/50 hover:border-purple-300 transition-all">
-                    <div className="absolute top-2 right-2 opacity-30">
-                      <CloudIcon className="h-16 w-16 text-violet-400" />
-                    </div>
-                    <div className="relative z-10">
-                      <h3 className="text-sm font-medium text-gray-600 mb-2">
-                        Conditions
-                      </h3>
-                      <p className="text-2xl font-bold text-gray-700 mb-2 capitalize">
-                        {weatherData.weather[0].description}
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        Visibility: {(weatherData.visibility / 1000).toFixed(1)}
-                        km
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Wind Card */}
-                  <div className="relative bg-emerald-50/60 backdrop-blur-sm p-5 rounded-2xl border border-emerald-200/50 hover:border-emerald-300 transition-all">
-                    <div className="absolute top-2 right-2 opacity-30">
-                      <WifiIcon className="h-16 w-16 text-emerald-400 transform rotate-45" />
-                    </div>
-                    <div className="relative z-10">
-                      <h3 className="text-sm font-medium text-gray-600 mb-2">
-                        Wind
-                      </h3>
-                      <p className="text-4xl font-bold text-gray-700 mb-2">
-                        {weatherData.wind.speed}m/s
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        Direction: {weatherData.wind.deg}°
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
+              <WeatherSection city={selectedCity} />
             </div>
 
             {/* Completed Plantations */}
@@ -299,7 +346,7 @@ function PlantationDashboard() {
                 </button>
               </div>
               <div className="space-y-4">
-                {completedPlantations.map((plantation) => (
+                {completedPlantations.slice(0, 3).map((plantation) => (
                   <div
                     key={plantation._id}
                     onClick={() => setSelectedProject(plantation)}
