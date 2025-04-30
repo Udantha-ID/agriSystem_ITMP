@@ -2,7 +2,6 @@ import React from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import Home from './Pages/Home.jsx'
 import Marketplace from './Pages/MarketPlace/MarketPlace.jsx'
-import Inventory from './Pages/MarketPlace/Inventory.jsx'
 import About from './Pages/About.jsx'
 import Contact from './Pages/Contact.jsx'
 import UserRegister from "./pages/SmartFarm/UserRegister.jsx";
@@ -22,6 +21,8 @@ import MonitoringReports from './Pages/PlantationManagement/MonitoringReports.js
 import AddPlantation from './Pages/PlantationManagement/AddPlantation.jsx'
 import UpdatePlantation from './Pages/PlantationManagement/UpdatePlantation.jsx'
 import ScrollToTop from './Components/ScrollToTop.js'
+import Inventory from './Pages/MarketPlace/Inventory.jsx'
+import AddProduct from './Pages/MarketPlace/AddProduct.jsx'
 
 // import LandDevelopment from './Pages/LandDevelopment/LandBoundary.jsx'
 
@@ -36,6 +37,8 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/marketplace" element={<Marketplace />} />
+        <Route path="/inventory" element={<Inventory/>} />
+        <Route path="addproduct" element={<AddProduct/>}/>
         <Route path="/pmdashboard" element={<PlantationDashboard />} />
         <Route path="/plantations" element={<PlantationManagement />} />
         <Route path="/resources" element={<FarmResourcePlanning/>} />
@@ -44,7 +47,6 @@ function App() {
         <Route path="/addplant" element={<AddPlantation />} />
         <Route path="/updateplant/:plantId" element={<UpdatePlantation />} />
         <Route path="/plantabout" element={<PlantationManagementAbout />} />
-        <Route path="/inventory" element={<Inventory />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
 
