@@ -1,14 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { LayoutGrid, BarChart, TreeDeciduous, Droplets, Ruler, Download } from 'lucide-react';
+import { LayoutGrid, BarChart, TreeDeciduous, Droplets, Ruler, Download, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 
 const Dashboard = () => {
   const [analyses, setAnalyses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedAnalysis, setSelectedAnalysis] = useState(null);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
+
     const fetchAnalyses = async () => {
       try {
         const token = localStorage.getItem('token');
@@ -21,16 +29,17 @@ const Dashboard = () => {
         if (!response.ok) throw new Error('Failed to fetch analyses');
         
         const data = await response.json();
-        setAnalyses(data.data);
+        setAnalyses(data.data || []);
         setLoading(false);
       } catch (error) {
         console.error('Error:', error);
+        setError(error.message);
         setLoading(false);
       }
     };
 
     fetchAnalyses();
-  }, []);
+  }, [isAuthenticated, navigate]);
 
   const handleDelete = async (id) => {
     try {
@@ -45,8 +54,12 @@ const Dashboard = () => {
       if (!response.ok) throw new Error('Failed to delete analysis');
       
       setAnalyses(analyses.filter(analysis => analysis._id !== id));
+      if (selectedAnalysis?._id === id) {
+        setSelectedAnalysis(null);
+      }
     } catch (error) {
       console.error('Error:', error);
+      alert('Failed to delete analysis. Please try again.');
     }
   };
 
@@ -58,67 +71,80 @@ const Dashboard = () => {
     );
   }
 
+  if (error) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="text-red-500 text-center">
+          <p className="text-xl font-semibold">Error loading analyses</p>
+          <p className="mt-2">{error}</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Land Development Dashboard</h1>
-          <button 
-            onClick={() => navigate('/land-boundary')}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+          <h1 className="text-3xl font-bold text-gray-900">My Land Analyses</h1>
+          <button
+            onClick={() => navigate('/landboundary')}
+            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
           >
             Create New Analysis
           </button>
         </div>
 
         {analyses.length === 0 ? (
-          <div className="bg-white p-8 rounded-lg shadow text-center">
-            <h3 className="text-xl font-medium text-gray-700 mb-2">No analyses found</h3>
-            <p className="text-gray-500 mb-4">Create your first land development analysis to get started</p>
-            <button 
+          <div className="text-center py-12">
+            <LayoutGrid className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900">No analyses yet</h3>
+            <p className="mt-2 text-gray-500">
+              Create your first land analysis to get started
+            </p>
+            <button
               onClick={() => navigate('/landboundary')}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
             >
-              Start Analyzing
+              Create Analysis
             </button>
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Analysis List */}
-            <div className="lg:col-span-1 space-y-4">
-              <div className="bg-white p-4 rounded-lg shadow">
-                <h3 className="font-medium text-lg mb-4 flex items-center">
-                  <LayoutGrid className="h-5 w-5 mr-2 text-blue-500" />
-                  My Analyses
-                </h3>
-                <div className="space-y-3">
+            <div className="lg:col-span-1">
+              <div className="bg-white rounded-lg shadow overflow-hidden">
+                <div className="p-4 border-b border-gray-200">
+                  <h2 className="text-lg font-semibold text-gray-900">Saved Analyses</h2>
+                </div>
+                <div className="divide-y divide-gray-200">
                   {analyses.map((analysis) => (
-                    <div 
+                    <div
                       key={analysis._id}
-                      onClick={() => setSelectedAnalysis(analysis)}
-                      className={`p-3 border rounded-lg cursor-pointer transition-colors ${
-                        selectedAnalysis?._id === analysis._id 
-                          ? 'border-blue-500 bg-blue-50' 
-                          : 'border-gray-200 hover:bg-gray-50'
+                      className={`p-4 cursor-pointer hover:bg-gray-50 transition-colors ${
+                        selectedAnalysis?._id === analysis._id ? 'bg-blue-50' : ''
                       }`}
+                      onClick={() => setSelectedAnalysis(analysis)}
                     >
                       <div className="flex justify-between items-start">
                         <div>
-                          <h4 className="font-medium">
-                            {new Date(analysis.createdAt).toLocaleDateString()}
-                          </h4>
+                          <h3 className="font-medium text-gray-900">
+                            Analysis {new Date(analysis.createdAt).toLocaleDateString()}
+                          </h3>
                           <p className="text-sm text-gray-500">
-                            {analysis.totalTrees} trees
+                            {analysis.totalTrees} trees • {analysis.plantableArea.toFixed(2)} m²
                           </p>
                         </div>
-                        <button 
+                        <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleDelete(analysis._id);
+                            if (window.confirm('Are you sure you want to delete this analysis?')) {
+                              handleDelete(analysis._id);
+                            }
                           }}
                           className="text-red-500 hover:text-red-700"
                         >
-                          Delete
+                          <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
                     </div>
@@ -152,27 +178,47 @@ const Dashboard = () => {
                       <div className="space-y-2">
                         <div className="flex justify-between">
                           <span className="text-gray-600">Total Area:</span>
-                          <span className="font-medium">
-                            {selectedAnalysis.totalArea.toFixed(2)} m²
-                          </span>
+                          <span className="font-medium">{selectedAnalysis.totalArea.toFixed(2)} m²</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600">Plantable Area:</span>
-                          <span className="font-medium">
-                            {selectedAnalysis.plantableArea.toFixed(2)} m²
-                          </span>
+                          <span className="font-medium">{selectedAnalysis.plantableArea.toFixed(2)} m²</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600">Tree Spacing:</span>
                           <span className="font-medium">
-                            {selectedAnalysis.treeSpacingHorizontal}m × {selectedAnalysis.treeSpacingVertical}m
+                            {selectedAnalysis.spacing.horizontal}m x {selectedAnalysis.spacing.vertical}m
                           </span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600">Total Trees:</span>
-                          <span className="font-medium">
-                            {selectedAnalysis.totalTrees}
-                          </span>
+                          <span className="font-medium">{selectedAnalysis.totalTrees} trees</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Economic Analysis */}
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <div className="flex items-center mb-3">
+                        <BarChart className="h-5 w-5 mr-2 text-blue-600" />
+                        <h3 className="font-medium">Economic Analysis</h3>
+                      </div>
+                      <div className="space-y-2">
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Annual Yield:</span>
+                          <span className="font-medium">{selectedAnalysis.metrics.estimatedYield.toFixed(0)} kg</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Maintenance Cost:</span>
+                          <span className="font-medium">${selectedAnalysis.metrics.maintenanceCost.toFixed(2)}/year</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Estimated Revenue:</span>
+                          <span className="font-medium">${selectedAnalysis.metrics.estimatedRevenue.toFixed(2)}/year</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">ROI:</span>
+                          <span className="font-medium">{selectedAnalysis.metrics.roi.toFixed(1)}%</span>
                         </div>
                       </div>
                     </div>
@@ -187,13 +233,13 @@ const Dashboard = () => {
                         <div className="flex justify-between">
                           <span className="text-gray-600">Water Requirement:</span>
                           <span className="font-medium">
-                            {(selectedAnalysis.totalTrees * 50 * 365 / 1000).toFixed(1)} m³/year
+                            {(selectedAnalysis.metrics.waterRequirement / 1000).toFixed(1)} m³/year
                           </span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600">Carbon Sequestration:</span>
                           <span className="font-medium">
-                            {(selectedAnalysis.totalTrees * 21.7).toFixed(1)} kg CO₂/year
+                            {selectedAnalysis.metrics.carbonSequestration.toFixed(1)} kg CO₂/year
                           </span>
                         </div>
                       </div>
