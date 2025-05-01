@@ -100,24 +100,40 @@ export const TreeAnalysis = ({ boundary, spacing, scale }) => {
 
   const handleSaveAnalysis = async () => {
     try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('You must be logged in to save analyses');
+      }
+
       const response = await fetch('/api/analyses', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
           totalArea: metrics.totalArea,
           plantableArea: metrics.plantableArea,
           spacing,
-          totalTrees: metrics.treeCount
+          totalTrees: metrics.treeCount,
+          boundary: boundary,
+          metrics: {
+            estimatedYield: metrics.estimatedYield,
+            waterRequirement: metrics.waterRequirement,
+            carbonSequestration: metrics.carbonSequestration,
+            maintenanceCost: metrics.maintenanceCost,
+            estimatedRevenue: metrics.estimatedRevenue,
+            roi: metrics.roi
+          }
         })
       });
   
       const data = await response.json();
       if (!response.ok) throw new Error(data.message);
       
-      alert('Analysis saved successfully!');
+      alert('Analysis saved successfully! You can view it in your dashboard.');
+      // Optionally navigate to dashboard
+      // navigate('/dashboard');
     } catch (error) {
       console.error('Error saving analysis:', error);
       alert(`Failed to save analysis: ${error.message}`);

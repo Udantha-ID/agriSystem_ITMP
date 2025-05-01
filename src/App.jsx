@@ -68,7 +68,14 @@ function App() {
           <Route path="/drone" element={<Drone />} />
           <Route path="/irrigation" element={<Irrigation />} />
           <Route path="/dashboard" element={<UserDashboard />} />
-          <Route path="/landboundary" element={<LandBoundary />} />
+          <Route 
+            path="/landboundary" 
+            element={
+              <ProtectedRoute>
+                <LandBoundary />
+              </ProtectedRoute>
+            } 
+          />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
