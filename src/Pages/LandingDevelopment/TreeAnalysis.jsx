@@ -125,38 +125,119 @@ export const TreeAnalysis = ({ boundary, spacing, scale }) => {
   };
 
   const handleDownloadImage = async () => {
-    if (reportRef.current) {
+    try {
+      if (!reportRef.current) {
+        throw new Error('Report content not found');
+      }
+
+      console.log('Starting image capture...');
+      console.log('Report ref dimensions:', {
+        width: reportRef.current.offsetWidth,
+        height: reportRef.current.offsetHeight,
+        scrollWidth: reportRef.current.scrollWidth,
+        scrollHeight: reportRef.current.scrollHeight
+      });
+
       const canvas = await html2canvas(reportRef.current, {
-        scale: 2,
-        backgroundColor: '#f9fafb'
+        scale: 1,
+        backgroundColor: '#ffffff',
+        logging: true,
+        useCORS: true,
+        allowTaint: true,
+        width: reportRef.current.offsetWidth,
+        height: reportRef.current.offsetHeight,
+        x: 0,
+        y: 0,
+        scrollX: 0,
+        scrollY: 0,
+        windowWidth: reportRef.current.offsetWidth,
+        windowHeight: reportRef.current.offsetHeight
+      });
+
+      console.log('Canvas created with dimensions:', {
+        width: canvas.width,
+        height: canvas.height
       });
       
       const link = document.createElement('a');
       link.download = 'land-development-report.png';
-      link.href = canvas.toDataURL('image/png');
+      link.href = canvas.toDataURL('image/png', 1.0);
+      document.body.appendChild(link);
       link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error('Error saving image:', error);
+      alert('Failed to save image. Please check console for details.');
     }
   };
 
   const handleDownloadPDF = async () => {
-    if (reportRef.current) {
-      const canvas = await html2canvas(reportRef.current, {
-        scale: 2,
-        backgroundColor: '#f9fafb'
+    try {
+      if (!reportRef.current) {
+        throw new Error('Report content not found');
+      }
+
+      console.log('Starting PDF capture...');
+      console.log('Report ref dimensions:', {
+        width: reportRef.current.offsetWidth,
+        height: reportRef.current.offsetHeight,
+        scrollWidth: reportRef.current.scrollWidth,
+        scrollHeight: reportRef.current.scrollHeight
       });
-      const imgData = canvas.toDataURL('image/png');
+
+      const canvas = await html2canvas(reportRef.current, {
+        scale: 1,
+        backgroundColor: '#ffffff',
+        logging: true,
+        useCORS: true,
+        allowTaint: true,
+        width: reportRef.current.offsetWidth,
+        height: reportRef.current.offsetHeight,
+        x: 0,
+        y: 0,
+        scrollX: 0,
+        scrollY: 0,
+        windowWidth: reportRef.current.offsetWidth,
+        windowHeight: reportRef.current.offsetHeight
+      });
+
+      console.log('Canvas created with dimensions:', {
+        width: canvas.width,
+        height: canvas.height
+      });
+      
+      const imgData = canvas.toDataURL('image/png', 1.0);
       
       const pdf = new jsPDF({
         orientation: 'portrait',
         unit: 'mm',
-        format: 'a4'
+        format: 'a4',
+        putOnlyUsedFonts: true,
+        floatPrecision: 16
       });
 
-      const imgWidth = 210;
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      
+      // Calculate dimensions to maintain aspect ratio
+      const imgWidth = pageWidth;
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
       
+      console.log('PDF dimensions:', {
+        pageWidth,
+        pageHeight,
+        imgWidth,
+        imgHeight
+      });
+
+      // Add image to PDF
       pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+      
+      // Save PDF
       pdf.save('land-development-report.pdf');
+    } catch (error) {
+      console.error('Error saving PDF:', error);
+      alert('Failed to save PDF. Please check console for details.');
     }
   };
 
