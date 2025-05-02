@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { MapPin, Trees, ArrowLeft, Ruler, LayoutGrid, Info, RotateCw, Download } from 'lucide-react';
 import { LandCanvas } from './LandCanvas';
 import { TreeAnalysis } from './TreeAnalysis';
 import Navbar from '../../Components/Navbar';
 import Footer from '../../Components/Footer';
+import { useAuth } from '../../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 function LandBoundary() {
   const [boundary, setBoundary] = useState([]);
@@ -13,6 +15,12 @@ function LandBoundary() {
   const [showAnalysis, setShowAnalysis] = useState(false);
   const [isDrawing, setIsDrawing] = useState(false);
   const [tooltip, setTooltip] = useState({ show: false, content: '', x: 0, y: 0 });
+  const [treePoints, setTreePoints] = useState([]);
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState(null);
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  const svgRef = useRef(null);
 
   const handleBoundaryUpdate = (points) => {
     setBoundary(points);
@@ -40,6 +48,65 @@ function LandBoundary() {
 
   const hideTooltip = () => {
     setTooltip({ ...tooltip, show: false });
+  };
+
+  const handleSaveAnalysis = async () => {
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
+
+    if (boundary.length < 3) {
+      alert('Please draw a valid land boundary first');
+      return;
+    }
+
+    try {
+      setIsSaving(true);
+      setError(null);
+
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/analyses', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          boundary: boundary,
+          treePoints: treePoints,
+          totalArea: calculateTotalArea(boundary),
+          plantableArea: calculatePlantableArea(boundary, treePoints),
+          totalTrees: treePoints.length,
+          spacing: {
+            horizontal: 5, // Default spacing values
+            vertical: 5
+          },
+          metrics: {
+            estimatedYield: calculateEstimatedYield(treePoints),
+            maintenanceCost: calculateMaintenanceCost(treePoints),
+            estimatedRevenue: calculateEstimatedRevenue(treePoints),
+            roi: calculateROI(treePoints),
+            waterRequirement: calculateWaterRequirement(treePoints),
+            carbonSequestration: calculateCarbonSequestration(treePoints)
+          }
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save analysis');
+      }
+
+      const data = await response.json();
+      alert('Analysis saved successfully!');
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('Error saving analysis:', error);
+      setError(error.message);
+      alert('Failed to save analysis. Please try again.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   useEffect(() => {
