@@ -1,15 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { LayoutGrid, BarChart, TreeDeciduous, Droplets, Ruler, Download, Trash2 } from 'lucide-react';
+import { LayoutGrid, BarChart, TreeDeciduous, Droplets, Ruler, Download, Trash2, Image as ImageIcon, FileText } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import html2canvas from 'html2canvas';
+import { jsPDF } from 'jspdf';
 
 const Dashboard = () => {
   const [analyses, setAnalyses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedAnalysis, setSelectedAnalysis] = useState(null);
   const [error, setError] = useState(null);
+  const [saving, setSaving] = useState(false);
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+  const reportRef = React.useRef(null);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -60,6 +64,92 @@ const Dashboard = () => {
     } catch (error) {
       console.error('Error:', error);
       alert('Failed to delete analysis. Please try again.');
+    }
+  };
+
+  const handleDownloadImage = async () => {
+    try {
+      if (!reportRef.current) {
+        throw new Error('Report content not found');
+      }
+
+      setSaving(true);
+      const canvas = await html2canvas(reportRef.current, {
+        scale: 1,
+        backgroundColor: '#ffffff',
+        logging: true,
+        useCORS: true,
+        allowTaint: true,
+        width: reportRef.current.offsetWidth,
+        height: reportRef.current.offsetHeight,
+        x: 0,
+        y: 0,
+        scrollX: 0,
+        scrollY: 0,
+        windowWidth: reportRef.current.offsetWidth,
+        windowHeight: reportRef.current.offsetHeight
+      });
+      
+      const link = document.createElement('a');
+      link.download = `land-analysis-${selectedAnalysis._id}.png`;
+      link.href = canvas.toDataURL('image/png', 1.0);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error('Error saving image:', error);
+      alert('Failed to save image. Please try again.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDownloadPDF = async () => {
+    try {
+      if (!reportRef.current) {
+        throw new Error('Report content not found');
+      }
+
+      setSaving(true);
+      const canvas = await html2canvas(reportRef.current, {
+        scale: 1,
+        backgroundColor: '#ffffff',
+        logging: true,
+        useCORS: true,
+        allowTaint: true,
+        width: reportRef.current.offsetWidth,
+        height: reportRef.current.offsetHeight,
+        x: 0,
+        y: 0,
+        scrollX: 0,
+        scrollY: 0,
+        windowWidth: reportRef.current.offsetWidth,
+        windowHeight: reportRef.current.offsetHeight
+      });
+      
+      const imgData = canvas.toDataURL('image/png', 1.0);
+      
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4',
+        putOnlyUsedFonts: true,
+        floatPrecision: 16
+      });
+
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      
+      const imgWidth = pageWidth;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      
+      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+      pdf.save(`land-analysis-${selectedAnalysis._id}.pdf`);
+    } catch (error) {
+      console.error('Error saving PDF:', error);
+      alert('Failed to save PDF. Please try again.');
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -156,14 +246,25 @@ const Dashboard = () => {
             {/* Analysis Detail */}
             <div className="lg:col-span-2">
               {selectedAnalysis ? (
-                <div className="bg-white p-6 rounded-lg shadow">
+                <div ref={reportRef} className="bg-white p-6 rounded-lg shadow">
                   <div className="flex justify-between items-center mb-6">
                     <h2 className="text-xl font-bold">
                       Analysis from {new Date(selectedAnalysis.createdAt).toLocaleString()}
                     </h2>
                     <div className="flex space-x-2">
-                      <button className="p-2 text-gray-500 hover:text-blue-600 hover:bg-gray-100 rounded">
-                        <Download className="h-5 w-5" />
+                      <button
+                        onClick={handleDownloadImage}
+                        disabled={saving}
+                        className="p-2 text-gray-500 hover:text-blue-600 hover:bg-gray-100 rounded disabled:opacity-50"
+                      >
+                        <ImageIcon className="h-5 w-5" />
+                      </button>
+                      <button
+                        onClick={handleDownloadPDF}
+                        disabled={saving}
+                        className="p-2 text-gray-500 hover:text-blue-600 hover:bg-gray-100 rounded disabled:opacity-50"
+                      >
+                        <FileText className="h-5 w-5" />
                       </button>
                     </div>
                   </div>
@@ -246,9 +347,36 @@ const Dashboard = () => {
                     </div>
                   </div>
 
-                  {/* Visualization Placeholder */}
-                  <div className="bg-gray-100 rounded-lg p-4 h-64 flex items-center justify-center text-gray-400">
-                    <p>Visualization of the land boundary and tree placement would appear here</p>
+                  {/* Visualization */}
+                  <div className="bg-gray-100 rounded-lg p-4 h-64">
+                    {selectedAnalysis.boundary && (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <svg
+                          viewBox="0 0 800 400"
+                          className="w-full h-full"
+                          preserveAspectRatio="xMidYMid meet"
+                        >
+                          {/* Draw boundary */}
+                          <polygon
+                            points={selectedAnalysis.boundary.map(p => `${p.x},${p.y}`).join(' ')}
+                            fill="rgba(34, 197, 94, 0.1)"
+                            stroke="rgb(34, 197, 94)"
+                            strokeWidth="2"
+                          />
+                          
+                          {/* Draw tree points */}
+                          {selectedAnalysis.treePoints?.map((point, index) => (
+                            <circle
+                              key={index}
+                              cx={point.x}
+                              cy={point.y}
+                              r="3"
+                              fill="rgb(34, 197, 94)"
+                            />
+                          ))}
+                        </svg>
+                      </div>
+                    )}
                   </div>
                 </div>
               ) : (

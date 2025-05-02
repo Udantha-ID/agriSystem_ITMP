@@ -47,9 +47,16 @@ function App() {
           <Route path="/inventory" element={<Inventory />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-
+          
           {/* Protected routes */}
+          <Route
+            path="/land-dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/profile"
             element={
@@ -57,6 +64,14 @@ function App() {
                 <UserProfile />
               </ProtectedRoute>
             }
+          />
+          <Route 
+            path="/landboundary" 
+            element={
+              <ProtectedRoute>
+                <LandBoundary />
+              </ProtectedRoute>
+            } 
           />
 
           {/* Public routes */}
@@ -67,15 +82,7 @@ function App() {
           <Route path="/explore" element={<Explore />} />
           <Route path="/drone" element={<Drone />} />
           <Route path="/irrigation" element={<Irrigation />} />
-          <Route path="/dashboard" element={<UserDashboard />} />
-          <Route 
-            path="/landboundary" 
-            element={
-              <ProtectedRoute>
-                <LandBoundary />
-              </ProtectedRoute>
-            } 
-          />
+          <Route path="/user-dashboard" element={<UserDashboard />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
