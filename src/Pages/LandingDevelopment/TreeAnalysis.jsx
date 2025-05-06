@@ -146,35 +146,70 @@ export const TreeAnalysis = ({ boundary, spacing, scale }) => {
         throw new Error('Report content not found');
       }
 
-      console.log('Starting image capture...');
-      console.log('Report ref dimensions:', {
-        width: reportRef.current.offsetWidth,
-        height: reportRef.current.offsetHeight,
-        scrollWidth: reportRef.current.scrollWidth,
-        scrollHeight: reportRef.current.scrollHeight
-      });
+      // Create a temporary container with basic styling
+      const tempContainer = document.createElement('div');
+      tempContainer.style.position = 'absolute';
+      tempContainer.style.left = '-9999px';
+      tempContainer.style.top = '-9999px';
+      tempContainer.style.width = '800px';
+      tempContainer.style.backgroundColor = '#ffffff';
+      tempContainer.style.padding = '20px';
+      tempContainer.style.fontFamily = 'Arial, sans-serif';
 
-      const canvas = await html2canvas(reportRef.current, {
-        scale: 1,
+      // Clone the content
+      const content = reportRef.current.cloneNode(true);
+
+      // Function to remove all color-related styles
+      const removeColorStyles = (element) => {
+        // Remove inline styles
+        element.removeAttribute('style');
+        
+        // Set basic styles
+        element.style.color = '#000000';
+        element.style.backgroundColor = '#ffffff';
+        element.style.borderColor = '#000000';
+        
+        // Remove any class that might contain color styles
+        element.removeAttribute('class');
+        
+        // Process children
+        Array.from(element.children).forEach(removeColorStyles);
+      };
+
+      // Remove all color styles
+      removeColorStyles(content);
+
+      // Add the processed content
+      tempContainer.appendChild(content);
+      document.body.appendChild(tempContainer);
+
+      // Wait a bit for styles to be applied
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // Capture the content
+      const canvas = await html2canvas(tempContainer, {
+        scale: 2, // Higher scale for better quality image
         backgroundColor: '#ffffff',
-        logging: true,
         useCORS: true,
         allowTaint: true,
-        width: reportRef.current.offsetWidth,
-        height: reportRef.current.offsetHeight,
-        x: 0,
-        y: 0,
-        scrollX: 0,
-        scrollY: 0,
-        windowWidth: reportRef.current.offsetWidth,
-        windowHeight: reportRef.current.offsetHeight
+        width: 800,
+        height: tempContainer.offsetHeight,
+        logging: false,
+        onclone: (clonedDoc) => {
+          // Ensure all elements in the cloned document have basic colors
+          const allElements = clonedDoc.getElementsByTagName('*');
+          Array.from(allElements).forEach(el => {
+            el.style.color = '#000000';
+            el.style.backgroundColor = '#ffffff';
+            el.style.borderColor = '#000000';
+          });
+        }
       });
 
-      console.log('Canvas created with dimensions:', {
-        width: canvas.width,
-        height: canvas.height
-      });
-      
+      // Clean up
+      document.body.removeChild(tempContainer);
+
+      // Create download link
       const link = document.createElement('a');
       link.download = 'land-development-report.png';
       link.href = canvas.toDataURL('image/png', 1.0);
@@ -183,7 +218,7 @@ export const TreeAnalysis = ({ boundary, spacing, scale }) => {
       document.body.removeChild(link);
     } catch (error) {
       console.error('Error saving image:', error);
-      alert('Failed to save image. Please check console for details.');
+      alert('Failed to save image. Please try again.');
     }
   };
 
@@ -193,67 +228,88 @@ export const TreeAnalysis = ({ boundary, spacing, scale }) => {
         throw new Error('Report content not found');
       }
 
-      console.log('Starting PDF capture...');
-      console.log('Report ref dimensions:', {
-        width: reportRef.current.offsetWidth,
-        height: reportRef.current.offsetHeight,
-        scrollWidth: reportRef.current.scrollWidth,
-        scrollHeight: reportRef.current.scrollHeight
-      });
+      // Create a temporary container with basic styling
+      const tempContainer = document.createElement('div');
+      tempContainer.style.position = 'absolute';
+      tempContainer.style.left = '-9999px';
+      tempContainer.style.top = '-9999px';
+      tempContainer.style.width = '800px';
+      tempContainer.style.backgroundColor = '#ffffff';
+      tempContainer.style.padding = '20px';
+      tempContainer.style.fontFamily = 'Arial, sans-serif';
 
-      const canvas = await html2canvas(reportRef.current, {
+      // Clone the content
+      const content = reportRef.current.cloneNode(true);
+
+      // Function to remove all color-related styles
+      const removeColorStyles = (element) => {
+        // Remove inline styles
+        element.removeAttribute('style');
+        
+        // Set basic styles
+        element.style.color = '#000000';
+        element.style.backgroundColor = '#ffffff';
+        element.style.borderColor = '#000000';
+        
+        // Remove any class that might contain color styles
+        element.removeAttribute('class');
+        
+        // Process children
+        Array.from(element.children).forEach(removeColorStyles);
+      };
+
+      // Remove all color styles
+      removeColorStyles(content);
+
+      // Add the processed content
+      tempContainer.appendChild(content);
+      document.body.appendChild(tempContainer);
+
+      // Wait a bit for styles to be applied
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // Simple html2canvas configuration
+      const canvas = await html2canvas(tempContainer, {
         scale: 1,
         backgroundColor: '#ffffff',
-        logging: true,
         useCORS: true,
         allowTaint: true,
-        width: reportRef.current.offsetWidth,
-        height: reportRef.current.offsetHeight,
-        x: 0,
-        y: 0,
-        scrollX: 0,
-        scrollY: 0,
-        windowWidth: reportRef.current.offsetWidth,
-        windowHeight: reportRef.current.offsetHeight
+        width: 800,
+        height: tempContainer.offsetHeight,
+        logging: false,
+        onclone: (clonedDoc) => {
+          // Ensure all elements in the cloned document have basic colors
+          const allElements = clonedDoc.getElementsByTagName('*');
+          Array.from(allElements).forEach(el => {
+            el.style.color = '#000000';
+            el.style.backgroundColor = '#ffffff';
+            el.style.borderColor = '#000000';
+          });
+        }
       });
 
-      console.log('Canvas created with dimensions:', {
-        width: canvas.width,
-        height: canvas.height
-      });
-      
-      const imgData = canvas.toDataURL('image/png', 1.0);
-      
+      // Clean up
+      document.body.removeChild(tempContainer);
+
+      // Create PDF
       const pdf = new jsPDF({
         orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4',
-        putOnlyUsedFonts: true,
-        floatPrecision: 16
+        unit: 'pt',
+        format: 'a4'
       });
 
       const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-      
-      // Calculate dimensions to maintain aspect ratio
       const imgWidth = pageWidth;
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      
-      console.log('PDF dimensions:', {
-        pageWidth,
-        pageHeight,
-        imgWidth,
-        imgHeight
-      });
 
       // Add image to PDF
-      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+      pdf.addImage(canvas.toDataURL('image/jpeg', 0.8), 'JPEG', 0, 0, imgWidth, imgHeight);
       
       // Save PDF
       pdf.save('land-development-report.pdf');
     } catch (error) {
       console.error('Error saving PDF:', error);
-      alert('Failed to save PDF. Please check console for details.');
+      alert('Failed to save PDF. Please try again.');
     }
   };
 
