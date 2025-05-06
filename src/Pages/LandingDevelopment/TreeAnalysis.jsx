@@ -7,6 +7,7 @@ import { BarLoader, SyncLoader } from 'react-spinners';
 
 export const TreeAnalysis = ({ boundary, spacing, scale }) => {
   const reportRef = useRef(null);
+  const treeVisStageRef = useRef(null);
   const [loading, setLoading] = useState(true);
   const [bufferDistance] = useState(5); // Buffer distance in meters
 
@@ -430,6 +431,7 @@ export const TreeAnalysis = ({ boundary, spacing, scale }) => {
               scale={scale}
               width={800}
               height={400}
+              stageRef={treeVisStageRef}
             />
           </div>
           <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
