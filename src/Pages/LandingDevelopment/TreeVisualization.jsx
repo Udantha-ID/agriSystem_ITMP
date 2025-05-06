@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Stage, Layer, Circle, Line, Text, Group } from 'react-konva';
+import { Stage, Layer, Circle, Line, Text, Group, Rect } from 'react-konva';
 
 export const TreeVisualization = ({
   boundary,
@@ -95,15 +95,41 @@ export const TreeVisualization = ({
     <div className="relative">
       <Stage width={width} height={height}>
         <Layer>
-          {/* Draw only the original boundary line */}
+          {/* Background grid */}
+          <Group>
+            {Array.from({ length: Math.ceil(width / 50) }).map((_, i) => (
+              <Line
+                key={`grid-v-${i}`}
+                points={[i * 50, 0, i * 50, height]}
+                stroke="#e5e7eb"
+                strokeWidth={0.5}
+                opacity={0.5}
+              />
+            ))}
+            {Array.from({ length: Math.ceil(height / 50) }).map((_, i) => (
+              <Line
+                key={`grid-h-${i}`}
+                points={[0, i * 50, width, i * 50]}
+                stroke="#e5e7eb"
+                strokeWidth={0.5}
+                opacity={0.5}
+              />
+            ))}
+          </Group>
+
+          {/* Draw the original boundary line with enhanced styling */}
           <Line
             points={boundary.flatMap(p => [p.x, p.y])}
             stroke="#2563eb"
-            strokeWidth={2}
+            strokeWidth={3}
             closed={true}
+            shadowColor="black"
+            shadowBlur={10}
+            shadowOpacity={0.2}
+            shadowOffset={{ x: 2, y: 2 }}
           />
           
-          {/* Draw trees (automatically avoids edges due to plantable area calculation) */}
+          {/* Draw trees with enhanced styling */}
           {treePositions.map((tree, index) => (
             <Group
               key={index}
@@ -116,28 +142,78 @@ export const TreeVisualization = ({
                 setSelectedTree(null);
               }}
             >
+              {/* Tree shadow */}
+              <Circle
+                x={tree.position.x + 2}
+                y={tree.position.y + 2}
+                radius={tree.size}
+                fill="rgba(0, 0, 0, 0.2)"
+                shadowBlur={5}
+              />
+              {/* Tree circle */}
               <Circle
                 x={tree.position.x}
                 y={tree.position.y}
                 radius={tree.size}
                 fill={tree.color}
                 shadowColor="black"
-                shadowBlur={2}
+                shadowBlur={5}
                 shadowOpacity={0.3}
+                shadowOffset={{ x: 1, y: 1 }}
+              />
+              {/* Tree highlight */}
+              <Circle
+                x={tree.position.x - tree.size * 0.3}
+                y={tree.position.y - tree.size * 0.3}
+                radius={tree.size * 0.3}
+                fill="rgba(255, 255, 255, 0.3)"
               />
             </Group>
           ))}
 
+          {/* Enhanced tooltip */}
           {showDetails && selectedTree && (
-            <Text
-              x={selectedTree.position.x + 10}
-              y={selectedTree.position.y - 20}
-              text={`Tree ${simulationYear} yrs`}
-              fontSize={12}
-              fill="black"
-              padding={5}
-              background="white"
-            />
+            <Group>
+              {/* Tooltip background */}
+              <Rect
+                x={selectedTree.position.x + 15}
+                y={selectedTree.position.y - 30}
+                width={120}
+                height={40}
+                fill="white"
+                shadowColor="black"
+                shadowBlur={10}
+                shadowOpacity={0.2}
+                cornerRadius={5}
+              />
+              {/* Tooltip border */}
+              <Rect
+                x={selectedTree.position.x + 15}
+                y={selectedTree.position.y - 30}
+                width={120}
+                height={40}
+                stroke="#e5e7eb"
+                strokeWidth={1}
+                cornerRadius={5}
+              />
+              {/* Tooltip text */}
+              <Text
+                x={selectedTree.position.x + 20}
+                y={selectedTree.position.y - 20}
+                text={`Tree ${simulationYear} yrs`}
+                fontSize={14}
+                fill="#1a1a1a"
+                fontFamily="Arial"
+              />
+              <Text
+                x={selectedTree.position.x + 20}
+                y={selectedTree.position.y}
+                text={`Size: ${(selectedTree.size * 2).toFixed(1)}m`}
+                fontSize={12}
+                fill="#4b5563"
+                fontFamily="Arial"
+              />
+            </Group>
           )}
         </Layer>
       </Stage>

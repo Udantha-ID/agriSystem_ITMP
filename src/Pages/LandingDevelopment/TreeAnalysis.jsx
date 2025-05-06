@@ -146,62 +146,80 @@ export const TreeAnalysis = ({ boundary, spacing, scale }) => {
         throw new Error('Report content not found');
       }
 
-      // Create a temporary container with basic styling
+      // Create a temporary container with enhanced styling
       const tempContainer = document.createElement('div');
       tempContainer.style.position = 'absolute';
       tempContainer.style.left = '-9999px';
       tempContainer.style.top = '-9999px';
-      tempContainer.style.width = '800px';
+      tempContainer.style.width = '1200px'; // Increased width for better quality
       tempContainer.style.backgroundColor = '#ffffff';
-      tempContainer.style.padding = '20px';
+      tempContainer.style.padding = '40px';
       tempContainer.style.fontFamily = 'Arial, sans-serif';
+      tempContainer.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+      tempContainer.style.borderRadius = '8px';
 
       // Clone the content
       const content = reportRef.current.cloneNode(true);
 
-      // Function to remove all color-related styles
-      const removeColorStyles = (element) => {
-        // Remove inline styles
-        element.removeAttribute('style');
-        
+      // Function to enhance styles for better visualization
+      const enhanceStyles = (element) => {
         // Set basic styles
-        element.style.color = '#000000';
+        element.style.color = '#1a1a1a';
         element.style.backgroundColor = '#ffffff';
-        element.style.borderColor = '#000000';
+        element.style.borderColor = '#e5e7eb';
         
-        // Remove any class that might contain color styles
-        element.removeAttribute('class');
+        // Enhance text elements
+        if (element.tagName === 'H1' || element.tagName === 'H2') {
+          element.style.fontSize = '24px';
+          element.style.fontWeight = 'bold';
+          element.style.marginBottom = '16px';
+          element.style.color = '#1e40af';
+        }
         
+        if (element.tagName === 'P') {
+          element.style.fontSize = '16px';
+          element.style.lineHeight = '1.5';
+          element.style.marginBottom = '12px';
+        }
+
+        // Enhance visualization elements
+        if (element.classList.contains('visualization')) {
+          element.style.border = '1px solid #e5e7eb';
+          element.style.borderRadius = '8px';
+          element.style.padding = '16px';
+          element.style.marginBottom = '24px';
+        }
+
         // Process children
-        Array.from(element.children).forEach(removeColorStyles);
+        Array.from(element.children).forEach(enhanceStyles);
       };
 
-      // Remove all color styles
-      removeColorStyles(content);
+      // Enhance styles
+      enhanceStyles(content);
 
       // Add the processed content
       tempContainer.appendChild(content);
       document.body.appendChild(tempContainer);
 
-      // Wait a bit for styles to be applied
-      await new Promise(resolve => setTimeout(resolve, 100));
+      // Wait for styles to be applied
+      await new Promise(resolve => setTimeout(resolve, 200));
 
-      // Capture the content
+      // Capture the content with enhanced quality
       const canvas = await html2canvas(tempContainer, {
-        scale: 2, // Higher scale for better quality image
+        scale: 3, // Increased scale for better quality
         backgroundColor: '#ffffff',
         useCORS: true,
         allowTaint: true,
-        width: 800,
+        width: 1200,
         height: tempContainer.offsetHeight,
         logging: false,
         onclone: (clonedDoc) => {
-          // Ensure all elements in the cloned document have basic colors
+          // Ensure all elements in the cloned document have enhanced styles
           const allElements = clonedDoc.getElementsByTagName('*');
           Array.from(allElements).forEach(el => {
-            el.style.color = '#000000';
+            el.style.color = '#1a1a1a';
             el.style.backgroundColor = '#ffffff';
-            el.style.borderColor = '#000000';
+            el.style.borderColor = '#e5e7eb';
           });
         }
       });
@@ -209,9 +227,10 @@ export const TreeAnalysis = ({ boundary, spacing, scale }) => {
       // Clean up
       document.body.removeChild(tempContainer);
 
-      // Create download link
+      // Create download link with timestamp
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
       const link = document.createElement('a');
-      link.download = 'land-development-report.png';
+      link.download = `land-development-report-${timestamp}.png`;
       link.href = canvas.toDataURL('image/png', 1.0);
       document.body.appendChild(link);
       link.click();
@@ -228,62 +247,79 @@ export const TreeAnalysis = ({ boundary, spacing, scale }) => {
         throw new Error('Report content not found');
       }
 
-      // Create a temporary container with basic styling
+      // Create a temporary container with enhanced styling
       const tempContainer = document.createElement('div');
       tempContainer.style.position = 'absolute';
       tempContainer.style.left = '-9999px';
       tempContainer.style.top = '-9999px';
-      tempContainer.style.width = '800px';
+      tempContainer.style.width = '1200px';
       tempContainer.style.backgroundColor = '#ffffff';
-      tempContainer.style.padding = '20px';
+      tempContainer.style.padding = '40px';
       tempContainer.style.fontFamily = 'Arial, sans-serif';
+      tempContainer.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+      tempContainer.style.borderRadius = '8px';
 
       // Clone the content
       const content = reportRef.current.cloneNode(true);
 
-      // Function to remove all color-related styles
-      const removeColorStyles = (element) => {
-        // Remove inline styles
-        element.removeAttribute('style');
-        
+      // Function to enhance styles for better visualization
+      const enhanceStyles = (element) => {
         // Set basic styles
-        element.style.color = '#000000';
+        element.style.color = '#1a1a1a';
         element.style.backgroundColor = '#ffffff';
-        element.style.borderColor = '#000000';
+        element.style.borderColor = '#e5e7eb';
         
-        // Remove any class that might contain color styles
-        element.removeAttribute('class');
+        // Enhance text elements
+        if (element.tagName === 'H1' || element.tagName === 'H2') {
+          element.style.fontSize = '24px';
+          element.style.fontWeight = 'bold';
+          element.style.marginBottom = '16px';
+          element.style.color = '#1e40af';
+        }
         
+        if (element.tagName === 'P') {
+          element.style.fontSize = '16px';
+          element.style.lineHeight = '1.5';
+          element.style.marginBottom = '12px';
+        }
+
+        // Enhance visualization elements
+        if (element.classList.contains('visualization')) {
+          element.style.border = '1px solid #e5e7eb';
+          element.style.borderRadius = '8px';
+          element.style.padding = '16px';
+          element.style.marginBottom = '24px';
+        }
+
         // Process children
-        Array.from(element.children).forEach(removeColorStyles);
+        Array.from(element.children).forEach(enhanceStyles);
       };
 
-      // Remove all color styles
-      removeColorStyles(content);
+      // Enhance styles
+      enhanceStyles(content);
 
       // Add the processed content
       tempContainer.appendChild(content);
       document.body.appendChild(tempContainer);
 
-      // Wait a bit for styles to be applied
-      await new Promise(resolve => setTimeout(resolve, 100));
+      // Wait for styles to be applied
+      await new Promise(resolve => setTimeout(resolve, 200));
 
-      // Simple html2canvas configuration
+      // Capture the content with enhanced quality
       const canvas = await html2canvas(tempContainer, {
-        scale: 1,
+        scale: 3,
         backgroundColor: '#ffffff',
         useCORS: true,
         allowTaint: true,
-        width: 800,
+        width: 1200,
         height: tempContainer.offsetHeight,
         logging: false,
         onclone: (clonedDoc) => {
-          // Ensure all elements in the cloned document have basic colors
           const allElements = clonedDoc.getElementsByTagName('*');
           Array.from(allElements).forEach(el => {
-            el.style.color = '#000000';
+            el.style.color = '#1a1a1a';
             el.style.backgroundColor = '#ffffff';
-            el.style.borderColor = '#000000';
+            el.style.borderColor = '#e5e7eb';
           });
         }
       });
@@ -291,22 +327,56 @@ export const TreeAnalysis = ({ boundary, spacing, scale }) => {
       // Clean up
       document.body.removeChild(tempContainer);
 
-      // Create PDF
+      // Create PDF with enhanced settings
       const pdf = new jsPDF({
         orientation: 'portrait',
         unit: 'pt',
-        format: 'a4'
+        format: 'a4',
+        putOnlyUsedFonts: true,
+        floatPrecision: 16
       });
 
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const imgWidth = pageWidth;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      // Add header
+      pdf.setFontSize(24);
+      pdf.setTextColor(30, 64, 175); // Blue color
+      pdf.text('Land Development Analysis Report', pdf.internal.pageSize.getWidth() / 2, 40, { align: 'center' });
 
-      // Add image to PDF
-      pdf.addImage(canvas.toDataURL('image/jpeg', 0.8), 'JPEG', 0, 0, imgWidth, imgHeight);
-      
-      // Save PDF
-      pdf.save('land-development-report.pdf');
+      // Add timestamp
+      pdf.setFontSize(12);
+      pdf.setTextColor(100);
+      const timestamp = new Date().toLocaleString();
+      pdf.text(`Generated on: ${timestamp}`, pdf.internal.pageSize.getWidth() / 2, 60, { align: 'center' });
+
+      // Add content
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const margin = 40;
+      const contentWidth = pageWidth - (margin * 2);
+      const contentHeight = (canvas.height * contentWidth) / canvas.width;
+
+      // Add the visualization with proper scaling
+      pdf.addImage(
+        canvas.toDataURL('image/jpeg', 0.95),
+        'JPEG',
+        margin,
+        80,
+        contentWidth,
+        contentHeight
+      );
+
+      // Add footer
+      pdf.setFontSize(10);
+      pdf.setTextColor(100);
+      pdf.text(
+        '© 2024 Land Development System - Confidential Report',
+        pageWidth / 2,
+        pageHeight - 20,
+        { align: 'center' }
+      );
+
+      // Save PDF with timestamp
+      const timestampStr = new Date().toISOString().replace(/[:.]/g, '-');
+      pdf.save(`land-development-report-${timestampStr}.pdf`);
     } catch (error) {
       console.error('Error saving PDF:', error);
       alert('Failed to save PDF. Please try again.');
