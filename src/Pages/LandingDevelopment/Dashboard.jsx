@@ -6,7 +6,26 @@ import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 
 const Dashboard = () => {
-  const [analyses, setAnalyses] = useState([]);
+  const [analyses, setAnalyses] = useState([
+    {
+      id: 1,
+      name: 'Sample Land Analysis 1',
+      date: '2024-05-01',
+      area: '2.5 ha',
+      yield: '5,000 kg',
+      boundary: [[0,0],[0,1],[1,1],[1,0]],
+      notes: 'Optimal for coconut plantation.'
+    },
+    {
+      id: 2,
+      name: 'Sample Land Analysis 2',
+      date: '2024-05-10',
+      area: '1.2 ha',
+      yield: '2,200 kg',
+      boundary: [[0,0],[0,2],[2,2],[2,0]],
+      notes: 'Suitable for mixed crops.'
+    }
+  ]);
   const [loading, setLoading] = useState(true);
   const [selectedAnalysis, setSelectedAnalysis] = useState(null);
   const [error, setError] = useState(null);

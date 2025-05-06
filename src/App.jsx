@@ -50,7 +50,7 @@ function App() {
           
           {/* Protected routes */}
           <Route
-            path="/land-dashboard"
+            path="/dashboard"
             element={
               <ProtectedRoute>
                 <Dashboard />
