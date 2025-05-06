@@ -416,7 +416,8 @@ export const TreeAnalysis = ({ boundary, spacing, scale }) => {
         </div>
       </div>
 
-      <div className="bg-white p-6 rounded-lg shadow-lg">
+      <div ref={reportRef} className="space-y-6">
+        <div className="bg-white p-6 rounded-lg shadow-lg">
           <div className="flex items-center space-x-2 mb-4">
             <Activity className="h-6 w-6 text-green-600" />
             <h3 className="text-xl font-semibold">Tree Layout Simulation</h3>
@@ -431,20 +432,58 @@ export const TreeAnalysis = ({ boundary, spacing, scale }) => {
               height={400}
             />
           </div>
+          <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <h4 className="font-medium text-gray-700">Layout Details</h4>
+              <div className="bg-gray-50 p-3 rounded-lg">
+                <div className="flex justify-between mb-2">
+                  <span className="text-gray-600">Tree Spacing:</span>
+                  <span className="font-medium">{spacing.horizontal}m × {spacing.vertical}m</span>
+                </div>
+                <div className="flex justify-between mb-2">
+                  <span className="text-gray-600">Buffer Zone:</span>
+                  <span className="font-medium">{metrics.bufferDistance.toFixed(1)}m</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Total Trees:</span>
+                  <span className="font-medium">{metrics.treeCount} trees</span>
+                </div>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <h4 className="font-medium text-gray-700">Growth Simulation</h4>
+              <div className="bg-gray-50 p-3 rounded-lg">
+                <div className="flex justify-between mb-2">
+                  <span className="text-gray-600">Maturity Age:</span>
+                  <span className="font-medium">5 years</span>
+                </div>
+                <div className="flex justify-between mb-2">
+                  <span className="text-gray-600">Max Height:</span>
+                  <span className="font-medium">15m</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Canopy Spread:</span>
+                  <span className="font-medium">8m</span>
+                </div>
+              </div>
+            </div>
+          </div>
           <div className="mt-4 space-y-2">
-            <p className="text-sm text-gray-600">
-              • Green dots represent optimal tree locations based on spacing and terrain
-            </p>
-            <p className="text-sm text-gray-600">
-              • Gray line shows original boundary, green line shows planting area with {metrics.bufferDistance.toFixed(1)}m buffer
-            </p>
-            <p className="text-sm text-gray-600">
-              • The simulation shows projected growth patterns over time
-            </p>
+            <div className="flex items-center space-x-2">
+              <div className="w-3 h-3 rounded-full bg-blue-600"></div>
+              <p className="text-sm text-gray-600">Original boundary</p>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className="w-3 h-3 rounded-full bg-green-600"></div>
+              <p className="text-sm text-gray-600">Planting area with buffer zone</p>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className="w-3 h-3 rounded-full bg-green-400"></div>
+              <p className="text-sm text-gray-600">Tree locations (optimal spacing)</p>
+            </div>
           </div>
         </div>
 
-      <div ref={reportRef} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="bg-white p-6 rounded-lg shadow-lg">
             <div className="flex items-center space-x-2 mb-4">
