@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { FaPhone, FaEnvelope, FaLock, FaCamera, FaMapMarkerAlt, FaUser, FaIdCard, FaCalendarAlt, FaCreditCard } from 'react-icons/fa';
+import { FaPhone, FaEnvelope, FaLock, FaCamera, FaMapMarkerAlt, FaUser, FaIdCard, FaCalendarAlt, FaCreditCard, FaEdit, FaSave, FaTimes, FaShieldAlt } from 'react-icons/fa';
 import Footer from '../../Components/Footer';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
 // Using a placeholder image URL - replace with your actual image path
 const profileImage = "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80";
@@ -172,261 +173,321 @@ const UserProfile = () => {
     }
   };
 
-  return (
-    <div>
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 font-sans pt-20">
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-white shadow-lg rounded-xl overflow-hidden">
-            {/* Success/Error Messages */}
-            {successMessage && (
-              <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4">
-                {successMessage}
-              </div>
-            )}
-            {errorMessage && (
-              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
-                {errorMessage}
-              </div>
-            )}
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: { 
+      opacity: 1,
+      transition: { 
+        staggerChildren: 0.1 
+      } 
+    }
+  };
+  
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: { 
+      y: 0, 
+      opacity: 1,
+      transition: { type: "spring", stiffness: 100 }
+    }
+  };
 
+  const FormField = ({ label, icon, name, type, value, placeholder, disabled, error }) => (
+    <motion.div variants={itemVariants} className="mb-5">
+      <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
+      <div className="relative">
+        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          {icon}
+        </div>
+        <input
+          type={type}
+          name={name}
+          value={value}
+          onChange={handleInputChange}
+          disabled={disabled}
+          placeholder={placeholder}
+          className={`block w-full pl-10 pr-3 py-3 border ${
+            error ? 'border-red-300 bg-red-50' : 'border-gray-300'
+          } rounded-lg shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-sm transition-all duration-300 ${
+            disabled ? 'bg-gray-50' : 'bg-white'
+          } ${isEditing && !disabled ? 'hover:border-teal-400' : ''}`}
+        />
+        {error && (
+          <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+            <FaTimes className="text-red-500" />
+          </div>
+        )}
+      </div>
+      {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
+    </motion.div>
+  );
+
+  // Notification component
+  const Notification = ({ message, type }) => (
+    <motion.div
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0 }}
+      className={`${
+        type === 'success' ? 'bg-green-50 border-green-400 text-green-700' : 'bg-red-50 border-red-400 text-red-700'
+      } border px-4 py-3 rounded-lg shadow-md mb-6 flex items-center`}
+    >
+      <div className={`p-2 rounded-full ${type === 'success' ? 'bg-green-200' : 'bg-red-200'} mr-3`}>
+        {type === 'success' ? (
+          <FaShieldAlt className={type === 'success' ? 'text-green-600' : 'text-red-600'} />
+        ) : (
+          <FaTimes className="text-red-600" />
+        )}
+      </div>
+      <span>{message}</span>
+    </motion.div>
+  );
+
+  return (
+    <div className="bg-gray-50 min-h-screen">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 font-sans pt-20">
+        <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          
+          {/* Success/Error Messages */}
+          {successMessage && <Notification message={successMessage} type="success" />}
+          {errorMessage && <Notification message={errorMessage} type="error" />}
+
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="bg-white shadow-xl rounded-2xl overflow-hidden border border-gray-100"
+          >
             {/* Profile Header */}
-            <div className="bg-teal-500 p-6 text-white">
-              <div className="flex items-center space-x-4">
-                <div className="relative">
-                  <img
-                    src={profileImage}
-                    alt="Profile"
-                    className="w-24 h-24 rounded-full border-4 border-white"
-                  />
+            <div className="bg-gradient-to-r from-teal-500 to-teal-600 p-8 text-white relative overflow-hidden">
+              <div className="absolute inset-0 bg-black opacity-10 z-0"></div>
+              <div className="relative z-10 flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6">
+                <div className="relative group">
+                  <div className="w-28 h-28 rounded-full overflow-hidden border-4 border-white shadow-lg">
+                    <img
+                      src={profileImage}
+                      alt="Profile"
+                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                    />
+                  </div>
                   {isEditing && (
-                    <button className="absolute bottom-0 right-0 bg-white p-2 rounded-full shadow-md">
-                      <FaCamera className="text-teal-500" />
-                    </button>
+                    <label className="absolute bottom-1 right-1 bg-white p-2 rounded-full shadow-lg cursor-pointer transition-all duration-300 hover:bg-teal-50">
+                      <FaCamera className="text-teal-600" />
+                      <input type="file" className="hidden" onChange={handleProfilePictureUpload} accept="image/*" />
+                    </label>
                   )}
                 </div>
-                <div>
-                  <h1 className="text-2xl font-bold">{user.fullName}</h1>
-                  <p className="text-teal-100">{user.email}</p>
+                <div className="text-center md:text-left">
+                  <h1 className="text-3xl font-bold mb-1">{user.fullName}</h1>
+                  <p className="text-teal-100 flex items-center justify-center md:justify-start">
+                    <FaEnvelope className="mr-2" /> {user.email}
+                  </p>
                 </div>
               </div>
             </div>
 
             {/* Tabs */}
-            <div className="border-b border-gray-200">
-              <nav className="flex">
+            <div className="border-b border-gray-200 bg-gray-50">
+              <nav className="flex justify-center md:justify-start px-6">
                 <button
                   onClick={() => setActiveTab('personal')}
-                  className={`px-6 py-3 text-sm font-medium ${
+                  className={`px-6 py-4 text-sm font-medium relative ${
                     activeTab === 'personal'
-                      ? 'border-b-2 border-teal-500 text-teal-600'
+                      ? 'text-teal-600'
                       : 'text-gray-500 hover:text-gray-700'
                   }`}
                 >
-                  Personal Information
+                  <div className="flex items-center space-x-2">
+                    <FaUser />
+                    <span>Personal Information</span>
+                  </div>
+                  {activeTab === 'personal' && (
+                    <motion.div 
+                      layoutId="activeTab"
+                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-teal-500" 
+                    />
+                  )}
                 </button>
                 <button
                   onClick={() => setActiveTab('payment')}
-                  className={`px-6 py-3 text-sm font-medium ${
+                  className={`px-6 py-4 text-sm font-medium relative ${
                     activeTab === 'payment'
-                      ? 'border-b-2 border-teal-500 text-teal-600'
+                      ? 'text-teal-600'
                       : 'text-gray-500 hover:text-gray-700'
                   }`}
                 >
-                  Payment Information
+                  <div className="flex items-center space-x-2">
+                    <FaCreditCard />
+                    <span>Payment Information</span>
+                  </div>
+                  {activeTab === 'payment' && (
+                    <motion.div 
+                      layoutId="activeTab"
+                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-teal-500" 
+                    />
+                  )}
                 </button>
               </nav>
             </div>
 
             {/* Tab Content */}
-            <div className="p-6">
+            <div className="p-8">
               {activeTab === 'personal' ? (
-                <div className="space-y-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Full Name</label>
-                    <div className="mt-1 relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <FaUser className="text-gray-400" />
-                      </div>
-                      <input
-                        type="text"
-                        name="fullName"
-                        value={user.fullName}
-                        onChange={handleInputChange}
-                        disabled={!isEditing}
-                        className={`block w-full pl-10 pr-3 py-2 border ${
-                          errors.fullName ? 'border-red-300' : 'border-gray-300'
-                        } rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-sm`}
-                      />
-                    </div>
-                    {errors.fullName && (
-                      <p className="mt-1 text-sm text-red-600">{errors.fullName}</p>
-                    )}
-                  </div>
+                <motion.div 
+                  variants={containerVariants}
+                  initial="hidden"
+                  animate="visible"
+                  className="space-y-4"
+                >
+                  <FormField
+                    label="Full Name"
+                    icon={<FaUser className="text-gray-400" />}
+                    name="fullName"
+                    type="text"
+                    value={user.fullName}
+                    disabled={!isEditing}
+                    error={errors.fullName}
+                  />
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Email</label>
-                    <div className="mt-1 relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <FaEnvelope className="text-gray-400" />
-                      </div>
-                      <input
-                        type="email"
-                        name="email"
-                        value={user.email}
-                        onChange={handleInputChange}
-                        disabled={!isEditing}
-                        className={`block w-full pl-10 pr-3 py-2 border ${
-                          errors.email ? 'border-red-300' : 'border-gray-300'
-                        } rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-sm`}
-                      />
-                    </div>
-                    {errors.email && (
-                      <p className="mt-1 text-sm text-red-600">{errors.email}</p>
-                    )}
-                  </div>
+                  <FormField
+                    label="Email"
+                    icon={<FaEnvelope className="text-gray-400" />}
+                    name="email"
+                    type="email"
+                    value={user.email}
+                    disabled={!isEditing}
+                    error={errors.email}
+                  />
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Phone Number</label>
-                    <div className="mt-1 relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <FaPhone className="text-gray-400" />
-                      </div>
-                      <input
-                        type="tel"
-                        name="phoneNumber"
-                        value={user.phoneNumber}
-                        onChange={handleInputChange}
-                        disabled={!isEditing}
-                        className={`block w-full pl-10 pr-3 py-2 border ${
-                          errors.phoneNumber ? 'border-red-300' : 'border-gray-300'
-                        } rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-sm`}
-                      />
-                    </div>
-                    {errors.phoneNumber && (
-                      <p className="mt-1 text-sm text-red-600">{errors.phoneNumber}</p>
-                    )}
-                  </div>
+                  <FormField
+                    label="Phone Number"
+                    icon={<FaPhone className="text-gray-400" />}
+                    name="phoneNumber"
+                    type="tel"
+                    value={user.phoneNumber}
+                    disabled={!isEditing}
+                    error={errors.phoneNumber}
+                  />
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Address</label>
-                    <div className="mt-1 relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <FaMapMarkerAlt className="text-gray-400" />
-                      </div>
-                      <input
-                        type="text"
-                        name="address"
-                        value={user.address}
-                        onChange={handleInputChange}
-                        disabled={!isEditing}
-                        className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-sm"
-                      />
-                    </div>
-                  </div>
-                </div>
+                  <FormField
+                    label="Address"
+                    icon={<FaMapMarkerAlt className="text-gray-400" />}
+                    name="address"
+                    type="text"
+                    value={user.address}
+                    disabled={!isEditing}
+                    error={null}
+                  />
+                </motion.div>
               ) : (
-                <div className="space-y-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Card Number</label>
-                    <div className="mt-1 relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <FaCreditCard className="text-gray-400" />
+                <motion.div 
+                  variants={containerVariants}
+                  initial="hidden"
+                  animate="visible"
+                  className="space-y-4"
+                >
+                  <div className="p-4 bg-blue-50 border border-blue-100 rounded-lg mb-6">
+                    <div className="flex items-start">
+                      <div className="p-2 bg-blue-100 rounded-full mr-3">
+                        <FaShieldAlt className="text-blue-500" />
                       </div>
-                      <input
-                        type="text"
-                        name="cardNumber"
-                        value={user.cardNumber}
-                        onChange={handleInputChange}
-                        disabled={!isEditing}
-                        className={`block w-full pl-10 pr-3 py-2 border ${
-                          errors.cardNumber ? 'border-red-300' : 'border-gray-300'
-                        } rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-sm`}
-                      />
-                    </div>
-                    {errors.cardNumber && (
-                      <p className="mt-1 text-sm text-red-600">{errors.cardNumber}</p>
-                    )}
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">Expiry Date</label>
-                      <div className="mt-1 relative">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <FaCalendarAlt className="text-gray-400" />
-                        </div>
-                        <input
-                          type="text"
-                          name="expiryDate"
-                          value={user.expiryDate}
-                          onChange={handleInputChange}
-                          disabled={!isEditing}
-                          placeholder="MM/YY"
-                          className={`block w-full pl-10 pr-3 py-2 border ${
-                            errors.expiryDate ? 'border-red-300' : 'border-gray-300'
-                          } rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-sm`}
-                        />
+                      <div>
+                        <h3 className="font-medium text-blue-800">Secure Payment Information</h3>
+                        <p className="text-sm text-blue-600 mt-1">Your payment details are encrypted and securely stored.</p>
                       </div>
-                      {errors.expiryDate && (
-                        <p className="mt-1 text-sm text-red-600">{errors.expiryDate}</p>
-                      )}
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">CVC</label>
-                      <div className="mt-1 relative">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <FaIdCard className="text-gray-400" />
-                        </div>
-                        <input
-                          type="text"
-                          name="cvc"
-                          value={user.cvc}
-                          onChange={handleInputChange}
-                          disabled={!isEditing}
-                          className={`block w-full pl-10 pr-3 py-2 border ${
-                            errors.cvc ? 'border-red-300' : 'border-gray-300'
-                          } rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-sm`}
-                        />
-                      </div>
-                      {errors.cvc && (
-                        <p className="mt-1 text-sm text-red-600">{errors.cvc}</p>
-                      )}
                     </div>
                   </div>
-                </div>
+                  
+                  <FormField
+                    label="Card Number"
+                    icon={<FaCreditCard className="text-gray-400" />}
+                    name="cardNumber"
+                    type="text"
+                    value={user.cardNumber}
+                    disabled={!isEditing}
+                    placeholder="XXXX XXXX XXXX XXXX"
+                    error={errors.cardNumber}
+                  />
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <FormField
+                      label="Expiry Date"
+                      icon={<FaCalendarAlt className="text-gray-400" />}
+                      name="expiryDate"
+                      type="text"
+                      value={user.expiryDate}
+                      disabled={!isEditing}
+                      placeholder="MM/YY"
+                      error={errors.expiryDate}
+                    />
+
+                    <FormField
+                      label="CVC"
+                      icon={<FaIdCard className="text-gray-400" />}
+                      name="cvc"
+                      type="text"
+                      value={user.cvc}
+                      disabled={!isEditing}
+                      placeholder="XXX"
+                      error={errors.cvc}
+                    />
+                  </div>
+                </motion.div>
               )}
 
               {/* Edit/Save/Cancel Buttons */}
-              <div className="mt-6 flex justify-end space-x-3">
+              <motion.div 
+                className="mt-8 flex justify-end space-x-3"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3 }}
+              >
                 {!isEditing ? (
                   <button
                     onClick={() => setIsEditing(true)}
-                    className="px-5 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition duration-300 shadow-md"
+                    className="px-6 py-3 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition duration-300 shadow-md flex items-center space-x-2"
                   >
-                    Edit Profile
+                    <FaEdit />
+                    <span>Edit Profile</span>
                   </button>
                 ) : (
                   <>
                     <button
                       onClick={handleCancel}
-                      className="px-5 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition duration-300"
+                      className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition duration-300 flex items-center space-x-2"
                       disabled={isLoading}
                     >
-                      Cancel
+                      <FaTimes />
+                      <span>Cancel</span>
                     </button>
                     <button
                       onClick={handleSave}
-                      className="px-5 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition duration-300 shadow-md"
+                      className={`px-6 py-3 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition duration-300 shadow-md flex items-center space-x-2 ${
+                        isLoading ? 'opacity-75 cursor-not-allowed' : ''
+                      }`}
                       disabled={isLoading}
                     >
-                      {isLoading ? 'Saving...' : 'Save Changes'}
+                      {isLoading ? (
+                        <>
+                          <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          <span>Saving...</span>
+                        </>
+                      ) : (
+                        <>
+                          <FaSave />
+                          <span>Save Changes</span>
+                        </>
+                      )}
                     </button>
                   </>
                 )}
-              </div>
+              </motion.div>
             </div>
-          </div>
+          </motion.div>
         </main>
       </div>
       <Footer />
