@@ -27,6 +27,7 @@ import ScrollToTop from './Components/ScrollToTop.js'
 import Dashboard from './Pages/LandingDevelopment/Dashboard.jsx'
 import LandBoundary from './Pages/LandingDevelopment/LandBoundary.jsx';
 import PlantationManagementAbout from './Pages/PlantationManagement/PlantationmanagementAbout.jsx'
+import SavedAnalyses from './Pages/Dashboard/SavedAnalyses.jsx'
 
 function App() {
   return (
@@ -54,6 +55,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/analyses"
+            element={
+              <ProtectedRoute>
+                <SavedAnalyses />
               </ProtectedRoute>
             }
           />

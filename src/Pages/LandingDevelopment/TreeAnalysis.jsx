@@ -1,19 +1,36 @@
 import React, { useRef, useMemo, useState, useEffect } from 'react';
 import { TreeVisualization } from './TreeVisualization';
-import { BarChart, Activity, Droplets, TreeDeciduous, Download, Image as ImageIcon, FileText } from 'lucide-react';
+import { BarChart, Activity, Droplets, TreeDeciduous, Download, Image as ImageIcon, FileText, Save, AlertCircle, CheckCircle } from 'lucide-react';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 import { BarLoader, SyncLoader } from 'react-spinners';
+import { useNavigate } from 'react-router-dom';
+import apiClient from '../../utils/axios';
+import { useAuth } from '../../context/AuthContext';
 
 export const TreeAnalysis = ({ boundary, spacing, scale }) => {
+  const navigate = useNavigate();
   const reportRef = useRef(null);
   const treeVisStageRef = useRef(null);
   const [loading, setLoading] = useState(true);
   const [bufferDistance] = useState(5); // Buffer distance in meters
+  const [saving, setSaving] = useState(false);
+  const [saveStatus, setSaveStatus] = useState({ type: '', message: '' });
 
   useEffect(() => {
     setTimeout(() => setLoading(false), 2400);
   }, []);
+
+  // Clear save status message after 5 seconds
+  useEffect(() => {
+    if (saveStatus.message) {
+      const timer = setTimeout(() => {
+        setSaveStatus({ type: '', message: '' });
+      }, 5000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [saveStatus]);
 
   // Function to create offset points for the buffer
   const createOffsetPoints = (originalPoints, offset) => {
@@ -101,43 +118,103 @@ export const TreeAnalysis = ({ boundary, spacing, scale }) => {
 
   const handleSaveAnalysis = async () => {
     try {
+      // Set saving state
+      setSaving(true);
+      setSaveStatus({ type: '', message: '' });
+      
+      // Check if user is in demo mode
+      const isDemoMode = localStorage.getItem('demo_mode') === 'true';
+      
+      // Get user data
       const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('You must be logged in to save analyses');
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      
+      if (!token || !user) {
+        setSaveStatus({ 
+          type: 'error', 
+          message: 'You must be logged in to save analyses. Please log in and try again.' 
+        });
+        
+        // Redirect to login page after a delay
+        setTimeout(() => {
+          navigate('/login', { state: { from: '/land-development' } });
+        }, 2000);
+        
+        return;
       }
 
-      const response = await fetch('/api/analyses', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          totalArea: metrics.totalArea,
-          plantableArea: metrics.plantableArea,
-          spacing,
-          totalTrees: metrics.treeCount,
-          boundary: boundary,
-          metrics: {
-            estimatedYield: metrics.estimatedYield,
-            waterRequirement: metrics.waterRequirement,
-            carbonSequestration: metrics.carbonSequestration,
-            maintenanceCost: metrics.maintenanceCost,
-            estimatedRevenue: metrics.estimatedRevenue,
-            roi: metrics.roi
-          }
-        })
-      });
-  
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.message);
+      // Calculate tree points for saving (optional - depends on your visualization logic)
+      const treePoints = []; // You could calculate this based on boundary and spacing
       
-      alert('Analysis saved successfully! You can view it in your dashboard.');
-      // Optionally navigate to dashboard
-      // navigate('/dashboard');
+      // Prepare analysis data
+      const analysisData = {
+        id: `analysis_${Date.now()}`,
+        userId: user.id || 'guest',
+        createdAt: new Date().toISOString(),
+        boundary: boundary,
+        treePoints: treePoints,
+        spacing: spacing,
+        totalArea: metrics.totalArea,
+        plantableArea: metrics.plantableArea,
+        totalTrees: metrics.treeCount,
+        metrics: {
+          estimatedYield: metrics.estimatedYield,
+          waterRequirement: metrics.waterRequirement,
+          carbonSequestration: metrics.carbonSequestration,
+          maintenanceCost: metrics.maintenanceCost,
+          estimatedRevenue: metrics.estimatedRevenue,
+          roi: metrics.roi
+        }
+      };
+
+      // If in demo mode, save to localStorage directly
+      if (isDemoMode) {
+        // Save to localStorage
+        const savedAnalyses = JSON.parse(localStorage.getItem('savedAnalyses') || '[]');
+        savedAnalyses.push(analysisData);
+        localStorage.setItem('savedAnalyses', JSON.stringify(savedAnalyses));
+        
+        setSaveStatus({ 
+          type: 'success', 
+          message: 'Analysis saved locally. You can view it in your dashboard.' 
+        });
+        return;
+      }
+
+      // Try to use the API client if not in demo mode
+      try {
+        const response = await apiClient.post('/api/analyses', analysisData);
+        
+        if (response.data.success) {
+          setSaveStatus({ 
+            type: 'success', 
+            message: 'Analysis saved successfully! You can view it in your dashboard.' 
+          });
+        }
+      } catch (apiError) {
+        console.warn('API server not available, saving to localStorage instead:', apiError);
+        
+        // Fallback to localStorage if API fails
+        const savedAnalyses = JSON.parse(localStorage.getItem('savedAnalyses') || '[]');
+        savedAnalyses.push(analysisData);
+        localStorage.setItem('savedAnalyses', JSON.stringify(savedAnalyses));
+        localStorage.setItem('demo_mode', 'true'); // Set demo mode flag since server is unavailable
+        
+        setSaveStatus({ 
+          type: 'success', 
+          message: 'Analysis saved locally. Server unavailable, but your data is safe.' 
+        });
+      }
     } catch (error) {
-      console.error('Error saving analysis:', error);
-      alert(`Failed to save analysis: ${error.message}`);
+      console.error('Error in save process:', error);
+      
+      // Simplified error handling
+      setSaveStatus({ 
+        type: 'error', 
+        message: 'An unexpected error occurred. Please try again.' 
+      });
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -401,6 +478,25 @@ export const TreeAnalysis = ({ boundary, spacing, scale }) => {
         <h2 className="text-2xl font-bold text-gray-900">Land Development Analysis</h2>
         <div className="flex space-x-2">
           <button
+            onClick={handleSaveAnalysis}
+            disabled={saving}
+            className={`flex items-center space-x-2 px-4 py-2 ${
+              saving ? 'bg-gray-400 cursor-not-allowed' : 'bg-teal-600 hover:bg-teal-700'
+            } text-white rounded-md transition-colors duration-300`}
+          >
+            {saving ? (
+              <>
+                <SyncLoader size={4} color="#ffffff" speedMultiplier={0.7} />
+                <span>Saving...</span>
+              </>
+            ) : (
+              <>
+                <Save className="h-5 w-5" />
+                <span>Save Analysis</span>
+              </>
+            )}
+          </button>
+          <button
             onClick={handleDownloadImage}
             className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
           >
@@ -416,6 +512,24 @@ export const TreeAnalysis = ({ boundary, spacing, scale }) => {
           </button>
         </div>
       </div>
+
+      {/* Status message */}
+      {saveStatus.message && (
+        <div className={`
+          flex items-center p-4 rounded-lg ${
+            saveStatus.type === 'success' 
+              ? 'bg-green-50 border border-green-200 text-green-800' 
+              : 'bg-red-50 border border-red-200 text-red-800'
+          }
+        `}>
+          {saveStatus.type === 'success' ? (
+            <CheckCircle className="h-5 w-5 mr-2 text-green-500" />
+          ) : (
+            <AlertCircle className="h-5 w-5 mr-2 text-red-500" />
+          )}
+          <p>{saveStatus.message}</p>
+        </div>
+      )}
 
       <div ref={reportRef} className="space-y-6">
         <div className="bg-white p-6 rounded-lg shadow-lg">
