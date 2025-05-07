@@ -27,7 +27,7 @@ const SavedAnalyses = () => {
   const [sortOrder, setSortOrder] = useState('newest');
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedAnalysis, setSelectedAnalysis] = useState(null);
-  const [dataSource, setDataSource] = useState('all'); // 'server', 'local', or 'all'
+  const [dataSource, setDataSource] = useState('server'); // Default to server data instead of 'all'
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -60,16 +60,22 @@ const SavedAnalyses = () => {
       setLoading(true);
       setError('');
       
+      console.log('Attempting to fetch analyses from server...');
       const response = await apiClient.get('/api/analyses');
       
       if (response.data.success) {
         setAnalyses(response.data.data);
+        console.log('Successfully loaded analyses from server:', response.data.data.length);
       } else {
-        setError('Failed to load analyses from server');
+        setError('Failed to load analyses from server: ' + (response.data.message || 'Unknown error'));
+        console.error('Server response error:', response.data);
       }
     } catch (error) {
       console.error('Error fetching analyses:', error);
-      setError('Failed to load analyses from server. Using local data.');
+      const errorMessage = error.response ? 
+        `Server error: ${error.response.status} - ${error.response.data?.message || 'Unknown'}` :
+        `Connection error: ${error.message}`;
+      setError(`Failed to load analyses from server: ${errorMessage}`);
     } finally {
       setLoading(false);
     }

@@ -52,39 +52,6 @@ const UserLogin = () => {
     if (error) setError(null);
   };
 
-  // Handle demo mode login
-  const handleDemoMode = () => {
-    setIsLoading(true);
-    setError(null);
-    
-    try {
-      // Create a demo token and user
-      const demoToken = `demo_${Math.random().toString(36).substring(2)}`;
-      const demoUser = {
-        id: 'demo_user_123',
-        fullName: 'Demo User',
-        email: 'demo@example.com',
-        role: 'user',
-        createdAt: new Date().toISOString()
-      };
-      
-      // Save to localStorage
-      localStorage.setItem('token', demoToken);
-      localStorage.setItem('user', JSON.stringify(demoUser));
-      localStorage.setItem('demo_mode', 'true');
-      
-      setSuccessMessage('Logged in with demo account! You can use the app without a backend server.');
-      
-      // Navigate to desired page after a short delay
-      setTimeout(() => {
-        navigate(from, { replace: true });
-      }, 1200);
-    } catch (err) {
-      setError('Failed to create demo account. Please try again.');
-      setIsLoading(false);
-    }
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -99,34 +66,6 @@ const UserLogin = () => {
         navigate('/', { replace: true });
       }
     } catch (err) {
-      // Check if it's a network error (server is down)
-      if (err.message && err.message.includes('Network Error')) {
-        console.warn('Server not available, using demo mode');
-        
-        // Create a demo token and user for offline use
-        const demoToken = `demo_${Math.random().toString(36).substring(2)}`;
-        const demoUser = {
-          id: 'demo_user_123',
-          fullName: 'Demo User',
-          email: formData.email || 'demo@example.com',
-          role: 'user',
-          createdAt: new Date().toISOString()
-        };
-        
-        // Save to localStorage
-        localStorage.setItem('token', demoToken);
-        localStorage.setItem('user', JSON.stringify(demoUser));
-        localStorage.setItem('demo_mode', 'true');
-        
-        setSuccessMessage('Logged in with demo account! Backend server is unavailable, but you can use the app in demo mode.');
-        
-        // Navigate to home page after a short delay
-        setTimeout(() => {
-          navigate('/', { replace: true });
-        }, 1500);
-        return;
-      }
-      
       setError(err.message || 'Invalid credentials. Please try again.');
       setIsLoading(false);
     }
@@ -244,24 +183,6 @@ const UserLogin = () => {
             >
               Forgot password?
             </a>
-          </motion.div>
-
-          {/* Demo Mode Button */}
-          <motion.div
-            className="text-center mb-4"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.45 }}
-          >
-            <p className="text-sm text-gray-500 mb-2">Server unavailable?</p>
-            <button
-              type="button"
-              onClick={handleDemoMode}
-              className="text-sm font-medium text-green-600 hover:text-green-800 hover:underline"
-              disabled={isLoading}
-            >
-              Try Demo Mode
-            </button>
           </motion.div>
 
           {/* Create Account Section */}

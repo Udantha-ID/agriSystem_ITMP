@@ -34,26 +34,6 @@ const register = async (userData) => {
     }
     return response.data;
   } catch (error) {
-    // If there's a network error (server down), set up demo mode
-    if (error.message && error.message.includes('Network Error')) {
-      // Create a demo user and token
-      const demoToken = `demo_${Math.random().toString(36).substring(2)}`;
-      const demoUser = {
-        id: `demo_${Date.now()}`,
-        fullName: userData.fullName || 'Demo User',
-        email: userData.email,
-        role: 'user',
-        createdAt: new Date().toISOString()
-      };
-      
-      // Save to localStorage
-      localStorage.setItem('token', demoToken);
-      localStorage.setItem('user', JSON.stringify(demoUser));
-      localStorage.setItem('demo_mode', 'true');
-      
-      return { user: demoUser, token: demoToken, success: true };
-    }
-    
     throw error.response?.data || { message: 'Network error. Please check your connection.' };
   }
 };
@@ -71,41 +51,32 @@ const registerOnly = async (userData) => {
 
 const login = async (email, password) => {
   try {
+    console.log('Attempting login for:', email);
+    
+    // Clean up any old tokens
+    localStorage.removeItem('demo_mode');
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    
     const response = await api.post('/login', { email, password });
+    
+    // Check if we have a valid response with token and user
     if (response.data && response.data.token && response.data.user) {
+      console.log('Login successful, token received:', response.data.token.substring(0, 10) + '...');
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('user', JSON.stringify(response.data.user));
-      localStorage.removeItem('demo_mode'); // Ensure we're not in demo mode
       return response.data;
     } else {
+      console.error('Invalid server response:', response.data);
       throw new Error('Invalid response from server');
     }
   } catch (error) {
-    // If there's a network error (server down), set up demo mode
-    if (error.message && error.message.includes('Network Error')) {
-      console.log('Server unreachable, setting up demo mode');
-      
-      // Create a demo user and token
-      const demoToken = `demo_${Math.random().toString(36).substring(2)}`;
-      const demoUser = {
-        id: 'demo_user_123',
-        fullName: 'Demo User',
-        email: email,
-        role: 'user',
-        createdAt: new Date().toISOString()
-      };
-      
-      // Save to localStorage
-      localStorage.setItem('token', demoToken);
-      localStorage.setItem('user', JSON.stringify(demoUser));
-      localStorage.setItem('demo_mode', 'true');
-      
-      return { user: demoUser, token: demoToken, success: true };
-    }
+    console.error('Login error:', error.message || 'Unknown error');
     
-    // Other error handling
+    // Clean up on error
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    
     throw error.response?.data || { message: 'Network error. Please check your connection.' };
   }
 };
@@ -132,46 +103,35 @@ const getCurrentUser = () => {
 const isAuthenticated = () => {
   const token = localStorage.getItem('token');
   const user = getCurrentUser();
-  return !!token && !!user;
+  
+  if (!token || !user) {
+    return false;
+  }
+  
+  // Check token format - at minimum should be a non-empty string
+  if (typeof token !== 'string' || token.trim() === '') {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    return false;
+  }
+  
+  return true;
 };
 
 const updateProfile = async (userData) => {
   try {
-    // If we're in demo mode, just update locally
-    if (localStorage.getItem('demo_mode') === 'true') {
-      const currentUser = getCurrentUser() || {};
-      const updatedUser = { ...currentUser, ...userData };
-      localStorage.setItem('user', JSON.stringify(updatedUser));
-      return { success: true, user: updatedUser };
-    }
-    
-    // Otherwise, try to update via API
     const response = await api.patch('/update', userData);
     if (response.data.user) {
       localStorage.setItem('user', JSON.stringify(response.data.user));
     }
     return response.data;
   } catch (error) {
-    // If network error, fall back to local update
-    if (error.message && error.message.includes('Network Error')) {
-      const currentUser = getCurrentUser() || {};
-      const updatedUser = { ...currentUser, ...userData };
-      localStorage.setItem('user', JSON.stringify(updatedUser));
-      localStorage.setItem('demo_mode', 'true');
-      return { success: true, user: updatedUser };
-    }
-    
     throw error.response?.data || { message: 'Network error. Please check your connection.' };
   }
 };
 
 const updatePassword = async (oldPassword, newPassword) => {
   try {
-    // If in demo mode, pretend it worked
-    if (localStorage.getItem('demo_mode') === 'true') {
-      return { success: true, message: 'Password updated (demo mode)' };
-    }
-    
     const response = await api.patch('/update-password', {
       oldPassword,
       newPassword,

@@ -122,9 +122,6 @@ export const TreeAnalysis = ({ boundary, spacing, scale }) => {
       setSaving(true);
       setSaveStatus({ type: '', message: '' });
       
-      // Check if user is in demo mode
-      const isDemoMode = localStorage.getItem('demo_mode') === 'true';
-      
       // Get user data
       const token = localStorage.getItem('token');
       const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -148,9 +145,6 @@ export const TreeAnalysis = ({ boundary, spacing, scale }) => {
       
       // Prepare analysis data
       const analysisData = {
-        id: `analysis_${Date.now()}`,
-        userId: user.id || 'guest',
-        createdAt: new Date().toISOString(),
         boundary: boundary,
         treePoints: treePoints,
         spacing: spacing,
@@ -167,43 +161,45 @@ export const TreeAnalysis = ({ boundary, spacing, scale }) => {
         }
       };
 
-      // If in demo mode, save to localStorage directly
-      if (isDemoMode) {
-        // Save to localStorage
-        const savedAnalyses = JSON.parse(localStorage.getItem('savedAnalyses') || '[]');
-        savedAnalyses.push(analysisData);
-        localStorage.setItem('savedAnalyses', JSON.stringify(savedAnalyses));
-        
-        setSaveStatus({ 
-          type: 'success', 
-          message: 'Analysis saved locally. You can view it in your dashboard.' 
-        });
-        return;
-      }
-
-      // Try to use the API client if not in demo mode
+      console.log('Sending analysis with token:', token.substring(0, 10) + '...');
+      
+      // Always try to use the API client first
       try {
-        const response = await apiClient.post('/api/analyses', analysisData);
+        // Set authorization header explicitly
+        const response = await apiClient.post('/api/analyses', analysisData, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
         
         if (response.data.success) {
           setSaveStatus({ 
             type: 'success', 
-            message: 'Analysis saved successfully! You can view it in your dashboard.' 
+            message: 'Analysis saved to database successfully! You can view it in your dashboard.' 
           });
         }
       } catch (apiError) {
-        console.warn('API server not available, saving to localStorage instead:', apiError);
+        console.error('Database save error:', apiError);
         
-        // Fallback to localStorage if API fails
-        const savedAnalyses = JSON.parse(localStorage.getItem('savedAnalyses') || '[]');
-        savedAnalyses.push(analysisData);
-        localStorage.setItem('savedAnalyses', JSON.stringify(savedAnalyses));
-        localStorage.setItem('demo_mode', 'true'); // Set demo mode flag since server is unavailable
-        
-        setSaveStatus({ 
-          type: 'success', 
-          message: 'Analysis saved locally. Server unavailable, but your data is safe.' 
-        });
+        if (apiError.response && apiError.response.status === 401) {
+          // Handle unauthorized error
+          setSaveStatus({ 
+            type: 'error', 
+            message: 'Authentication error. Please log in again and try again.' 
+          });
+          
+          // Redirect to login after a delay
+          setTimeout(() => {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            navigate('/login', { state: { from: '/land-development' } });
+          }, 2000);
+        } else {
+          setSaveStatus({ 
+            type: 'error', 
+            message: 'Failed to save to database. Please check if the server is running.' 
+          });
+        }
       }
     } catch (error) {
       console.error('Error in save process:', error);
