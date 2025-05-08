@@ -16,6 +16,7 @@ export const TreeAnalysis = ({ boundary, spacing, scale }) => {
   const [bufferDistance] = useState(5); // Buffer distance in meters
   const [saving, setSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState({ type: '', message: '' });
+  const { user } = useAuth(); // Get user from auth context
 
   useEffect(() => {
     setTimeout(() => setLoading(false), 2400);
@@ -220,6 +221,20 @@ export const TreeAnalysis = ({ boundary, spacing, scale }) => {
         throw new Error('Report content not found');
       }
 
+      // Get user data
+      const userData = user || JSON.parse(localStorage.getItem('user') || '{}');
+      const username = userData.name || userData.username || userData.email || 'User';
+      
+      // First, capture the Konva stage as an image
+      let treeVisualizationImage = null;
+      if (treeVisStageRef.current) {
+        const stage = treeVisStageRef.current.getStage();
+        treeVisualizationImage = stage.toDataURL({
+          pixelRatio: 3, // Higher quality
+          mimeType: 'image/png'
+        });
+      }
+
       // Create a temporary container with enhanced styling
       const tempContainer = document.createElement('div');
       tempContainer.style.position = 'absolute';
@@ -231,6 +246,39 @@ export const TreeAnalysis = ({ boundary, spacing, scale }) => {
       tempContainer.style.fontFamily = 'Arial, sans-serif';
       tempContainer.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
       tempContainer.style.borderRadius = '8px';
+
+      // Add user info header
+      const userHeader = document.createElement('div');
+      userHeader.style.marginBottom = '30px';
+      userHeader.style.borderBottom = '1px solid #e5e7eb';
+      userHeader.style.paddingBottom = '20px';
+      
+      const userTitle = document.createElement('h1');
+      userTitle.textContent = 'Land Development Analysis Report';
+      userTitle.style.fontSize = '28px';
+      userTitle.style.fontWeight = 'bold';
+      userTitle.style.color = '#1e40af';
+      userTitle.style.marginBottom = '10px';
+      userHeader.appendChild(userTitle);
+      
+      const userSubtitle = document.createElement('div');
+      userSubtitle.style.display = 'flex';
+      userSubtitle.style.justifyContent = 'space-between';
+      
+      const userInfo = document.createElement('p');
+      userInfo.textContent = `Prepared for: ${username}`;
+      userInfo.style.fontSize = '16px';
+      userInfo.style.color = '#4b5563';
+      userSubtitle.appendChild(userInfo);
+      
+      const dateInfo = document.createElement('p');
+      dateInfo.textContent = `Date: ${new Date().toLocaleDateString()}`;
+      dateInfo.style.fontSize = '16px';
+      dateInfo.style.color = '#4b5563';
+      userSubtitle.appendChild(dateInfo);
+      
+      userHeader.appendChild(userSubtitle);
+      tempContainer.appendChild(userHeader);
 
       // Clone the content
       const content = reportRef.current.cloneNode(true);
@@ -262,6 +310,27 @@ export const TreeAnalysis = ({ boundary, spacing, scale }) => {
           element.style.borderRadius = '8px';
           element.style.padding = '16px';
           element.style.marginBottom = '24px';
+        }
+
+        // Replace the Konva canvas with an image if found
+        if (treeVisualizationImage && element.querySelector('.konvajs-content')) {
+          const konvaContainer = element.querySelector('.konvajs-content');
+          if (konvaContainer) {
+            const parentDiv = konvaContainer.closest('.border-2');
+            if (parentDiv) {
+              // Create an image element to replace the canvas
+              const img = document.createElement('img');
+              img.src = treeVisualizationImage;
+              img.style.width = '100%';
+              img.style.height = 'auto';
+              img.style.maxHeight = '400px';
+              img.style.objectFit = 'contain';
+              
+              // Clear the parent div and append the image
+              parentDiv.innerHTML = '';
+              parentDiv.appendChild(img);
+            }
+          }
         }
 
         // Process children
@@ -321,6 +390,20 @@ export const TreeAnalysis = ({ boundary, spacing, scale }) => {
         throw new Error('Report content not found');
       }
 
+      // Get user data
+      const userData = user || JSON.parse(localStorage.getItem('user') || '{}');
+      const username = userData.name || userData.username || userData.email || 'User';
+      
+      // First, capture the Konva stage as an image
+      let treeVisualizationImage = null;
+      if (treeVisStageRef.current) {
+        const stage = treeVisStageRef.current.getStage();
+        treeVisualizationImage = stage.toDataURL({
+          pixelRatio: 3, // Higher quality
+          mimeType: 'image/png'
+        });
+      }
+
       // Create a temporary container with enhanced styling
       const tempContainer = document.createElement('div');
       tempContainer.style.position = 'absolute';
@@ -332,6 +415,39 @@ export const TreeAnalysis = ({ boundary, spacing, scale }) => {
       tempContainer.style.fontFamily = 'Arial, sans-serif';
       tempContainer.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
       tempContainer.style.borderRadius = '8px';
+
+      // Add user info header
+      const userHeader = document.createElement('div');
+      userHeader.style.marginBottom = '30px';
+      userHeader.style.borderBottom = '1px solid #e5e7eb';
+      userHeader.style.paddingBottom = '20px';
+      
+      const userTitle = document.createElement('h1');
+      userTitle.textContent = 'Land Development Analysis Report';
+      userTitle.style.fontSize = '28px';
+      userTitle.style.fontWeight = 'bold';
+      userTitle.style.color = '#1e40af';
+      userTitle.style.marginBottom = '10px';
+      userHeader.appendChild(userTitle);
+      
+        const userSubtitle = document.createElement('div');
+        userSubtitle.style.display = 'flex';
+        userSubtitle.style.justifyContent = 'space-between';
+      
+      const userInfo = document.createElement('p');
+      userInfo.textContent = `Prepared for: ${username}`;
+      userInfo.style.fontSize = '16px';
+      userInfo.style.color = '#4b5563';
+      userSubtitle.appendChild(userInfo);
+      
+      const dateInfo = document.createElement('p');
+      dateInfo.textContent = `Date: ${new Date().toLocaleDateString()}`;
+      dateInfo.style.fontSize = '16px';
+      dateInfo.style.color = '#4b5563';
+      userSubtitle.appendChild(dateInfo);
+      
+      userHeader.appendChild(userSubtitle);
+      tempContainer.appendChild(userHeader);
 
       // Clone the content
       const content = reportRef.current.cloneNode(true);
@@ -363,6 +479,27 @@ export const TreeAnalysis = ({ boundary, spacing, scale }) => {
           element.style.borderRadius = '8px';
           element.style.padding = '16px';
           element.style.marginBottom = '24px';
+        }
+
+        // Replace the Konva canvas with an image if found
+        if (treeVisualizationImage && element.querySelector('.konvajs-content')) {
+          const konvaContainer = element.querySelector('.konvajs-content');
+          if (konvaContainer) {
+            const parentDiv = konvaContainer.closest('.border-2');
+            if (parentDiv) {
+              // Create an image element to replace the canvas
+              const img = document.createElement('img');
+              img.src = treeVisualizationImage;
+              img.style.width = '100%';
+              img.style.height = 'auto';
+              img.style.maxHeight = '400px';
+              img.style.objectFit = 'contain';
+              
+              // Clear the parent div and append the image
+              parentDiv.innerHTML = '';
+              parentDiv.appendChild(img);
+            }
+          }
         }
 
         // Process children
@@ -415,11 +552,16 @@ export const TreeAnalysis = ({ boundary, spacing, scale }) => {
       pdf.setTextColor(30, 64, 175); // Blue color
       pdf.text('Land Development Analysis Report', pdf.internal.pageSize.getWidth() / 2, 40, { align: 'center' });
 
+      // Add user information
+      // pdf.setFontSize(14);
+      // pdf.setTextColor(75, 85, 99); // Gray color
+      // pdf.text(`Prepared for: ${username}`, 40, 70);
+      
       // Add timestamp
       pdf.setFontSize(12);
       pdf.setTextColor(100);
       const timestamp = new Date().toLocaleString();
-      pdf.text(`Generated on: ${timestamp}`, pdf.internal.pageSize.getWidth() / 2, 60, { align: 'center' });
+      pdf.text(`Generated on: ${timestamp}`, pdf.internal.pageSize.getWidth() / 2, 70, { align: 'center' });
 
       // Add content
       const pageWidth = pdf.internal.pageSize.getWidth();
@@ -433,7 +575,7 @@ export const TreeAnalysis = ({ boundary, spacing, scale }) => {
         canvas.toDataURL('image/jpeg', 0.95),
         'JPEG',
         margin,
-        80,
+        90, // Move content down to make space for user info
         contentWidth,
         contentHeight
       );
