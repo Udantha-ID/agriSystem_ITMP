@@ -175,8 +175,13 @@ export const TreeAnalysis = ({ boundary, spacing, scale }) => {
         if (response.data.success) {
           setSaveStatus({ 
             type: 'success', 
-            message: 'Analysis saved to database successfully! You can view it in your dashboard.' 
+            message: 'Analysis saved to database successfully! Redirecting to dashboard...' 
           });
+          
+          // Redirect to analyses dashboard after successful save
+          setTimeout(() => {
+            navigate('/analyses');
+          }, 1500);
         }
       } catch (apiError) {
         console.error('Database save error:', apiError);
