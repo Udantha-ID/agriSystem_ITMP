@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Stage, Layer, Circle, Line, Text, Group, Rect } from 'react-konva';
 
 export const TreeVisualization = ({
@@ -7,6 +7,7 @@ export const TreeVisualization = ({
   scale,
   width,
   height,
+  stageRef,
 }) => {
   const [showDetails, setShowDetails] = useState(false);
   const [selectedTree, setSelectedTree] = useState(null);
@@ -93,7 +94,7 @@ export const TreeVisualization = ({
 
   return (
     <div className="relative">
-      <Stage width={width} height={height}>
+      <Stage width={width} height={height} ref={stageRef}>
         <Layer>
           {/* Background grid */}
           <Group>
