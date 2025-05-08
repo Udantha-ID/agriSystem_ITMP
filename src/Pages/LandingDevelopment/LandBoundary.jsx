@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { MapPin, Trees, ArrowLeft, Ruler, LayoutGrid, Info, RotateCw, Download } from 'lucide-react';
+import { MapPin, Trees, ArrowLeft, Ruler, LayoutGrid, Info, RotateCw, Download, BadgeCheck } from 'lucide-react';
 import { LandCanvas } from './LandCanvas';
 import { TreeAnalysis } from './TreeAnalysis';
 import Navbar from '../../Components/Navbar';
@@ -20,9 +20,13 @@ function LandBoundary() {
   const [error, setError] = useState(null);
   const [landArea, setLandArea] = useState(0);
   const [landDimensions, setLandDimensions] = useState({ width: 0, height: 0, perimeter: 0 });
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [analysisProgress, setAnalysisProgress] = useState(0);
+  const [analysisStage, setAnalysisStage] = useState('');
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const svgRef = useRef(null);
+  const analyzeButtonRef = useRef(null);
 
   const handleBoundaryUpdate = (points, metadata) => {
     setBoundary(points);
@@ -69,9 +73,49 @@ function LandBoundary() {
     }
   };
 
+  const simulateAnalysisProcess = () => {
+    setIsAnalyzing(true);
+    setAnalysisProgress(0);
+    setAnalysisStage('Calculating boundary metrics...');
+    
+    // Simulate multistage analysis with progress updates
+    const totalDuration = 2200; // Total animation duration in ms
+    const stages = [
+      { progress: 25, message: 'Analyzing terrain topology...' },
+      { progress: 50, message: 'Optimizing tree placement...' },
+      { progress: 75, message: 'Calculating growth projections...' },
+      { progress: 95, message: 'Finalizing analysis...' },
+      { progress: 100, message: 'Analysis complete!' }
+    ];
+    
+    // Schedule each stage to run at appropriate time
+    stages.forEach((stage, index) => {
+      setTimeout(() => {
+        setAnalysisProgress(stage.progress);
+        setAnalysisStage(stage.message);
+        
+        // When all stages complete, show the analysis
+        if (index === stages.length - 1) {
+          setTimeout(() => {
+            // Add final completion effects
+            if (analyzeButtonRef.current) {
+              analyzeButtonRef.current.classList.add('analysis-complete');
+            }
+            // Show checkmark animation
+            setTimeout(() => {
+              setShowAnalysis(true);
+              setIsAnalyzing(false);
+              setAnalysisProgress(0);
+            }, 500);
+          }, 300);
+        }
+      }, (totalDuration / stages.length) * index);
+    });
+  };
+
   const handleAnalyze = () => {
     if (boundary.length > 2) {
-      setShowAnalysis(true);
+      simulateAnalysisProcess();
     }
   };
 
@@ -159,6 +203,46 @@ function LandBoundary() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-25 to-gray-75 font-sans">
+      {/* Custom CSS for animations */}
+      <style jsx="true">{`
+        @keyframes pulse-green {
+          0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+          50% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+        }
+        
+        @keyframes float-up {
+          0% { opacity: 0; transform: translateY(10px); }
+          100% { opacity: 1; transform: translateY(-20px); }
+        }
+        
+        @keyframes shimmer {
+          0% { background-position: -100% 0; }
+          100% { background-position: 200% 0; }
+        }
+        
+        .analysis-complete {
+          animation: pulse-green 1s ease-in-out;
+          background: linear-gradient(to right, #10b981, #059669, #10b981) !important;
+          background-size: 200% auto !important;
+          transition: all 0.5s ease !important;
+        }
+        
+        .progress-bar-shimmer {
+          background: linear-gradient(
+            90deg,
+            rgba(59, 130, 246, 0.5) 0%,
+            rgba(16, 185, 129, 0.8) 50%,
+            rgba(59, 130, 246, 0.5) 100%
+          );
+          background-size: 200% 100%;
+          animation: shimmer 2s infinite linear;
+        }
+        
+        .stage-indicator {
+          animation: float-up 0.5s ease-out forwards;
+        }
+      `}</style>
+      
       {/* Sticky header with glass morphism effect */}
       <header className="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-50 border-b border-gray-100">
         <div className="max-w-8xl mx-auto px-6 py-3">
@@ -311,23 +395,51 @@ function LandBoundary() {
 
                   <div className="pt-4">
                     <button
+                      ref={analyzeButtonRef}
                       onClick={handleAnalyze}
-                      disabled={boundary.length < 3}
-                      className={`w-full flex justify-center items-center px-6 py-3 rounded-xl text-white font-medium transition-all duration-300 transform hover:scale-[1.02] ${
+                      disabled={boundary.length < 3 || isAnalyzing}
+                      className={`w-full flex justify-center items-center px-6 py-3 rounded-xl text-white font-medium transition-all duration-300 transform hover:scale-[1.02] relative overflow-hidden ${
                         boundary.length < 3
                           ? 'bg-gray-300 cursor-not-allowed'
+                          : isAnalyzing
+                          ? 'bg-blue-600 cursor-wait'
                           : 'bg-gradient-to-r from-blue-600 to-blue-500 shadow-lg hover:shadow-xl'
                       }`}
                     >
                       {boundary.length < 3 ? (
                         'Draw boundary to analyze'
+                      ) : isAnalyzing ? (
+                        <div className="w-full flex flex-col items-center">
+                          {/* Progress bar */}
+                          <div className="w-full bg-blue-900/20 h-1 mb-2 rounded-full overflow-hidden">
+                            <div 
+                              className="h-full progress-bar-shimmer rounded-full transition-all duration-300 ease-out"
+                              style={{ width: `${analysisProgress}%` }}
+                            ></div>
+                          </div>
+                          <div className="flex items-center justify-center">
+                            <span className="mr-2 text-sm font-medium">{analysisStage}</span>
+                            <span className="text-xs opacity-75">{analysisProgress}%</span>
+                          </div>
+                        </div>
                       ) : (
                         <>
+                          <BadgeCheck className="w-5 h-5 mr-2" />
                           <span>Generate Analysis</span>
                           <svg className="w-4 h-4 ml-2 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                           </svg>
                         </>
+                      )}
+                      
+                      {/* Floating completion message */}
+                      {analysisProgress === 100 && (
+                        <div className="absolute top-0 left-0 w-full text-center stage-indicator">
+                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            <BadgeCheck className="w-3 h-3 mr-1" />
+                            Analysis Complete!
+                          </span>
+                        </div>
                       )}
                     </button>
                   </div>
