@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import {
   BarChart,
@@ -16,6 +16,7 @@ import {
 import apiClient from '../../utils/axios';
 import { BarLoader } from 'react-spinners';
 import { useAuth } from '../../context/AuthContext';
+import AnalysisDetailModal from '../../Components/AnalysisDetailModal';
 
 const SavedAnalyses = () => {
   const { isAuthenticated, currentUser } = useAuth();
@@ -28,6 +29,8 @@ const SavedAnalyses = () => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedAnalysis, setSelectedAnalysis] = useState(null);
   const [dataSource, setDataSource] = useState('server'); // Default to server data instead of 'all'
+  const [detailModalOpen, setDetailModalOpen] = useState(false);
+  const [detailAnalysis, setDetailAnalysis] = useState(null);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -159,6 +162,16 @@ const SavedAnalyses = () => {
     setSelectedAnalysis(null);
   };
 
+  const openDetailModal = (analysis) => {
+    setDetailAnalysis(analysis);
+    setDetailModalOpen(true);
+  };
+
+  const closeDetailModal = () => {
+    setDetailModalOpen(false);
+    setDetailAnalysis(null);
+  };
+
   const formatDate = (dateString) => {
     const options = { 
       year: 'numeric', 
@@ -262,7 +275,11 @@ const SavedAnalyses = () => {
               const analysisId = analysis._id || analysis.id;
               
               return (
-                <div key={analysisId} className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
+                <div 
+                  key={analysisId} 
+                  className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 cursor-pointer"
+                  onClick={() => openDetailModal(analysis)}
+                >
                   <div className="p-6">
                     <div className="flex justify-between items-start">
                       <div className="flex items-center">
@@ -287,14 +304,98 @@ const SavedAnalyses = () => {
                     
                     <h3 className="text-lg font-semibold mt-4">Land Analysis Report</h3>
                     
+                    {/* Tree Visualization Preview */}
+                    <div className="mt-4 bg-gray-50 rounded-lg p-2 h-32 flex items-center justify-center overflow-hidden">
+                      {analysis.boundary && analysis.boundary.length > 0 ? (
+                        <svg 
+                          viewBox="0 0 400 200" 
+                          className="w-full h-full" 
+                          preserveAspectRatio="xMidYMid meet"
+                        >
+                          {/* Draw boundary */}
+                          <polygon
+                            points={analysis.boundary.map(p => `${p.x},${p.y}`).join(' ')}
+                            fill="rgba(34, 197, 94, 0.1)"
+                            stroke="rgb(34, 197, 94)"
+                            strokeWidth="2"
+                          />
+                          
+                          {/* Draw simplified tree points */}
+                          {Array.from({ length: Math.min(20, analysis.totalTrees || 5) }).map((_, i) => {
+                            // Calculate positions within the boundary using proper spacing values
+                            const minX = Math.min(...analysis.boundary.map(p => p.x));
+                            const maxX = Math.max(...analysis.boundary.map(p => p.x));
+                            const minY = Math.min(...analysis.boundary.map(p => p.y));
+                            const maxY = Math.max(...analysis.boundary.map(p => p.y));
+                            
+                            // Apply actual spacing if available, otherwise use a grid
+                            if (analysis.spacing && analysis.scale) {
+                              // Use the actual spacing parameters
+                              const scale = analysis.scale || 1;
+                              const pixelSpacingH = (analysis.spacing.horizontal || 5) / scale;
+                              const pixelSpacingV = (analysis.spacing.vertical || 5) / scale;
+                              
+                              // Calculate an appropriate starting offset
+                              const offsetX = minX + (pixelSpacingH / 2);
+                              const offsetY = minY + (pixelSpacingV / 2);
+                              
+                              // Use a more spread out distribution based on tree index
+                              const cols = Math.ceil(Math.sqrt(Math.min(20, analysis.totalTrees || 5)));
+                              const colIdx = i % cols;
+                              const rowIdx = Math.floor(i / cols);
+                              
+                              // Apply the proper spacing
+                              const x = offsetX + (colIdx * pixelSpacingH);
+                              const y = offsetY + (rowIdx * pixelSpacingV);
+                              
+                              // Only return points that would be inside the boundary
+                              if (x <= maxX && y <= maxY) {
+                                return (
+                                  <circle
+                                    key={i}
+                                    cx={x}
+                                    cy={y}
+                                    r="3"
+                                    fill="rgb(34, 197, 94)"
+                                  />
+                                );
+                              }
+                              return null;
+                            } else {
+                              // Fallback to the existing grid pattern if spacing/scale not available
+                              const cols = 5;
+                              const rows = 4;
+                              const colIdx = i % cols;
+                              const rowIdx = Math.floor(i / cols);
+                              
+                              // Calculate position within the grid
+                              const x = minX + ((maxX - minX) * (colIdx + 0.5)) / cols;
+                              const y = minY + ((maxY - minY) * (rowIdx + 0.5)) / rows;
+                              
+                              return (
+                                <circle
+                                  key={i}
+                                  cx={x}
+                                  cy={y}
+                                  r="3"
+                                  fill="rgb(34, 197, 94)"
+                                />
+                              );
+                            }
+                          }).filter(Boolean)}
+                        </svg>
+                      ) : (
+                        <div className="text-center text-gray-500">
+                          <TreeDeciduous className="h-6 w-6 mx-auto mb-2 text-gray-400" />
+                          <p className="text-xs">Tree visualization not available</p>
+                        </div>
+                      )}
+                    </div>
+                    
                     <div className="mt-4 space-y-3">
                       <div className="flex justify-between">
                         <span className="text-gray-600">Total Area:</span>
                         <span className="font-medium">{analysis.totalArea.toFixed(2)} m²</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Plantable Area:</span>
-                        <span className="font-medium">{analysis.plantableArea.toFixed(2)} m²</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600">Total Trees:</span>
@@ -308,20 +409,26 @@ const SavedAnalyses = () => {
                     
                     <div className="flex justify-between mt-6">
                       <button
-                        onClick={() => openDeleteModal(analysis, isLocalAnalysis)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openDeleteModal(analysis, isLocalAnalysis);
+                        }}
                         className="flex items-center text-red-600 hover:text-red-800 transition-colors"
                       >
                         <Trash2 className="h-4 w-4 mr-1" />
                         Delete
                       </button>
                       
-                      <Link 
-                        to={isLocalAnalysis ? `/local-analysis/${analysisId}` : `/analysis/${analysisId}`}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openDetailModal(analysis);
+                        }}
                         className="flex items-center text-teal-600 hover:text-teal-800 transition-colors"
                       >
                         <Eye className="h-4 w-4 mr-1" />
                         View Details
-                      </Link>
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -333,7 +440,7 @@ const SavedAnalyses = () => {
 
       {/* Delete Confirmation Modal */}
       {deleteModalOpen && selectedAnalysis && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50" onClick={(e) => e.stopPropagation()}>
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
             <h3 className="text-lg font-medium text-gray-900 mb-4">Delete Analysis</h3>
             <p className="text-gray-600 mb-2">
@@ -366,6 +473,14 @@ const SavedAnalyses = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Detail Modal */}
+      {detailModalOpen && detailAnalysis && (
+        <AnalysisDetailModal 
+          analysis={detailAnalysis} 
+          onClose={closeDetailModal}
+        />
       )}
     </div>
   );
