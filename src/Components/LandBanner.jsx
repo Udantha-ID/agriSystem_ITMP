@@ -1,21 +1,25 @@
 import React from 'react';
 import Image5 from '../Images/14.jpg';
 import { useNavigate } from 'react-router-dom';
-import { MapPin, Leaf, LineChart, Calendar, Phone } from 'lucide-react';
+import { MapPin, Leaf, LineChart, Calendar, Phone, DatabaseIcon, Trees } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 function LandBanner() {
-
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
 
-  // Function to handle button click
-  const handleButtonClick = () => {
+  // Function to handle button click for new analysis
+  const handleNewAnalysisClick = () => {
     navigate('/landboundary');
   };
-
+  
+  // Function to handle button click for viewing saved analyses
+  const handleViewAnalysesClick = () => {
+    navigate('/analyses');
+  };
 
   return (
     <div>
-     
       <section className="bg-gradient-to-r from-emerald-600 to-teal-800 text-white py-20 relative overflow-hidden">
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-10">
@@ -33,20 +37,29 @@ function LandBanner() {
 
         <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between relative z-10">
           <div className="md:w-1/2 text-left mb-12 md:mb-0">
-            <h2 className="text-5xl font-bold mb-6 leading-tight">Transform Your <span className="text-green-300">Land's Potential</span></h2>
+            <h2 className="text-5xl font-bold mb-6 leading-tight">Land <span className="text-green-300">Development</span> and Analysis</h2>
             <p className="text-lg text-green-100 mb-8 max-w-xl">
-              Our AI-powered analysis provides custom insights to maximize your farm's productivity and sustainability.
+              Our intelligent analysis provides custom insights to optimize tree placement, maximize productivity, and ensure sustainable land development.
             </p>
             
             <div className="flex flex-wrap gap-4">
-              <button onClick={handleButtonClick} className="bg-white text-teal-900 px-6 py-3 rounded-lg font-semibold hover:bg-green-100 transition-colors flex items-center gap-2">
+              <button 
+                onClick={handleNewAnalysisClick} 
+                className="bg-white text-teal-900 px-6 py-3 rounded-lg font-semibold hover:bg-green-100 transition-colors flex items-center gap-2"
+              >
                 <Calendar size={20} />
-                Updload Your Land Map
+                New Land Analysis
               </button>
-              <button className="bg-teal-700 border border-teal-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-teal-600 transition-colors flex items-center gap-2">
-                <Phone size={20} />
-                Contact Sales
-              </button>
+              
+              {isAuthenticated && (
+                <button 
+                  onClick={handleViewAnalysesClick} 
+                  className="bg-teal-700 border border-teal-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-teal-600 transition-colors flex items-center gap-2"
+                >
+                  <LineChart size={20} />
+                  View Saved Analyses
+                </button>
+              )}
             </div>
             
             <div className="flex mt-10 gap-8">
@@ -56,7 +69,7 @@ function LandBanner() {
               </div>
               <div className="flex items-center gap-2">
                 <Leaf className="text-green-300" />
-                <span className="text-sm">Sustainable Solutions</span>
+                <span className="text-sm">Optimal Tree Placement</span>
               </div>
               <div className="flex items-center gap-2">
                 <LineChart className="text-green-300" />
