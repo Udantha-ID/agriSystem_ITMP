@@ -11,8 +11,7 @@ import {
   AlertCircle,
   RefreshCw,
   Database,
-  HardDrive,
-  Trees
+  HardDrive
 } from 'lucide-react';
 import apiClient from '../../utils/axios';
 import { BarLoader } from 'react-spinners';
@@ -192,14 +191,6 @@ const SavedAnalyses = () => {
           </div>
           
           <div className="mt-4 md:mt-0 flex flex-col sm:flex-row gap-3">
-            <Link 
-              to="/landboundary" 
-              className="flex items-center justify-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-            >
-              <Trees className="h-4 w-4 mr-2" />
-              Create New Analysis
-            </Link>
-            
             <div className="relative">
               <input
                 type="text"
@@ -252,17 +243,16 @@ const SavedAnalyses = () => {
 
         {hasNoAnalyses ? (
           <div className="bg-white rounded-xl shadow-sm p-8 text-center">
-            <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
-              <TreeDeciduous className="h-8 w-8 text-green-600" />
+            <div className="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+              <TreeDeciduous className="h-8 w-8 text-gray-400" />
             </div>
             <h3 className="text-lg font-medium text-gray-900 mb-2">No saved analyses yet</h3>
-            <p className="text-gray-600 mb-6">Get started by creating your first land development analysis.</p>
+            <p className="text-gray-600 mb-6">Start by creating a new land development analysis.</p>
             <Link 
-              to="/landboundary" 
-              className="inline-flex items-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+              to="/land-development" 
+              className="inline-flex items-center px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700"
             >
-              <Trees className="h-5 w-5 mr-2" />
-              Create First Analysis
+              Create New Analysis
             </Link>
           </div>
         ) : (

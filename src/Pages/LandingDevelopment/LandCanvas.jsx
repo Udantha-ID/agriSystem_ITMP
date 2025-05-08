@@ -1,9 +1,9 @@
-import React, { useState, useCallback } from 'react';
-import { Stage, Layer, Line, Circle, Image as KonvaImage, Group } from 'react-konva';
+import React, { useState, useCallback, useEffect } from 'react';
+import { Stage, Layer, Line, Circle, Image as KonvaImage, Group, Text } from 'react-konva';
 import useImage from 'use-image';
-import { Pencil, MousePointer, Grid, Undo2, Redo2 } from 'lucide-react';
+import { Pencil, MousePointer, Grid, Undo2, Redo2, Ruler } from 'lucide-react';
 
-export const LandCanvas = ({ width, height, onBoundaryUpdate }) => {
+export const LandCanvas = ({ width, height, onBoundaryUpdate, drawingActive, scale = 1 }) => {
   const [points, setPoints] = useState([]);
   const [history, setHistory] = useState([[]]);
   const [historyIndex, setHistoryIndex] = useState(0);
@@ -15,6 +15,8 @@ export const LandCanvas = ({ width, height, onBoundaryUpdate }) => {
   const [showGrid, setShowGrid] = useState(true);
   const [gridSize, setGridSize] = useState(20);
   const [selectedPointIndex, setSelectedPointIndex] = useState(null);
+  const [showMeasurements, setShowMeasurements] = useState(true);
+  const [totalArea, setTotalArea] = useState(0);
 
   const addToHistory = useCallback((newPoints) => {
     const newHistory = history.slice(0, historyIndex + 1);
@@ -133,6 +135,59 @@ export const LandCanvas = ({ width, height, onBoundaryUpdate }) => {
     onBoundaryUpdate(newPoints);
   };
 
+  // Calculate distances and area
+  const calculateDistances = useCallback(() => {
+    if (points.length < 2) return [];
+    
+    return points.map((point, i) => {
+      const nextIndex = (i + 1) % points.length;
+      const nextPoint = points[nextIndex];
+      
+      // Calculate distance between points
+      const dx = nextPoint.x - point.x;
+      const dy = nextPoint.y - point.y;
+      const pixelDistance = Math.sqrt(dx * dx + dy * dy);
+      const realDistance = pixelDistance * scale; // Convert to real-world units
+      
+      // Calculate midpoint for label placement
+      const midX = (point.x + nextPoint.x) / 2;
+      const midY = (point.y + nextPoint.y) / 2;
+      
+      return {
+        from: i,
+        to: nextIndex,
+        distance: realDistance,
+        midpoint: { x: midX, y: midY }
+      };
+    });
+  }, [points, scale]);
+
+  // Calculate polygon area
+  const calculateArea = useCallback(() => {
+    if (points.length < 3) return 0;
+    
+    let area = 0;
+    for (let i = 0; i < points.length; i++) {
+      const j = (i + 1) % points.length;
+      area += points[i].x * points[j].y;
+      area -= points[j].x * points[i].y;
+    }
+    
+    const pixelArea = Math.abs(area / 2);
+    return pixelArea * (scale * scale); // Convert to square meters
+  }, [points, scale]);
+
+  // Update area when points change
+  useEffect(() => {
+    const calculatedArea = calculateArea();
+    setTotalArea(calculatedArea);
+    
+    // Also pass this info to parent along with boundary
+    if (onBoundaryUpdate && typeof onBoundaryUpdate === 'function') {
+      onBoundaryUpdate(points, { area: calculatedArea });
+    }
+  }, [points, calculateArea, onBoundaryUpdate]);
+
   return (
     <div className="space-y-4">
       <div className="flex gap-4">
@@ -189,6 +244,17 @@ export const LandCanvas = ({ width, height, onBoundaryUpdate }) => {
             <Grid className="h-4 w-4" />
             <span>Grid</span>
           </button>
+          <button
+            onClick={() => setShowMeasurements(!showMeasurements)}
+            className={`px-4 py-2 rounded-md flex items-center space-x-2 ${
+              showMeasurements
+                ? 'bg-blue-100 text-blue-700'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            <Ruler className="h-4 w-4" />
+            <span>Measurements</span>
+          </button>
         </div>
 
         <div className="flex items-center space-x-2">
@@ -202,6 +268,13 @@ export const LandCanvas = ({ width, height, onBoundaryUpdate }) => {
             max="100"
           />
         </div>
+
+        {/* Area display */}
+        {points.length > 2 && (
+          <div className="ml-auto bg-green-50 text-green-800 px-4 py-2 rounded-md font-medium">
+            Land Area: {totalArea.toFixed(2)} m²
+          </div>
+        )}
 
         <div className="flex space-x-2">
           <button
@@ -254,87 +327,115 @@ export const LandCanvas = ({ width, height, onBoundaryUpdate }) => {
           onMouseUp={handleMouseUp}
         >
           <Layer>
-            {/* Grid */}
-            {showGrid && Array.from({ length: Math.ceil(width / gridSize) }).map((_, i) => (
-              <Line
-                key={`vertical-${i}`}
-                points={[i * gridSize, 0, i * gridSize, height]}
-                stroke="#ddd"
-                strokeWidth={1}
-              />
-            ))}
-            {showGrid && Array.from({ length: Math.ceil(height / gridSize) }).map((_, i) => (
-              <Line
-                key={`horizontal-${i}`}
-                points={[0, i * gridSize, width, i * gridSize]}
-                stroke="#ddd"
-                strokeWidth={1}
-              />
-            ))}
-
-            {/* Background Image */}
-            {mapImage && image && (
+            {/* Background and grid */}
+            {image && (
               <KonvaImage
                 image={image}
-                scaleX={imageScale.x}
-                scaleY={imageScale.y}
-                opacity={0.5}
+                width={width * imageScale.x}
+                height={height * imageScale.y}
+                opacity={0.4}
               />
             )}
-
-            {/* Boundary Line */}
-            <Line
-              points={points.flatMap(p => [p.x, p.y])}
-              stroke="#2563eb"
-              strokeWidth={2}
-              closed={points.length > 2}
-            />
-
-            {/* Points */}
+            
+            {showGrid && (
+              <Group>
+                {/* Horizontal grid lines */}
+                {Array.from({ length: Math.ceil(height / gridSize) }).map((_, i) => (
+                  <Line
+                    key={`h-${i}`}
+                    points={[0, i * gridSize, width, i * gridSize]}
+                    stroke="#ddd"
+                    strokeWidth={1}
+                  />
+                ))}
+                {/* Vertical grid lines */}
+                {Array.from({ length: Math.ceil(width / gridSize) }).map((_, i) => (
+                  <Line
+                    key={`v-${i}`}
+                    points={[i * gridSize, 0, i * gridSize, height]}
+                    stroke="#ddd"
+                    strokeWidth={1}
+                  />
+                ))}
+              </Group>
+            )}
+            
+            {/* Draw boundary line */}
+            {points.length > 0 && (
+              <Line
+                points={points.flatMap(p => [p.x, p.y])}
+                closed={points.length > 2}
+                stroke="#3b82f6"
+                strokeWidth={2}
+                fill="rgba(59, 130, 246, 0.2)"
+              />
+            )}
+            
+            {/* Measurements */}
+            {showMeasurements && points.length > 1 && calculateDistances().map((line, i) => (
+              <Group key={`measure-${i}`}>
+                <Text
+                  x={line.midpoint.x - 20}
+                  y={line.midpoint.y - 10}
+                  text={`${line.distance.toFixed(1)}m`}
+                  fontSize={12}
+                  fill="black"
+                  background="white"
+                  padding={2}
+                />
+              </Group>
+            ))}
+            
+            {/* Draw control points */}
             {points.map((point, i) => (
-              <Group key={i}>
+              <Group key={`point-${i}`}>
                 <Circle
                   x={point.x}
                   y={point.y}
                   radius={6}
-                  fill={selectedPointIndex === i ? '#ef4444' : '#2563eb'}
+                  fill={selectedPointIndex === i ? "#f59e0b" : "#3b82f6"}
+                  stroke="#fff"
+                  strokeWidth={2}
                   onClick={() => handlePointClick(i)}
                   onDblClick={() => handleDeletePoint(i)}
                   draggable={drawingMode === 'point'}
                   onDragMove={(e) => {
-                    const pos = snapToGrid({
-                      x: e.target.x(),
-                      y: e.target.y()
-                    });
+                    const pos = e.target.position();
+                    const snappedPos = snapToGrid(pos);
                     const newPoints = [...points];
-                    newPoints[i] = pos;
+                    newPoints[i] = snappedPos;
                     setPoints(newPoints);
-                    addToHistory(newPoints);
                     onBoundaryUpdate(newPoints);
                   }}
+                  onDragEnd={() => {
+                    addToHistory(points);
+                  }}
                 />
-                {selectedPointIndex === i && (
-                  <Circle
-                    x={point.x}
-                    y={point.y}
-                    radius={8}
-                    stroke="#ef4444"
-                    strokeWidth={1}
-                  />
-                )}
+                <Text
+                  x={point.x + 10}
+                  y={point.y - 20}
+                  text={`P${i+1}`}
+                  fontSize={14}
+                  fill="#3b82f6"
+                  fontStyle="bold"
+                />
               </Group>
             ))}
           </Layer>
         </Stage>
       </div>
-
-      <div className="text-sm text-gray-600 space-y-1">
-        <p>• Use Point Mode to place precise points (click to add, drag to move)</p>
-        <p>• Use Freehand Mode to draw naturally (click and drag)</p>
-        <p>• Double-click a point to delete it</p>
-        <p>• Toggle grid and adjust grid size for precise measurements</p>
-        <p>• Use Undo/Redo to correct mistakes</p>
-        <p>• Clear Boundary to start over</p>
+      
+      {/* Instructions */}
+      <div className="text-sm text-gray-600 bg-blue-50 p-3 rounded-md">
+        <p className="font-semibold mb-1">Instructions:</p>
+        <ul className="list-disc pl-5 space-y-1">
+          <li>Click on the canvas to place boundary points</li>
+          <li>Use point mode for precise placement, freehand for quick sketching</li>
+          <li>Drag points to adjust their position</li>
+          <li>Double-click on a point to remove it</li>
+          <li>Toggle measurements to see lengths and area</li>
+          <li>The total area is calculated in square meters based on the scale factor</li>
+        </ul>
       </div>
     </div>
   );
