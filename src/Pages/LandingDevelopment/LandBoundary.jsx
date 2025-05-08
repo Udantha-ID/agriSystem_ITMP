@@ -18,13 +18,55 @@ function LandBoundary() {
   const [treePoints, setTreePoints] = useState([]);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState(null);
+  const [landArea, setLandArea] = useState(0);
+  const [landDimensions, setLandDimensions] = useState({ width: 0, height: 0, perimeter: 0 });
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const svgRef = useRef(null);
 
-  const handleBoundaryUpdate = (points) => {
+  const handleBoundaryUpdate = (points, metadata) => {
     setBoundary(points);
     setIsDrawing(points.length > 0);
+    
+    // Update area if provided in metadata
+    if (metadata && typeof metadata.area === 'number') {
+      setLandArea(metadata.area);
+    }
+    
+    // Calculate land dimensions
+    if (points.length > 2) {
+      // Find bounding box
+      const xCoordinates = points.map(p => p.x);
+      const yCoordinates = points.map(p => p.y);
+      
+      const minX = Math.min(...xCoordinates);
+      const maxX = Math.max(...xCoordinates);
+      const minY = Math.min(...yCoordinates);
+      const maxY = Math.max(...yCoordinates);
+      
+      // Calculate width and height in meters
+      const widthPixels = maxX - minX;
+      const heightPixels = maxY - minY;
+      
+      const widthMeters = widthPixels * scale;
+      const heightMeters = heightPixels * scale;
+      
+      // Calculate perimeter
+      let perimeter = 0;
+      for (let i = 0; i < points.length; i++) {
+        const nextIndex = (i + 1) % points.length;
+        const dx = points[nextIndex].x - points[i].x;
+        const dy = points[nextIndex].y - points[i].y;
+        const segmentLength = Math.sqrt(dx * dx + dy * dy) * scale;
+        perimeter += segmentLength;
+      }
+      
+      setLandDimensions({
+        width: widthMeters,
+        height: heightMeters,
+        perimeter: perimeter
+      });
+    }
   };
 
   const handleAnalyze = () => {
@@ -132,14 +174,6 @@ function LandBoundary() {
             </div>
             
             <div className="flex items-center space-x-3">
-              <button
-                onClick={() => navigate('/analyses')}
-                className="flex items-center px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-all duration-300"
-              >
-                <MapPin className="h-4 w-4 mr-2" />
-                <span>View Saved Analyses</span>
-              </button>
-              
               {showAnalysis ? (
                 <button
                   onClick={handleBack}
@@ -244,6 +278,37 @@ function LandBoundary() {
                     </div>
                   </div>
 
+                  {/* Land Dimensions */}
+                  {isDrawing && (
+                    <div className="pt-5 border-t border-gray-100">
+                      <div className="bg-blue-50 p-4 rounded-lg">
+                        <h3 className="text-sm font-semibold text-blue-800 mb-3">Land Dimensions</h3>
+                        <div className="space-y-2 text-sm">
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Area:</span>
+                            <span className="font-medium">{landArea.toFixed(2)} m²</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Width:</span>
+                            <span className="font-medium">{landDimensions.width.toFixed(2)} m</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Length:</span>
+                            <span className="font-medium">{landDimensions.height.toFixed(2)} m</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Perimeter:</span>
+                            <span className="font-medium">{landDimensions.perimeter.toFixed(2)} m</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-600">Points:</span>
+                            <span className="font-medium">{boundary.length}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   <div className="pt-4">
                     <button
                       onClick={handleAnalyze}
@@ -297,7 +362,18 @@ function LandBoundary() {
               <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden h-full">
                 <div className="p-1 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
                   <div className="px-4 py-2 text-sm text-gray-500">
-                    {isDrawing ? `${boundary.length} points placed` : 'Click to start drawing boundary'}
+                    {isDrawing ? (
+                      <div className="flex items-center">
+                        <span className="mr-2">{boundary.length} points placed</span>
+                        {landArea > 0 && (
+                          <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
+                            {landArea.toFixed(2)} m²
+                          </span>
+                        )}
+                      </div>
+                    ) : (
+                      'Click to start drawing boundary'
+                    )}
                   </div>
                   <div className="flex space-x-2">
                     <button className="p-2 text-gray-400 hover:text-blue-600 rounded hover:bg-gray-100 transition-colors">
@@ -311,6 +387,7 @@ function LandBoundary() {
                     height={700}
                     onBoundaryUpdate={handleBoundaryUpdate}
                     drawingActive={!showAnalysis}
+                    scale={scale}
                   />
                 </div>
               </div>
