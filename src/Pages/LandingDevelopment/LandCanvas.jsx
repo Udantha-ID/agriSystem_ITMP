@@ -112,18 +112,37 @@ export const LandCanvas = ({ width, height, onBoundaryUpdate, drawingActive, sca
     const snappedPos = snapToGrid(pos);
     const constrainedPos = constrainToCanvas(snappedPos);
 
+    // In point mode, check if we're near an existing point to modify it
     if (drawingMode === 'point') {
+      // Find if we're clicking near an existing point (within 10 pixels)
+      const existingPointIndex = points.findIndex(point => {
+        const dx = point.x - pos.x;
+        const dy = point.y - pos.y;
+        return Math.sqrt(dx * dx + dy * dy) < 10; // 10px threshold
+      });
+      
+      if (existingPointIndex !== -1) {
+        // If near an existing point, select it for potential movement
+        setSelectedPointIndex(existingPointIndex);
+        return;
+      }
+      
       if (selectedPointIndex !== null) {
+        // If a point is already selected, move it to the new position
         const newPoints = [...points];
         newPoints[selectedPointIndex] = constrainedPos;
         setPoints(newPoints);
         addToHistory(newPoints);
+        onBoundaryUpdate(newPoints);
+        setSelectedPointIndex(null); // Deselect after moving
       } else {
+        // Otherwise add a new point
         const newPoints = [...points, constrainedPos];
         setPoints(newPoints);
         addToHistory(newPoints);
       }
     } else {
+      // Freehand mode behavior remains the same
       setIsDrawing(true);
       const newPoints = [...points, constrainedPos];
       setPoints(newPoints);
@@ -166,6 +185,16 @@ export const LandCanvas = ({ width, height, onBoundaryUpdate, drawingActive, sca
       setCursorMeasurement(null);
     }
     
+    // Move selected point if mouse is pressed and we have a selected point
+    if (e.evt.buttons === 1 && selectedPointIndex !== null && !outOfBounds) {
+      const constrainedPos = constrainToCanvas(snappedPos);
+      const newPoints = [...points];
+      newPoints[selectedPointIndex] = constrainedPos;
+      setPoints(newPoints);
+      onBoundaryUpdate(newPoints);
+      return;
+    }
+    
     if (!isDrawing || drawingMode === 'point') return;
     
     // Don't add new points if out of bounds in freehand mode
@@ -201,8 +230,14 @@ export const LandCanvas = ({ width, height, onBoundaryUpdate, drawingActive, sca
   };
 
   const handleMouseUp = () => {
+    // Add to history when releasing the mouse after dragging a point
+    if (selectedPointIndex !== null) {
+      addToHistory(points);
+    }
+    
     setIsDrawing(false);
     onBoundaryUpdate(points);
+    setSelectedPointIndex(null); // Deselect after mouse up
   };
 
   const handleClearBoundary = () => {
@@ -496,7 +531,7 @@ export const LandCanvas = ({ width, height, onBoundaryUpdate, drawingActive, sca
           onClick={handleCanvasClick}
           onMouseLeave={handleMouseLeave}
           onMouseEnter={handleMouseEnter}
-          style={{ cursor: isOutOfBounds ? 'not-allowed' : 'default' }}
+          style={{ cursor: isOutOfBounds ? 'not-allowed' : (selectedPointIndex !== null ? 'move' : 'default') }}
         >
           <Layer>
             {/* Background and grid */}
@@ -628,6 +663,15 @@ export const LandCanvas = ({ width, height, onBoundaryUpdate, drawingActive, sca
                   onClick={() => handlePointClick(i)}
                   onDblClick={() => handleDeletePoint(i)}
                   draggable={drawingMode === 'point'}
+                  onMouseOver={e => {
+                    document.body.style.cursor = 'move';
+                    e.target.getStage().container().style.cursor = 'move';
+                  }}
+                  onMouseOut={e => {
+                    document.body.style.cursor = 'default';
+                    const isMoving = selectedPointIndex !== null;
+                    e.target.getStage().container().style.cursor = isMoving ? 'move' : 'default';
+                  }}
                   onDragMove={(e) => {
                     const pos = e.target.position();
                     const snappedPos = snapToGrid(pos);
@@ -677,7 +721,8 @@ export const LandCanvas = ({ width, height, onBoundaryUpdate, drawingActive, sca
           <li>The distance is displayed in meters along the preview line</li>
           <li>Click to place additional points when you're satisfied with the position</li>
           <li>Move close to the first point to close the polygon (green indicator will appear)</li>
-          <li>Drag points to adjust their position</li>
+          <li>To adjust an existing point: click and hold directly on the point, then drag to a new position</li>
+          <li>You can also click near a point to select it, then click elsewhere to move it to that position</li>
           <li>Double-click on a point to remove it</li>
           <li>The total area is calculated automatically in square meters</li>
           <li>Points cannot be placed outside the drawing area (dashed border)</li>
