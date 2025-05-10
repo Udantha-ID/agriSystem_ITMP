@@ -63,7 +63,7 @@ export default function UpdatePlantation() {
         };
 
         await axios.put(`http://localhost:5000/plantations/${id}`, payload);
-        navigate("/plantationsmanage");
+        navigate("/plantations");
       } catch (error) {
         console.error("Error updating plantation:", error);
         setErrors({
