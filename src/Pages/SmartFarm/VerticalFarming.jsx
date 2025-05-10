@@ -1,66 +1,66 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ChevronRight, ChevronLeft, Info, Droplet, CloudRain, Sun, Thermometer, Wifi, AlertCircle, BarChart2, Zap } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Info, Leaf, Sun, Thermometer, Wifi, AlertCircle, BarChart2, Zap, Droplet, Factory } from 'lucide-react';
 import { ChevronDown } from 'lucide-react';
-import watersmart from "../../Images/SmartFarm/water_smart.png";
-import soilmoisture from "../../Images/SmartFarm/soil_moisure.jpg";
-import weatherstation from "../../Images/SmartFarm/Agri_Weather.jpg";
-import dripirrigation from "../../Images/SmartFarm/Drip_Irrigation.jpg";
-import aianalytics from "../../Images/SmartFarm/Dashboard.jpg";
-import iotirrigation from "../../Images/SmartFarm/remote.jpg";
-import flowsensor from "../../Images/SmartFarm/flow_sensor.jpeg";
+import verticalfarm from "../../Images/SmartFarm/vertical_farm.jpg";
+import hydroponics from "../../Images/SmartFarm/hydroponics.jpg";
+import ledlights from "../../Images/SmartFarm/led_grow.jpeg";
+import automatedsystem from "../../Images/SmartFarm/automated_system.jpg";
+import aianalytics from "../../Images/SmartFarm/vertical_farm.jpg";
+import urbanfarm from "../../Images/SmartFarm/urban_farm.jpg";
+import stackedlayers from "../../Images/SmartFarm/stacked_layers.jpg";
 import Navbar from '../../Components/Navbar';
 import Footer from '../../Components/Footer';
 
-function Irrigation() {
+function VerticalFarming() {
     const [activeSlide, setActiveSlide] = useState(0);
     const [isVisible, setIsVisible] = useState({});
     const observedElements = useRef({});
 
     // Stats for data visualization section
     const stats = [
-        { value: '30-50%', label: 'Water savings compared to traditional methods', icon: <Droplet /> },
-        { value: '25%', label: 'Increase in crop yields with optimized irrigation', icon: <BarChart2 /> },
-        { value: '70%', label: 'Of global freshwater used in agriculture', icon: <CloudRain /> },
-        { value: '90%', label: 'Reduction in runoff with smart systems', icon: <Zap /> },
+        { value: '90%', label: 'Less water usage compared to traditional farming', icon: <Droplet /> },
+        { value: '10x', label: 'Higher yields per square meter', icon: <BarChart2 /> },
+        { value: '365', label: 'Days of year-round crop production', icon: <Sun /> },
+        { value: '70%', label: 'Reduction in transportation emissions for urban areas', icon: <Zap /> },
     ];
 
     // Features data for carousel
     const features = [
         {
-            title: "Real-Time Soil Moisture Monitoring",
-            description: "Smart irrigation systems utilize advanced soil moisture sensors that are strategically placed throughout agricultural fields or landscaped areas. These sensors continuously measure the water content in the soil and transmit real-time data to a central irrigation controller. This technology ensures plants receive precisely the amount of water they need, when they need it.",
-            image: soilmoisture,
-            icon: <Droplet className="w-8 h-8" />
+            title: "Hydroponic & Aeroponic Systems",
+            description: "Vertical farms utilize soil-less cultivation techniques like hydroponics (growing plants in nutrient-rich water) and aeroponics (growing plants in air with nutrient mist). These systems deliver precise amounts of water and nutrients directly to plant roots, resulting in faster growth rates and higher yields compared to traditional soil-based agriculture.",
+            image: hydroponics,
+            icon: <Leaf className="w-8 h-8" />
         },
         {
-            title: "Weather-Adaptive Watering (ET-Based Systems)",
-            description: "Modern irrigation systems incorporate evapotranspiration (ET) data from local weather stations and satellite information to make intelligent watering decisions. These systems analyze multiple environmental factors including temperature, humidity, wind speed, and solar radiation to calculate the exact amount of water lost through evaporation and plant transpiration.",
-            image: weatherstation,
+            title: "Precision LED Grow Lights",
+            description: "Specially designed LED lighting systems provide the exact light spectrum needed for each crop's optimal growth at different stages. These energy-efficient lights can be tuned to specific wavelengths (like more blue for leafy greens, more red for fruiting plants) and are positioned at ideal distances from plants. Smart systems adjust lighting duration and intensity automatically based on plant needs and growth stages.",
+            image: ledlights,
             icon: <Sun className="w-8 h-8" />
         },
         {
-            title: "Automated Drip & Sprinkler Control",
-            description: "At the heart of smart irrigation systems are automated control valves that precisely regulate water delivery through either drip irrigation lines or sprinkler systems. These smart valves can be programmed to water specific zones at different rates and frequencies based on plant needs. Drip systems deliver water directly to the root zone through a network of tubes and emitters, minimizing evaporation and runoff.",
-            image: dripirrigation,
-            icon: <CloudRain className="w-8 h-8" />
-        },
-        {
-            title: "AI & Predictive Analytics",
-            description: "The most advanced irrigation systems now incorporate artificial intelligence and machine learning algorithms that analyze vast amounts of historical and real-time data. These systems process information about soil conditions, crop growth stages, weather patterns, and water usage to develop increasingly accurate irrigation models.",
-            image: aianalytics,
+            title: "Automated Climate Control",
+            description: "Advanced environmental control systems maintain perfect growing conditions 24/7. Temperature, humidity, CO2 levels, and air flow are constantly monitored and adjusted. This creates an ideal microclimate for each crop, eliminating seasonal limitations and protecting plants from extreme weather events that affect traditional farming.",
+            image: automatedsystem,
             icon: <Thermometer className="w-8 h-8" />
         },
         {
-            title: "Remote Control & IoT Integration",
-            description: "Through Internet of Things (IoT) technology, modern irrigation systems can be monitored and controlled from anywhere using smartphones, tablets, or computers. Cloud-based platforms collect data from all system components and present it through user-friendly dashboards. Farmers receive instant alerts about system status, potential problems, or unusual water usage patterns.",
-            image: iotirrigation,
+            title: "AI-Powered Growth Optimization",
+            description: "Machine learning algorithms analyze vast amounts of data from sensors monitoring plant health, growth rates, and environmental conditions. The system can predict optimal harvest times, detect early signs of disease or nutrient deficiencies, and automatically adjust growing parameters to maximize yield and quality while minimizing resource use.",
+            image: aianalytics,
             icon: <Wifi className="w-8 h-8" />
         },
         {
-            title: "Water Flow Sensors & Leak Detection",
-            description: "Smart irrigation systems incorporate high-precision flow meters that constantly monitor water movement through the entire network. These sensors can detect even small variations in flow rates that might indicate leaks, broken pipes, or clogged emitters. When abnormal water usage is detected, the system immediately alerts the operator and can automatically shut down affected sections to prevent water loss.",
-            image: flowsensor,
+            title: "Urban Vertical Farming",
+            description: "By growing food in multi-story buildings within cities, vertical farms drastically reduce the distance food travels from farm to consumer. This means fresher produce, lower transportation emissions, and food security for urban populations. Abandoned warehouses, shipping containers, and even underground spaces can be transformed into productive farms.",
+            image: urbanfarm,
+            icon: <Factory className="w-8 h-8" />
+        },
+        {
+            title: "Stacked Growing Systems",
+            description: "Vertical farming uses tiered growing systems that multiply production capacity per square foot. Plants are grown in stacked layers, often on rotating shelves or vertical columns to ensure even light distribution. This spatial efficiency allows a vertical farm to produce the same amount of crops as a traditional farm using just 5-10% of the land area.",
+            image: stackedlayers,
             icon: <AlertCircle className="w-8 h-8" />
         }
     ];
@@ -99,7 +99,7 @@ function Irrigation() {
 
     return (
         <div>
-        <div className="w-full bg-gradient-to-br from-blue-50 to-white">
+        <div className="w-full bg-gradient-to-br from-green-50 to-white">
             <Navbar />
             {/* Hero Section */}
             <section className="relative h-screen overflow-hidden bg-gradient-to-br from-green-600 to-green-800">
@@ -111,8 +111,8 @@ function Irrigation() {
                     transition={{ duration: 20, repeat: Infinity, repeatType: "reverse" }}
                 >
                     <img
-      src={watersmart}
-      alt="Smart irrigation system in field"
+      src={verticalfarm}
+      alt="Vertical farm with stacked growing layers"
       className="w-full h-full object-cover"
     />
                 </motion.div>
@@ -123,7 +123,7 @@ function Irrigation() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 1, delay: 0.2 }}
                     >
-                        Water Conservation Revolution
+                        The Future of Agriculture
                     </motion.h1>
                     <motion.h2
                         className="text-3xl md:text-4xl font-bold text-green-300 mb-8"
@@ -131,7 +131,7 @@ function Irrigation() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 1, delay: 0.4 }}
                     >
-                        Smart Irrigation Systems
+                        Vertical Farming Technology
                     </motion.h2>
                     <motion.p
                         className="text-xl text-gray-100 max-w-3xl mb-10"
@@ -139,7 +139,7 @@ function Irrigation() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 1, delay: 0.6 }}
                     >
-                        Agricultural irrigation accounts for 70% of global freshwater use. Smart systems can reduce water consumption by 30-50% while increasing crop yields by up to 25%.
+                        Vertical farming can produce 10x more crops per square meter than traditional agriculture while using 90% less water and no pesticides. The global vertical farming market is projected to reach $20 billion by 2028.
                     </motion.p>
                     <motion.div
                         initial={{ opacity: 0, scale: 0.8 }}
@@ -176,7 +176,7 @@ function Irrigation() {
                         animate={isVisible['stats-title'] ? "visible" : "hidden"}
                         id="stats-title"
                     >
-                        The Impact of Smart Irrigation
+                        The Impact of Vertical Farming
                     </motion.h2>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -190,7 +190,7 @@ function Irrigation() {
                                 animate={isVisible[`stat-${index}`] ? "visible" : "hidden"}
                                 transition={{ delay: index * 0.1 }}
                             >
-                                <div className="bg-white rounded-xl shadow-lg p-8 text-center h-full transform transition-all duration-300 hover:scale-105 hover:shadow-xl border-t-4 border-green-500">
+                                <div className="bg-white rounded-xl shadow-lg p-8 text-center h-full transform transition-all duration-300 hover:scale-105 hover:shadow-xl border-t-4 border-blue-500">
                                     <div className="flex justify-center mb-4 text-green-500">
                                         {stat.icon}
                                     </div>
@@ -213,7 +213,7 @@ function Irrigation() {
                         initial="hidden"
                         animate={isVisible['features-title'] ? "visible" : "hidden"}
                     >
-                        Key Features of Smart Irrigation Systems
+                        Key Features of Vertical Farming Systems
                     </motion.h2>
 
                     <div className="relative">
@@ -290,7 +290,7 @@ function Irrigation() {
                         initial="hidden"
                         animate={isVisible['benefits-title'] ? "visible" : "hidden"}
                     >
-                        Why Smart Irrigation is a Game-Changer
+                        Why Vertical Farming is Revolutionary
                     </motion.h2>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -304,12 +304,12 @@ function Irrigation() {
                         >
                             <div className="flex items-center gap-4 mb-4">
                                 <div className="bg-green-400 bg-opacity-20 p-3 rounded-full">
-                                    <Droplet className="w-6 h-6" />
+                                    <Leaf className="w-6 h-6" />
                                 </div>
-                                <h3 className="text-xl font-bold">Water Conservation</h3>
+                                <h3 className="text-xl font-bold">Space Efficiency</h3>
                             </div>
                             <p className="text-black text-opacity-90">
-                                Smart irrigation systems can reduce water usage by 30-50% compared to conventional methods, addressing one of agriculture's most pressing challenges - sustainable water use.
+                                Vertical farms produce 10-20 times more crops per square meter than traditional farms, making them ideal for urban areas where land is scarce and expensive.
                             </p>
                         </motion.div>
 
@@ -324,12 +324,12 @@ function Irrigation() {
                         >
                             <div className="flex items-center gap-4 mb-4">
                                 <div className="bg-green-400 bg-opacity-20 p-3 rounded-full">
-                                    <BarChart2 className="w-6 h-6" />
+                                    <Droplet className="w-6 h-6" />
                                 </div>
-                                <h3 className="text-xl font-bold">Increased Yields</h3>
+                                <h3 className="text-xl font-bold">Water Conservation</h3>
                             </div>
                             <p className="text-black text-opacity-90">
-                                Farmers see increased crop yields (up to 25%) due to optimized growing conditions, while also benefiting from lower water and energy bills.
+                                These systems use up to 90% less water than conventional agriculture by recycling water in closed-loop systems and eliminating evaporation and runoff.
                             </p>
                         </motion.div>
 
@@ -344,12 +344,12 @@ function Irrigation() {
                         >
                             <div className="flex items-center gap-4 mb-4">
                                 <div className="bg-green-400 bg-opacity-20 p-3 rounded-full">
-                                    <CloudRain className="w-6 h-6" />
+                                    <Sun className="w-6 h-6" />
                                 </div>
-                                <h3 className="text-xl font-bold">Environmental Protection</h3>
+                                <h3 className="text-xl font-bold">Year-Round Production</h3>
                             </div>
                             <p className="text-black text-opacity-90">
-                                Minimizes water waste and reduces the runoff of fertilizers and pesticides into nearby waterways by up to 90%, protecting local ecosystems.
+                                Controlled environments allow for consistent, year-round crop production regardless of external weather conditions, ensuring stable food supplies.
                             </p>
                         </motion.div>
                     </div>
@@ -366,7 +366,7 @@ function Irrigation() {
                         initial="hidden"
                         animate={isVisible['future-title'] ? "visible" : "hidden"}
                     >
-                        Future Trends & Innovations
+                        Emerging Innovations
                     </motion.h2>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -378,13 +378,13 @@ function Irrigation() {
                             initial="hidden"
                             animate={isVisible['future-tech-1'] ? "visible" : "hidden"}
                         >
-                            <div className="h-48 overflow-hidden bg-blue-100 flex items-center justify-center">
+                            <div className="h-48 overflow-hidden bg-green-100 flex items-center justify-center">
                                 <Zap className="w-20 h-20 text-green-400" />
                             </div>
                             <div className="p-6">
-                                <h3 className="text-xl font-bold text-gray-800 mb-3">Solar-Powered Systems</h3>
+                                <h3 className="text-xl font-bold text-gray-800 mb-3">Robotic Harvesting</h3>
                                 <p className="text-gray-600">
-                                    Solar-powered systems are bringing irrigation capabilities to off-grid areas, particularly in developing countries, making smart irrigation accessible to more farmers worldwide.
+                                    Advanced robotics and computer vision systems are being developed to automate planting, maintenance, and harvesting in vertical farms, reducing labor costs and increasing efficiency.
                                 </p>
                             </div>
                         </motion.div>
@@ -398,13 +398,13 @@ function Irrigation() {
                             animate={isVisible['future-tech-2'] ? "visible" : "hidden"}
                             transition={{ delay: 0.2 }}
                         >
-                            <div className="h-48 overflow-hidden bg-blue-100 flex items-center justify-center">
+                            <div className="h-48 overflow-hidden bg-green-100 flex items-center justify-center">
                                 <Wifi className="w-20 h-20 text-green-400" />
                             </div>
                             <div className="p-6">
-                                <h3 className="text-xl font-bold text-gray-800 mb-3">5G & Advanced AI</h3>
+                                <h3 className="text-xl font-bold text-gray-800 mb-3">AI-Optimized Genetics</h3>
                                 <p className="text-gray-600">
-                                    The integration of 5G networks will enable faster data transmission and real-time decision making. AI will become more sophisticated in predicting water needs and optimizing schedules.
+                                    AI is being used to develop plant varieties specifically optimized for vertical farming conditions - faster growing, more compact, and with higher nutritional value.
                                 </p>
                             </div>
                         </motion.div>
@@ -430,7 +430,7 @@ function Irrigation() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 {/* Challenge 1 */}
                                 <motion.div
-                                    className="bg-blue-50 rounded-xl p-6 observe-me"
+                                    className="bg-green-50 rounded-xl p-6 observe-me"
                                     id="challenge-1"
                                     variants={fadeInUp}
                                     initial="hidden"
@@ -438,16 +438,16 @@ function Irrigation() {
                                 >
                                     <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
                                         <AlertCircle className="text-green-500" />
-                                        <span>Initial Investment</span>
+                                        <span>Energy Consumption</span>
                                     </h3>
                                     <p className="text-gray-600">
-                                        The upfront cost of smart irrigation systems can be prohibitive for small-scale farmers, despite long-term savings. Financing options and government subsidies are helping to address this barrier.
+                                        The energy requirements for lighting and climate control are significant. While LED efficiency is improving, renewable energy integration is key to making vertical farming truly sustainable.
                                     </p>
                                 </motion.div>
 
                                 {/* Challenge 2 */}
                                 <motion.div
-                                    className="bg-blue-50 rounded-xl p-6 observe-me"
+                                    className="bg-green-50 rounded-xl p-6 observe-me"
                                     id="challenge-2"
                                     variants={fadeInUp}
                                     initial="hidden"
@@ -456,16 +456,16 @@ function Irrigation() {
                                 >
                                     <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
                                         <AlertCircle className="text-green-500" />
-                                        <span>Technical Knowledge</span>
+                                        <span>High Initial Costs</span>
                                     </h3>
                                     <p className="text-gray-600">
-                                        Farmers need training to effectively use and maintain these systems. Extension services and user-friendly interfaces are making the technology more accessible to non-technical users.
+                                        Setting up a vertical farm requires substantial capital investment in infrastructure, technology, and systems. Economies of scale and modular designs are helping to reduce these barriers.
                                     </p>
                                 </motion.div>
 
                                 {/* Challenge 3 */}
                                 <motion.div
-                                    className="bg-blue-50 rounded-xl p-6 observe-me"
+                                    className="bg-green-50 rounded-xl p-6 observe-me"
                                     id="challenge-3"
                                     variants={fadeInUp}
                                     initial="hidden"
@@ -474,16 +474,16 @@ function Irrigation() {
                                 >
                                     <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
                                         <AlertCircle className="text-green-500" />
-                                        <span>Infrastructure Requirements</span>
+                                        <span>Crop Limitations</span>
                                     </h3>
                                     <p className="text-gray-600">
-                                        Reliable internet connectivity and power supply are essential for full functionality, which can be lacking in remote agricultural areas. Hybrid systems with offline capabilities are being developed.
+                                        Currently, vertical farms are most economically viable for leafy greens, herbs, and some fruits. Research is ongoing to expand viable crop varieties, particularly for staple foods.
                                     </p>
                                 </motion.div>
 
                                 {/* Challenge 4 */}
                                 <motion.div
-                                    className="bg-blue-50 rounded-xl p-6 observe-me"
+                                    className="bg-green-50 rounded-xl p-6 observe-me"
                                     id="challenge-4"
                                     variants={fadeInUp}
                                     initial="hidden"
@@ -492,10 +492,10 @@ function Irrigation() {
                                 >
                                     <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
                                         <AlertCircle className="text-green-500" />
-                                        <span>Maintenance</span>
+                                        <span>Technical Expertise</span>
                                     </h3>
                                     <p className="text-gray-600">
-                                        Sensors and automated components require regular calibration and maintenance. Newer systems are being designed with self-diagnostic capabilities and more durable components.
+                                        Operating a vertical farm requires knowledge of horticulture, engineering, and data science. Training programs and simplified control systems are making the technology more accessible.
                                     </p>
                                 </motion.div>
                             </div>
@@ -514,7 +514,7 @@ function Irrigation() {
                         initial="hidden"
                         animate={isVisible['cta-title'] ? "visible" : "hidden"}
                     >
-                        Ready to Transform Your Irrigation?
+                        Ready to Start Your Vertical Farm?
                     </motion.h2>
 
                     <motion.p
@@ -525,7 +525,7 @@ function Irrigation() {
                         animate={isVisible['cta-text'] ? "visible" : "hidden"}
                         transition={{ delay: 0.2 }}
                     >
-                        Smart irrigation technology offers a sustainable solution to water scarcity while improving crop yields and reducing costs. The future of agriculture is precise, efficient, and water-smart.
+                        Vertical farming represents the next evolution in agriculture - sustainable, efficient, and resilient. Whether you're a commercial grower, urban developer, or community organization, the future of farming is here.
                     </motion.p>
 
                     <motion.div
@@ -559,4 +559,4 @@ function Irrigation() {
     );
 }
 
-export default Irrigation;
+export default VerticalFarming;
