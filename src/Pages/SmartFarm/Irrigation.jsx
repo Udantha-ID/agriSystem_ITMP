@@ -102,7 +102,7 @@ function Irrigation() {
         <div className="w-full bg-gradient-to-br from-blue-50 to-white">
             <Navbar />
             {/* Hero Section */}
-            <section className="relative h-screen overflow-hidden bg-gradient-to-br from-blue-600 to-blue-800">
+            <section className="relative h-screen overflow-hidden bg-gradient-to-br from-green-600 to-green-800">
             <div className="absolute inset-0 bg-black opacity-60 z-10"></div>
             <motion.div
                     className="absolute inset-0 z-0"
@@ -126,7 +126,7 @@ function Irrigation() {
                         Water Conservation Revolution
                     </motion.h1>
                     <motion.h2
-                        className="text-3xl md:text-4xl font-bold text-blue-300 mb-8"
+                        className="text-3xl md:text-4xl font-bold text-green-300 mb-8"
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 1, delay: 0.4 }}
@@ -146,7 +146,7 @@ function Irrigation() {
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ duration: 0.8, delay: 0.8 }}
                     >
-                        <a href="#features" className="bg-green-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-full inline-block transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                        <a href="#features" className="bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-8 rounded-full inline-block transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
                             Explore Features
                         </a>
                     </motion.div>
