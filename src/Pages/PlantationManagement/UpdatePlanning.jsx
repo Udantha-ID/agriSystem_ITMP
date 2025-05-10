@@ -33,7 +33,7 @@ function UpdatePlanning() {
         
         setFormData(processedData);
       } catch (error) {
-        navigate('/resourcesplan');
+        navigate('/resources');
       }
     };
     fetchPlanning();
@@ -162,7 +162,7 @@ function UpdatePlanning() {
           date: new Date(control.date).toISOString()
         }))
       });
-      navigate('/resourcesplan');
+      navigate('/resources');
     } catch (error) {
       alert(`Error: ${error.response?.data?.message || error.message}`);
     }

@@ -31,7 +31,7 @@ export default function AddPlantation() {
         };
 
         await axios.post("http://localhost:5000/plantations", payload);
-        navigate("/plantationsmanage");
+        navigate("/plantations");
       } catch (error) {
         console.error("Error creating plantation:", error);
         setErrors({
