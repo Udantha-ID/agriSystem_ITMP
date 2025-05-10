@@ -686,3 +686,6 @@ const Inventory = () => {
 };
 
 export default Inventory;
+
+
+//BJBJKBJBJB
