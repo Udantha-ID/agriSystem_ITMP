@@ -34,7 +34,7 @@ const Inventory = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this product?')) {
       try {
-        await fetch(`http://localhost:5000/api/products/${id}`, {
+        await fetch(`http://localhost:5000/products/${id}`, {
           method: 'DELETE'
         });
         setInventory(inventory.filter(item => item._id !== id));
@@ -48,7 +48,7 @@ const Inventory = () => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const response = await fetch(`http://localhost:5000/api/products/${editingProduct._id}`, {
+      const response = await fetch(`http://localhost:5000/products/${editingProduct._id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(editingProduct)
