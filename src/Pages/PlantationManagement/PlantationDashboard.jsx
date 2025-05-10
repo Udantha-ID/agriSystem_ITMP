@@ -201,114 +201,162 @@ function PlantationDashboard() {
   };
 
   const ProjectModal = ({ project, onClose }) => (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl p-6 max-w-2xl w-full relative">
-        <button onClick={onClose} className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl">
-          &times;
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+      <div className="bg-white rounded-2xl p-8 max-w-4xl w-full relative shadow-2xl">
+        {/* Close Button */}
+        <button 
+          onClick={onClose} 
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
         </button>
-        <h3 className="text-2xl font-bold mb-4 text-emerald-700">{project.projectName}</h3>
-        
-        <div className="grid grid-cols-2 gap-4 mb-6">
-          <div className="flex items-center">
-            <MapPinIcon className="h-5 w-5 mr-2 text-gray-500" />
-            <span className="font-medium">Location:</span> {project.location}
-          </div>
-          <div className="flex items-center">
-            <UserGroupIcon className="h-5 w-5 mr-2 text-gray-500" />
-            <span className="font-medium">Employees:</span> {project.employees}
-          </div>
-          <div className="flex items-center">
-            <CalendarIcon className="h-5 w-5 mr-2 text-gray-500" />
-            <span className="font-medium">Start Date:</span> 
-            {new Date(project.startDate).toLocaleDateString()}
-          </div>
-          <div className="flex items-center">
-            <CheckCircleIcon className="h-5 w-5 mr-2 text-gray-500" />
-            <span className="font-medium">Completed Date:</span> 
-            {new Date(project.completedDate).toLocaleDateString()}
-          </div>
-          <div className="flex items-center">
-            <Square3Stack3DIcon className="h-5 w-5 mr-2 text-gray-500" />
-            <span className="font-medium">Type:</span> {project.type}
-          </div>
-          <div className="flex items-center">
-            <GlobeAmericasIcon className="h-5 w-5 mr-2 text-gray-500" />
-            <span className="font-medium">Land Area:</span> {project.landArea} acres
+
+        {/* Header Section */}
+        <div className="border-b border-gray-100 pb-6 mb-6">
+          <h3 className="text-3xl font-bold text-emerald-700 mb-2">{project.projectName}</h3>
+          <div className="flex items-center gap-4 text-gray-500">
+            <span className="flex items-center">
+              <MapPinIcon className="h-5 w-5 mr-2 text-emerald-500" />
+              {project.location}
+            </span>
+            <span className="flex items-center">
+              <CalendarIcon className="h-5 w-5 mr-2 text-emerald-500" />
+              Completed {new Date(project.completedDate).toLocaleDateString()}
+            </span>
           </div>
         </div>
 
-        <div className="bg-gray-50 p-4 rounded-lg">
-          <h4 className="font-medium mb-2">Planning Details</h4>
-          {project.planning ? (
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm flex items-center gap-1">
-                    <DocumentTextIcon className="w-4 h-4" />
-                    <span className="font-medium">Fertilizer Schedules:</span> 
-                    {project.planning.fertilizerSchedules?.length || 0}
-                  </p>
-                  <p className="text-sm flex items-center gap-1">
-                    <BugAntIcon className="w-4 h-4" />
-                    <span className="font-medium">Pest Controls:</span> 
-                    {project.planning.pestControls?.length || 0}
-                  </p>
+        {/* Main Content */}
+        <div className="grid grid-cols-2 gap-8">
+          {/* Left Column - Project Details */}
+          <div className="space-y-6">
+            <div className="bg-gray-50 rounded-xl p-6">
+              <h4 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                <Square3Stack3DIcon className="h-5 w-5 mr-2 text-emerald-500" />
+                Project Details
+              </h4>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Type</span>
+                  <span className="font-medium text-gray-800">{project.type}</span>
                 </div>
-                <div>
-                  <p className="text-sm flex items-center gap-1">
-                    <SunIcon className="w-4 h-4" />
-                    <span className="font-medium">Soil Quality:</span> 
-                    {project.planning.soilData?.quality || 'N/A'}
-                  </p>
-                  <p className="text-sm flex items-center gap-1">
-                    <CalendarIcon className="w-4 h-4" />
-                    <span className="font-medium">Last Updated:</span> 
-                    {new Date(project.planning.updatedAt).toLocaleDateString()}
-                  </p>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Land Area</span>
+                  <span className="font-medium text-gray-800">{project.landArea} acres</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Employees</span>
+                  <span className="font-medium text-gray-800">{project.employees}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Start Date</span>
+                  <span className="font-medium text-gray-800">
+                    {new Date(project.startDate).toLocaleDateString()}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">Harvest Date</span>
+                  <span className="font-medium text-gray-800">
+                    {new Date(project.harvestingDate).toLocaleDateString()}
+                  </span>
                 </div>
               </div>
-
-              {/* Fertilizer Schedules */}
-              {project.planning.fertilizerSchedules?.length > 0 && (
-                <div className="mt-4">
-                  <h5 className="font-medium text-sm mb-2">Fertilizer Schedule History</h5>
-                  <div className="space-y-2">
-                    {project.planning.fertilizerSchedules.map((schedule, index) => (
-                      <div key={index} className="bg-white p-2 rounded border border-gray-100">
-                        <p className="text-sm">
-                          <span className="font-medium">{schedule.type}</span> - {schedule.method}
-                          <span className="text-gray-500 text-xs ml-2">
-                            {new Date(schedule.date).toLocaleDateString()}
-                          </span>
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Pest Control History */}
-              {project.planning.pestControls?.length > 0 && (
-                <div className="mt-4">
-                  <h5 className="font-medium text-sm mb-2">Pest Control History</h5>
-                  <div className="space-y-2">
-                    {project.planning.pestControls.map((control, index) => (
-                      <div key={index} className="bg-white p-2 rounded border border-gray-100">
-                        <p className="text-sm">
-                          <span className="font-medium">{control.method}</span> - {control.product}
-                          <span className="text-gray-500 text-xs ml-2">
-                            {new Date(control.date).toLocaleDateString()}
-                          </span>
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
-          ) : (
-            <p className="text-sm text-gray-500">No planning data available</p>
-          )}
+          </div>
+
+          {/* Right Column - Planning Details */}
+          <div className="space-y-6">
+            {project.planning ? (
+              <div className="bg-gray-50 rounded-xl p-6">
+                <h4 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                  <DocumentTextIcon className="h-5 w-5 mr-2 text-emerald-500" />
+                  Planning Details
+                </h4>
+                
+                {/* Soil Quality */}
+                <div className="mb-6">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-gray-600">Soil Quality</span>
+                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                      project.planning.soilData?.quality === 'High' 
+                        ? 'bg-green-100 text-green-800' 
+                        : project.planning.soilData?.quality === 'Medium'
+                        ? 'bg-amber-100 text-amber-800'
+                        : 'bg-red-100 text-red-800'
+                    }`}>
+                      {project.planning.soilData?.quality || 'N/A'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Fertilizer Schedules */}
+                {project.planning.fertilizerSchedules?.length > 0 && (
+                  <div className="mb-6">
+                    <h5 className="text-sm font-semibold text-gray-700 mb-3 flex items-center">
+                      <BeakerIcon className="h-4 w-4 mr-2 text-emerald-500" />
+                      Fertilizer Schedules
+                    </h5>
+                    <div className="space-y-2">
+                      {project.planning.fertilizerSchedules.map((schedule, index) => (
+                        <div key={index} className="bg-white p-3 rounded-lg border border-gray-100">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <p className="font-medium text-gray-800">{schedule.type}</p>
+                              <p className="text-sm text-gray-600">{schedule.method}</p>
+                            </div>
+                            <span className="text-xs text-gray-500">
+                              {new Date(schedule.date).toLocaleDateString()}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Pest Controls */}
+                {project.planning.pestControls?.length > 0 && (
+                  <div>
+                    <h5 className="text-sm font-semibold text-gray-700 mb-3 flex items-center">
+                      <BugAntIcon className="h-4 w-4 mr-2 text-emerald-500" />
+                      Pest Controls
+                    </h5>
+                    <div className="space-y-2">
+                      {project.planning.pestControls.map((control, index) => (
+                        <div key={index} className="bg-white p-3 rounded-lg border border-gray-100">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <p className="font-medium text-gray-800">{control.method}</p>
+                              <p className="text-sm text-gray-600">{control.product}</p>
+                            </div>
+                            <span className="text-xs text-gray-500">
+                              {new Date(control.date).toLocaleDateString()}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="bg-gray-50 rounded-xl p-6 text-center text-gray-500">
+                No planning data available
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="mt-8 pt-6 border-t border-gray-100 flex justify-end">
+          <button
+            onClick={onClose}
+            className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
+          >
+            Close
+          </button>
         </div>
       </div>
     </div>
