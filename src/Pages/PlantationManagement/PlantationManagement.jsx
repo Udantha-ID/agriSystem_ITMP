@@ -292,7 +292,7 @@ const handleComplete = async (id) => {
                   </p>
                 </div>
                 <button
-                  onClick={() => navigate("/addplantation")}
+                  onClick={() => navigate("/addplant")}
                   className="group bg-gradient-to-r from-emerald-600 to-emerald-700 text-white px-6 py-3 rounded-xl font-medium transition-all duration-300 flex items-center shadow-lg hover:shadow-emerald-200 hover:scale-105"
                 >
                   <PlusIcon className="h-5 w-5 mr-2 group-hover:rotate-90 transition-transform duration-300" />
@@ -436,7 +436,7 @@ const handleComplete = async (id) => {
                           <div className="flex items-center justify-start space-x-1.5">
                             <button
                               onClick={() =>
-                                navigate(`/updateplantation/${plantation._id}`)
+                                navigate(`/updateplant/${plantation._id}`)
                               }
                               className="text-emerald-600 hover:text-emerald-800 p-1 rounded-lg hover:bg-emerald-50 transition-all duration-200"
                               title="Update Plantation"
