@@ -69,32 +69,72 @@ const handleComplete = async (id) => {
     try {
       const doc = new jsPDF();
       const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
       const mainColor = "#047857";
       const secondaryColor = "#064e3b";
+      const accentColor = "#059669";
 
       // Add Cover Page
       doc.setFillColor(232, 253, 245);
-      doc.rect(0, 0, pageWidth, doc.internal.pageSize.getHeight(), "F");
+      doc.rect(0, 0, pageWidth, pageHeight, "F");
 
-      // Header
-      doc.setFontSize(28);
+      // Decorative Elements
+      doc.setFillColor(209, 250, 229);
+      doc.rect(0, 0, pageWidth, 60, "F");
+      doc.setFillColor(236, 253, 245);
+      doc.rect(0, pageHeight - 40, pageWidth, 40, "F");
+
+      // Logo/Header
+      doc.setFontSize(32);
       doc.setTextColor(mainColor);
       doc.setFont("helvetica", "bold");
-      doc.text("Green Plantations Co.", pageWidth / 2, 40, { align: "center" });
+      doc.text("GREENSOIL", pageWidth / 2, 40, { align: "center" });
 
       // Project Title
-      doc.setFontSize(22);
-      doc.text(`${plantation.projectName} Report`, pageWidth / 2, 60, {
+      doc.setFontSize(24);
+      doc.text(`${plantation.projectName} Report`, pageWidth / 2, 80, {
         align: "center",
       });
 
-      // Report Details
+      // Project Details Box
+      doc.setFillColor(255, 255, 255);
+      doc.roundedRect(20, 100, pageWidth - 40, 60, 3, 3, "F");
+      doc.setDrawColor(209, 250, 229);
+      doc.roundedRect(20, 100, pageWidth - 40, 60, 3, 3, "D");
+
+      // Project Details Content
       doc.setFontSize(12);
       doc.setTextColor(secondaryColor);
+      const details = [
+        ["Location", plantation.location],
+        ["Type", plantation.type],
+        ["Land Area", `${plantation.landArea} acres`],
+        ["Employees", plantation.employees.toString()],
+        ["Start Date", new Date(plantation.startDate).toLocaleDateString()],
+        ["Harvest Date", new Date(plantation.harvestingDate).toLocaleDateString()],
+      ];
+
+      let x = 30;
+      let y = 115;
+      details.forEach(([key, value], index) => {
+        if (index % 2 === 0 && index !== 0) {
+          y += 15;
+          x = 30;
+        }
+        doc.setFont("helvetica", "bold");
+        doc.text(`${key}:`, x, y);
+        doc.setFont("helvetica", "normal");
+        doc.text(value, x + 40, y);
+        x += 90;
+      });
+
+      // Report Details
+      doc.setFontSize(10);
+      doc.setTextColor(100);
       doc.text(
         `Report Generated: ${new Date().toLocaleDateString()}`,
         pageWidth / 2,
-        170,
+        180,
         { align: "center" }
       );
 
@@ -108,11 +148,12 @@ const handleComplete = async (id) => {
       // Section Header Function
       const addSectionHeader = (text, y) => {
         doc.setFillColor(209, 250, 229);
-        doc.rect(margin - 5, y - 5, 50, 10, "F");
-        doc.setFontSize(14);
+        doc.roundedRect(margin - 5, y - 5, pageWidth - (margin * 2) + 10, 15, 3, 3, "F");
+        doc.setFontSize(16);
         doc.setTextColor(secondaryColor);
+        doc.setFont("helvetica", "bold");
         doc.text(text, margin, y);
-        return y + 10;
+        return y + 15;
       };
 
       // Key Value Pair Function
@@ -133,14 +174,8 @@ const handleComplete = async (id) => {
       const overviewData = [
         ["Project Type", plantation.type || "N/A"],
         ["Land Area", `${plantation.landArea || 0} acres`],
-        [
-          "Start Date",
-          new Date(plantation.startDate).toLocaleDateString() || "N/A",
-        ],
-        [
-          "Harvest Date",
-          new Date(plantation.harvestingDate).toLocaleDateString() || "N/A",
-        ],
+        ["Start Date", new Date(plantation.startDate).toLocaleDateString() || "N/A"],
+        ["Harvest Date", new Date(plantation.harvestingDate).toLocaleDateString() || "N/A"],
         ["Location", plantation.location || "N/A"],
         ["Employees", plantation.employees?.toString() || "0"],
       ];
@@ -157,21 +192,70 @@ const handleComplete = async (id) => {
       // Progress Bar
       const progress = 65; // Replace with real data
       doc.setFillColor(209, 250, 229);
-      doc.rect(margin, yPos, 100, 8, "F");
+      doc.roundedRect(margin, yPos, 100, 8, 3, 3, "F");
       doc.setFillColor(mainColor);
-      doc.rect(margin, yPos, progress, 8, "F");
+      doc.roundedRect(margin, yPos, progress, 8, 3, 3, "F");
       doc.setFontSize(10);
       doc.setTextColor(mainColor);
       doc.text(`${progress}% Completed`, margin + 105, yPos + 6);
-      yPos += 15;
+      yPos += 20;
+
+      // Planning Details Section
+      if (plantation.planning) {
+        yPos = addSectionHeader("Planning Details", yPos);
+        yPos += 5;
+
+        // Soil Quality
+        yPos = addKeyValue("Soil Quality", plantation.planning.soilData?.quality || "N/A", yPos);
+
+        // Fertilizer Schedules
+        if (plantation.planning.fertilizerSchedules?.length > 0) {
+          yPos += 5;
+          doc.setFont("helvetica", "bold");
+          doc.setTextColor(secondaryColor);
+          doc.text("Fertilizer Schedules:", margin, yPos);
+          yPos += 5;
+
+          plantation.planning.fertilizerSchedules.forEach((schedule, index) => {
+            doc.setFont("helvetica", "normal");
+            doc.setTextColor(40);
+            doc.text(
+              `${index + 1}. ${schedule.type} - ${schedule.method} (${new Date(schedule.date).toLocaleDateString()})`,
+              margin + 5,
+              yPos
+            );
+            yPos += 7;
+          });
+        }
+
+        // Pest Controls
+        if (plantation.planning.pestControls?.length > 0) {
+          yPos += 5;
+          doc.setFont("helvetica", "bold");
+          doc.setTextColor(secondaryColor);
+          doc.text("Pest Controls:", margin, yPos);
+          yPos += 5;
+
+          plantation.planning.pestControls.forEach((control, index) => {
+            doc.setFont("helvetica", "normal");
+            doc.setTextColor(40);
+            doc.text(
+              `${index + 1}. ${control.method} - ${control.product} (${new Date(control.date).toLocaleDateString()})`,
+              margin + 5,
+              yPos
+            );
+            yPos += 7;
+          });
+        }
+      }
 
       // Footer
       doc.setFontSize(10);
       doc.setTextColor(100);
       doc.text(
-        "© 2024 Green Plantations Co. - Confidential Report",
+        "© 2024 GREENSOIL. - Confidential Report",
         pageWidth / 2,
-        doc.internal.pageSize.getHeight() - 10,
+        pageHeight - 10,
         { align: "center" }
       );
 
