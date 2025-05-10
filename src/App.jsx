@@ -9,7 +9,7 @@ import UserRegister from "./pages/SmartFarm/UserRegister.jsx";
 import UserLogin from "./pages/SmartFarm/UserLogin.jsx";
 import UserRegPayment from "./pages/SmartFarm/UserRegPayment.jsx";
 import SmartFarm from "./pages/SmartFarm/SmartFarm.jsx";
-import UserProfile from "./pages/SmartFarm/UserProfile.jsx";
+import UserProfile from "./Pages/SmartFarm/UserProfile.jsx";
 import Explore from "./pages/SmartFarm/Explore.jsx";
 import Drone from "./pages/SmartFarm/Drone.jsx";
 import Irrigation from "./pages/SmartFarm/Irrigation.jsx";
