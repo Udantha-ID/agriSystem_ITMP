@@ -166,7 +166,7 @@ function PlanningForm() {
         }))
       };
   
-      console.log('Submitting payload:', payload); // For debugging
+      console.log('Submitting payload:', payload); 
   
       const response = await axios.post('http://localhost:5000/plannings', payload);
       
