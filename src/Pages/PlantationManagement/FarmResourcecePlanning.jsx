@@ -269,7 +269,7 @@ useEffect(() => {
                               </>
                             ) : (
                               <button
-                                onClick={() => navigate(`/create-planning/${project._id}`)}
+                                onClick={() => navigate(`/planning/${project._id}`)}
                                 className="px-4 py-2 text-sm bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-lg hover:from-emerald-600 hover:to-emerald-700 shadow-md hover:shadow-lg transition-all duration-300"
                               >
                                 Create Plan

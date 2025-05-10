@@ -31,6 +31,8 @@ import Dashboard from './Pages/LandingDevelopment/Dashboard.jsx'
 import LandBoundary from './Pages/LandingDevelopment/LandBoundary.jsx';
 import PlantationManagementAbout from './Pages/PlantationManagement/PlantationmanagementAbout.jsx'
 import SavedAnalyses from './Pages/Dashboard/SavedAnalyses.jsx'
+import AddProduct from './Pages/MarketPlace/AddProduct.jsx'
+import UpdatePlanning from './Pages/PlantationManagement/UpdatePlanning.jsx'
 
 function App() {
   return (
@@ -43,12 +45,14 @@ function App() {
           <Route path="/pmdashboard" element={<PlantationDashboard />} />
           <Route path="/plantations" element={<PlantationManagement />} />
           <Route path="/resources" element={<FarmResourcePlanning />} />
-          <Route path="/planning/:projectId" element={<PlanningForm />} />
+          <Route path="/planning/:id" element={<PlanningForm />} />
+          <Route path="/update-planning/:id" element={<UpdatePlanning />} />
           <Route path="/reports" element={<MonitoringReports />} />
           <Route path="/addplant" element={<AddPlantation />} />
-          <Route path="/updateplant/:plantId" element={<UpdatePlantation />} />
+          <Route path="/updateplant/:id" element={<UpdatePlantation />} />
           <Route path="/plantabout" element={<PlantationManagementAbout />} />
           <Route path="/inventory" element={<Inventory />} />
+          <Route path="/addproduct" element={<AddProduct />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           
