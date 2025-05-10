@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-const UserRegisterPayment = () => {
+const UserRegPayment = () => {
   const [paymentData, setPaymentData] = useState({
     cardHolderName: '',
     cardNumber: '',
