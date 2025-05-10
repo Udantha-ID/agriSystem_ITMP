@@ -16,19 +16,19 @@ function PlantationSidebar() {
           Dashboard Overview
         </Link>
         <Link
-          to="/plantationsmanage"
+          to="/plantations"
           className="py-4 px-4 hover:bg-gray-700 transition-all"
         >
           Plantation Management
         </Link>
         <Link
-          to="/resourcesplan"
+          to="/resources"
           className="py-4 px-4 hover:bg-gray-700 transition-all"
         >
           Farm Resource Planning
         </Link>
         <Link
-          to="/mreports"
+          to="/reports"
           className="py-4 px-4 hover:bg-gray-700 transition-all"
         >
           Monitoring & Reports

@@ -171,7 +171,7 @@ function PlanningForm() {
       const response = await axios.post('http://localhost:5000/plannings', payload);
       
       if (response.status === 201) {
-        navigate('/resourcesplan');
+        navigate('/resources');
       }
     } catch (error) {
       console.error('Submission error:', error);
