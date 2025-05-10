@@ -29,12 +29,14 @@ useEffect(() => {
         axios.get("http://localhost:5000/plannings"),
       ]);
 
-      const mergedData = plantationsRes.data.map((plantation) => ({
-        ...plantation,
-        planning: planningsRes.data.find(
-          (p) => p.projectId === plantation._id
-        ),
-      }));
+      const mergedData = plantationsRes.data
+        .filter(plantation => !plantation.completed)
+        .map((plantation) => ({
+          ...plantation,
+          planning: planningsRes.data.find(
+            (p) => p.projectId === plantation._id
+          ),
+        }));
 
       setPlantations(mergedData);
     } catch (error) {
@@ -106,7 +108,7 @@ useEffect(() => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-cyan-50">
+      <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-cyan-50">
         <PlantationSidebar />
         <div className="md:pl-64 p-6 flex justify-center items-center h-screen">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
@@ -117,7 +119,7 @@ useEffect(() => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-cyan-50">
+      <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-cyan-50">
         <PlantationSidebar />
         <div className="md:pl-64 p-6 flex justify-center items-center h-screen">
           <div className="text-red-500 text-lg">{error}</div>
@@ -127,168 +129,194 @@ useEffect(() => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-cyan-50">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-cyan-50">
       <PlantationSidebar />
       <div className="md:pl-64 p-6">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl font-bold text-gray-800 mb-8">
-            Farm Resource Planning Dashboard
-          </h1>
+          {/* Header Section with Decorative Elements */}
+          <div className="relative mb-12">
+            <div className="absolute -top-6 -left-6 w-24 h-24 bg-emerald-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
+            <div className="absolute -bottom-8 -right-8 w-24 h-24 bg-cyan-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
+            <div className="relative">
+              <h1 className="text-4xl font-bold text-gray-900 mb-2 bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-cyan-600">
+                Farm Resource Planning
+              </h1>
+              <p className="text-gray-600 text-lg">
+                Manage and monitor your agricultural resources efficiently
+              </p>
+            </div>
+          </div>
           
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Projects Column */}
             <div className="lg:col-span-2">
-              <div className="bg-white p-6 rounded-xl shadow-lg border border-green-50">
-                <div className="flex items-center mb-6">
-                  <div className="bg-green-500 p-3 rounded-lg mr-3">
-                    <ChartBarIcon className="w-6 h-6 text-white" />
+              <div className="bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-xl border border-gray-100">
+                <div className="flex items-center mb-8">
+                  <div className="bg-gradient-to-br from-emerald-500 to-emerald-600 p-3.5 rounded-xl mr-4 shadow-lg">
+                    <ChartBarIcon className="w-7 h-7 text-white" />
                   </div>
-                  <h2 className="text-xl font-bold text-gray-800">
+                  <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-cyan-600">
                     Agricultural Projects
                   </h2>
                 </div>
 
                 {plantations.length === 0 ? (
-                  <div className="text-center py-4 text-gray-500">
-                    No agricultural projects found
+                  <div className="text-center py-12">
+                    <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-emerald-100 to-emerald-200 mb-4 shadow-lg">
+                      <ChartBarIcon className="h-10 w-10 text-emerald-600" />
+                    </div>
+                    <h3 className="text-xl font-medium text-gray-900 mb-2">
+                      No projects found
+                    </h3>
+                    <p className="text-gray-500 mb-6 max-w-sm mx-auto">
+                      Start by creating a new agricultural project to manage your resources
+                    </p>
                   </div>
                 ) : (
-                  plantations.map((project) => (
-                    <div
-                      key={project._id}
-                      className="group relative p-4 bg-white rounded-lg border border-gray-100 mb-4 transition-all hover:shadow-md"
-                    >
-                      <div className="flex justify-between items-start">
-                        <div className="flex-1">
-                          <h3 className="text-lg font-semibold text-gray-800 mb-1">
-                            {project.projectName}
-                          </h3>
-                          {project.planning ? (
-                            <div className="grid grid-cols-2 gap-4 mt-3">
-                              {/* Soil Quality Card */}
-                              <div className="p-3 bg-green-50 rounded-lg">
-                                <div className="flex items-center mb-2">
-                                  <SunIcon className="w-5 h-5 text-green-600 mr-2" />
-                                  <span className="font-medium">Soil Quality</span>
+                  <div className="space-y-6">
+                    {plantations.map((project) => (
+                      <div
+                        key={project._id}
+                        className="group relative p-6 bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300"
+                      >
+                        <div className="flex justify-between items-start">
+                          <div className="flex-1">
+                            <h3 className="text-xl font-semibold text-gray-800 mb-3 group-hover:text-emerald-600 transition-colors duration-300">
+                              {project.projectName}
+                            </h3>
+                            {project.planning ? (
+                              <div className="grid grid-cols-2 gap-4 mt-4">
+                                {/* Soil Quality Card */}
+                                <div className="p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border border-green-100">
+                                  <div className="flex items-center mb-3">
+                                    <div className="bg-green-100 p-2 rounded-lg mr-3">
+                                      <SunIcon className="w-5 h-5 text-green-600" />
+                                    </div>
+                                    <span className="font-medium text-gray-700">Soil Quality</span>
+                                  </div>
+                                  <div className={`text-sm px-3 py-1.5 rounded-full inline-block ${
+                                    project.planning.soilData?.quality === 'High' 
+                                      ? 'bg-green-100 text-green-800' :
+                                    project.planning.soilData?.quality === 'Medium' 
+                                      ? 'bg-amber-100 text-amber-800' :
+                                      'bg-red-100 text-red-800'
+                                  }`}>
+                                    {project.planning.soilData?.quality || "N/A"}
+                                  </div>
                                 </div>
-                                <div className={`text-sm px-2 py-1 rounded-full inline-block ${
-                                  project.planning.soilData?.quality === 'High' 
-                                    ? 'bg-green-100 text-green-800' :
-                                  project.planning.soilData?.quality === 'Medium' 
-                                    ? 'bg-amber-100 text-amber-800' :
-                                    'bg-red-100 text-red-800'
-                                }`}>
-                                  {project.planning.soilData?.quality || "N/A"}
-                                </div>
-                              </div>
 
-                              {/* Fertilizer Card */}
-                              <div className="p-3 bg-blue-50 rounded-lg">
-                                <div className="flex items-center mb-2">
-                                  <BeakerIcon className="w-5 h-5 text-blue-600 mr-2" />
-                                  <span className="font-medium">Next Fertilizer</span>
+                                {/* Fertilizer Card */}
+                                <div className="p-4 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl border border-blue-100">
+                                  <div className="flex items-center mb-3">
+                                    <div className="bg-blue-100 p-2 rounded-lg mr-3">
+                                      <BeakerIcon className="w-5 h-5 text-blue-600" />
+                                    </div>
+                                    <span className="font-medium text-gray-700">Next Fertilizer</span>
+                                  </div>
+                                  <div className="text-sm text-gray-600 font-medium">
+                                    {getNextFertilizerDate(project.planning)}
+                                  </div>
                                 </div>
-                                <div className="text-sm text-gray-600">
-                                  {getNextFertilizerDate(project.planning)}
-                                </div>
-                              </div>
 
-                              {/* Pest Control Card */}
-                              <div className="p-3 bg-purple-50 rounded-lg">
-                                <div className="flex items-center mb-2">
-                                  <BugAntIcon className="w-5 h-5 text-purple-600 mr-2" />
-                                  <span className="font-medium">Next Pest Control</span>
+                                {/* Pest Control Card */}
+                                <div className="p-4 bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl border border-purple-100">
+                                  <div className="flex items-center mb-3">
+                                    <div className="bg-purple-100 p-2 rounded-lg mr-3">
+                                      <BugAntIcon className="w-5 h-5 text-purple-600" />
+                                    </div>
+                                    <span className="font-medium text-gray-700">Next Pest Control</span>
+                                  </div>
+                                  <div className="text-sm text-gray-600 font-medium">
+                                    {getNextPestControlDate(project.planning)}
+                                  </div>
                                 </div>
-                                <div className="text-sm text-gray-600">
-                                  {getNextPestControlDate(project.planning)}
-                                </div>
-                              </div>
 
-                              {/* Timeline Card */}
-                              <div className="p-3 bg-orange-50 rounded-lg">
-                                <div className="flex items-center mb-2">
-                                  <CalendarIcon className="w-5 h-5 text-orange-600 mr-2" />
-                                  <span className="font-medium">Created</span>
-                                </div>
-                                <div className="text-sm text-gray-600">
-                                  {new Date(
-                                    project.planning.createdAt
-                                  ).toLocaleDateString()}
+                                {/* Timeline Card */}
+                                <div className="p-4 bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl border border-orange-100">
+                                  <div className="flex items-center mb-3">
+                                    <div className="bg-orange-100 p-2 rounded-lg mr-3">
+                                      <CalendarIcon className="w-5 h-5 text-orange-600" />
+                                    </div>
+                                    <span className="font-medium text-gray-700">Created</span>
+                                  </div>
+                                  <div className="text-sm text-gray-600 font-medium">
+                                    {new Date(project.planning.createdAt).toLocaleDateString()}
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                          ) : (
-                            <div className="text-sm text-gray-500 italic">
-                              No planning created yet
-                            </div>
-                          )}
-                        </div>
-                        <div className="flex flex-col gap-2 ml-4">
-                          {project.planning ? (
-                            <>
+                            ) : (
+                              <div className="text-sm text-gray-500 italic bg-gray-50 p-4 rounded-lg border border-gray-100">
+                                No planning created yet
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex flex-col gap-2 ml-6">
+                            {project.planning ? (
+                              <>
+                                <button
+                                  onClick={() => navigate(`/update-planning/${project.planning._id}`)}
+                                  className="px-4 py-2 text-sm bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 shadow-md hover:shadow-lg transition-all duration-300"
+                                >
+                                  Update
+                                </button>
+
+                                <button
+                                  onClick={() => handleDeletePlanning(project.planning._id)}
+                                  className="px-4 py-2 text-sm bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 shadow-md hover:shadow-lg transition-all duration-300"
+                                >
+                                  Delete
+                                </button>
+                              </>
+                            ) : (
                               <button
-                                onClick={() =>
-                                  navigate(
-                                    `/update-planning/${project.planning._id}`
-                                  )
-                                }
-                                className="px-3 py-1.5 text-sm bg-blue-100 text-blue-600 rounded-md hover:bg-blue-200"
+                                onClick={() => navigate(`/create-planning/${project._id}`)}
+                                className="px-4 py-2 text-sm bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-lg hover:from-emerald-600 hover:to-emerald-700 shadow-md hover:shadow-lg transition-all duration-300"
                               >
-                                Update
+                                Create Plan
                               </button>
-
-                              <button
-                                onClick={() =>
-                                  handleDeletePlanning(project.planning._id)
-                                }
-                                className="px-3 py-1.5 text-sm bg-red-100 text-red-600 rounded-md hover:bg-red-200"
-                              >
-                                Delete
-                              </button>
-                            </>
-                          ) : (
-                            <button
-                              onClick={() =>
-                                navigate(`/create-planning/${project._id}`)
-                              }
-                              className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
-                            >
-                              Create Plan
-                            </button>
-                          )}
+                            )}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))
+                    ))}
+                  </div>
                 )}
               </div>
             </div>
 
             {/* Reminders Column */}
-            <div className="bg-white p-6 rounded-xl shadow-lg border border-green-50 h-fit">
-              <div className="flex items-center mb-6">
-                <div className="bg-purple-500 p-3 rounded-lg mr-3">
-                  <CalendarIcon className="w-6 h-6 text-white" />
+            <div className="bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-xl border border-gray-100 h-fit">
+              <div className="flex items-center mb-8">
+                <div className="bg-gradient-to-br from-purple-500 to-purple-600 p-3.5 rounded-xl mr-4 shadow-lg">
+                  <CalendarIcon className="w-7 h-7 text-white" />
                 </div>
-                <h2 className="text-xl font-bold text-gray-800">
+                <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-600">
                   Upcoming Reminders
                 </h2>
               </div>
 
               {getReminderTasks().length === 0 ? (
-                <div className="text-center py-4 text-gray-500">
-                  No upcoming reminders
+                <div className="text-center py-12">
+                  <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-purple-100 to-purple-200 mb-4 shadow-lg">
+                    <CalendarIcon className="h-10 w-10 text-purple-600" />
+                  </div>
+                  <h3 className="text-xl font-medium text-gray-900 mb-2">
+                    No reminders
+                  </h3>
+                  <p className="text-gray-500 mb-6 max-w-sm mx-auto">
+                    You have no upcoming reminders at the moment
+                  </p>
                 </div>
               ) : (
                 <div className="space-y-4">
                   {getReminderTasks().map((task, index) => (
                     <div 
                       key={index}
-                      className="p-4 rounded-lg border border-gray-100 hover:shadow-md transition-all"
+                      className="p-5 rounded-xl border border-gray-100 hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-white to-gray-50"
                     >
                       <div className="flex items-start justify-between">
                         <div>
-                          <div className={`text-sm font-medium mb-1 ${
+                          <div className={`text-sm font-semibold mb-2 ${
                             task.type === 'Fertilizer' 
                               ? 'text-blue-600' 
                               : 'text-purple-600'
@@ -298,12 +326,12 @@ useEffect(() => {
                           <div className="text-xs text-gray-500 mb-2">
                             {task.project}
                           </div>
-                          <div className="text-sm text-gray-700">
+                          <div className="text-sm text-gray-700 font-medium">
                             {task.details}
                           </div>
                         </div>
                         <div className="text-right">
-                          <div className="text-sm font-medium text-gray-600">
+                          <div className="text-sm font-semibold text-gray-600">
                             {new Date(task.date).toLocaleDateString()}
                           </div>
                           <div className="text-xs text-gray-400 mt-1">
