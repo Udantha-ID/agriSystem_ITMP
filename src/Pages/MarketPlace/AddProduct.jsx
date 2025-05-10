@@ -10,21 +10,19 @@ const AddProduct = () => {
     price: '',
     stock: '',
     threshold: '',
-    description: ''
+    description: '',
+    imageUrl: ''
   });
-  const [image, setImage] = useState(null);
   const [preview, setPreview] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
   const categories = ['coconuts', 'oil', 'beverages', 'baking', 'snacks', 'vegetables', 'fertilizers'];
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setImage(file);
-      setPreview(URL.createObjectURL(file));
-    }
+  const handleImageUrlChange = (e) => {
+    const url = e.target.value;
+    setNewProduct({...newProduct, imageUrl: url});
+    setPreview(url);
   };
 
   const handleSubmit = async (e) => {
@@ -33,20 +31,22 @@ const AddProduct = () => {
     setError('');
     
     try {
-      const formData = new FormData();
-      formData.append('name', newProduct.name);
-      formData.append('category', newProduct.category);
-      formData.append('price', newProduct.price);
-      formData.append('stock', newProduct.stock);
-      formData.append('threshold', newProduct.threshold);
-      formData.append('description', newProduct.description);
-      if (image) {
-        formData.append('image', image);
-      }
+      const productData = {
+        name: newProduct.name,
+        category: newProduct.category,
+        price: parseFloat(newProduct.price),
+        stock: parseInt(newProduct.stock),
+        threshold: parseInt(newProduct.threshold),
+        description: newProduct.description,
+        imageUrl: newProduct.imageUrl
+      };
 
       const response = await fetch('http://localhost:5000/products', {
         method: 'POST',
-        body: formData,
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(productData)
       });
       
       if (!response.ok) {
@@ -148,32 +148,34 @@ const AddProduct = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Product Image</label>
-              <div className="flex items-center gap-4">
-                {preview ? (
+              <label className="block text-sm font-medium text-gray-700 mb-1">Image URL</label>
+              <input
+                type="url"
+                className="w-full p-2 border rounded"
+                value={newProduct.imageUrl}
+                onChange={handleImageUrlChange}
+                placeholder="https://example.com/image.jpg"
+              />
+              <p className="text-xs text-gray-500 mt-1">Enter a direct link to an image (optional)</p>
+            </div>
+
+            {preview && (
+              <div className="mt-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">Image Preview</label>
+                <div className="w-full h-48 bg-gray-100 rounded border flex items-center justify-center overflow-hidden">
                   <img 
                     src={preview} 
                     alt="Preview" 
-                    className="w-16 h-16 rounded object-cover border"
+                    className="max-h-full max-w-full object-contain"
+                    onError={(e) => {
+                      setPreview('');
+                      e.target.onerror = null;
+                      alert('Could not load the image. Please check the URL.');
+                    }}
                   />
-                ) : (
-                  <div className="w-16 h-16 rounded bg-gray-200 flex items-center justify-center text-gray-500 border">
-                    No Image
-                  </div>
-                )}
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  className="block w-full text-sm text-gray-500
-                    file:mr-4 file:py-2 file:px-4
-                    file:rounded-md file:border-0
-                    file:text-sm file:font-semibold
-                    file:bg-blue-50 file:text-blue-700
-                    hover:file:bg-blue-100"
-                />
+                </div>
               </div>
-            </div>
+            )}
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
