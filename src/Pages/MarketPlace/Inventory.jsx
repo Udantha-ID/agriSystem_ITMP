@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PencilIcon, TrashIcon, MagnifyingGlassIcon, XMarkIcon, PlusIcon, DocumentTextIcon, ShoppingCartIcon, ExclamationCircleIcon } from '@heroicons/react/24/outline';
+import PlantationSidebar from '../../Components/PlantationSidebar';
 
 const Inventory = () => {
   const navigate = useNavigate();
@@ -330,6 +331,7 @@ const Inventory = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-blue-50">
+      <PlantationSidebar />
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-indigo-900 mb-2">Inventory Management</h1>

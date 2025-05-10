@@ -6,9 +6,15 @@ function PlantationSidebar() {
   return (
     <div className="h-screen w-60 bg-green-500 text-white fixed">
       <h2 className="text-xl font-bold p-4 border-b border-green-700">
-      Plantation Dashboard
+      Admin Dashboard
       </h2>
       <nav className="flex flex-col mt-4">
+        <Link
+          to="/inventory"
+          className="py-4 px-4 hover:bg-gray-700 transition-all"
+        >
+          Inventory Management
+        </Link>
         <Link
           to="/pmdashboard"
           className="py-4 px-4 hover:bg-gray-700 transition-all"
