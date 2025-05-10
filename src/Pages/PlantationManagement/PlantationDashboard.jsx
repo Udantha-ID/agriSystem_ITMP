@@ -13,7 +13,8 @@ import {
   MapPinIcon,
   DocumentTextIcon,
   BugAntIcon,
-  ExclamationTriangleIcon
+  ExclamationTriangleIcon,
+  Square3Stack3DIcon
 } from "@heroicons/react/24/outline";
 import PlantationSidebar from "../../Components/PlantationSidebar";
 
@@ -39,10 +40,19 @@ function PlantationDashboard() {
   useEffect(() => {
     const fetchPlantations = async () => {
       try {
-        const plantationsResponse = await axios.get("http://localhost:5000/plantations");
-        setAllPlantations(plantationsResponse.data);
+        const [plantationsResponse, planningsResponse] = await Promise.all([
+          axios.get("http://localhost:5000/plantations"),
+          axios.get("http://localhost:5000/plannings")
+        ]);
+
+        const plantationsWithPlanning = plantationsResponse.data.map(plantation => ({
+          ...plantation,
+          planning: planningsResponse.data.find(p => p.projectId === plantation._id)
+        }));
+
+        setAllPlantations(plantationsWithPlanning);
         
-        const activeProjects = plantationsResponse.data.filter(p => !p.completed);
+        const activeProjects = plantationsWithPlanning.filter(p => !p.completed);
         const assigned = activeProjects.reduce((sum, p) => sum + (p.employees || 0), 0);
         setAssignedWorkers(assigned);
       } catch (error) {
@@ -214,39 +224,87 @@ function PlantationDashboard() {
           </div>
           <div className="flex items-center">
             <CheckCircleIcon className="h-5 w-5 mr-2 text-gray-500" />
-            <span className="font-medium">Completed:</span> 
+            <span className="font-medium">Completed Date:</span> 
             {new Date(project.completedDate).toLocaleDateString()}
+          </div>
+          <div className="flex items-center">
+            <Square3Stack3DIcon className="h-5 w-5 mr-2 text-gray-500" />
+            <span className="font-medium">Type:</span> {project.type}
+          </div>
+          <div className="flex items-center">
+            <GlobeAmericasIcon className="h-5 w-5 mr-2 text-gray-500" />
+            <span className="font-medium">Land Area:</span> {project.landArea} acres
           </div>
         </div>
 
         <div className="bg-gray-50 p-4 rounded-lg">
           <h4 className="font-medium mb-2">Planning Details</h4>
           {project.planning ? (
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-sm flex items-center gap-1">
-                  <DocumentTextIcon className="w-4 h-4" />
-                  <span className="font-medium">Fertilizer Schedules:</span> 
-                  {project.planning.fertilizerSchedules?.length || 0}
-                </p>
-                <p className="text-sm flex items-center gap-1">
-                  <BugAntIcon className="w-4 h-4" />
-                  <span className="font-medium">Pest Controls:</span> 
-                  {project.planning.pestControls?.length || 0}
-                </p>
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm flex items-center gap-1">
+                    <DocumentTextIcon className="w-4 h-4" />
+                    <span className="font-medium">Fertilizer Schedules:</span> 
+                    {project.planning.fertilizerSchedules?.length || 0}
+                  </p>
+                  <p className="text-sm flex items-center gap-1">
+                    <BugAntIcon className="w-4 h-4" />
+                    <span className="font-medium">Pest Controls:</span> 
+                    {project.planning.pestControls?.length || 0}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm flex items-center gap-1">
+                    <SunIcon className="w-4 h-4" />
+                    <span className="font-medium">Soil Quality:</span> 
+                    {project.planning.soilData?.quality || 'N/A'}
+                  </p>
+                  <p className="text-sm flex items-center gap-1">
+                    <CalendarIcon className="w-4 h-4" />
+                    <span className="font-medium">Last Updated:</span> 
+                    {new Date(project.planning.updatedAt).toLocaleDateString()}
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="text-sm flex items-center gap-1">
-                  <SunIcon className="w-4 h-4" />
-                  <span className="font-medium">Soil Quality:</span> 
-                  {project.planning.soilData?.quality || 'N/A'}
-                </p>
-                <p className="text-sm flex items-center gap-1">
-                  <CalendarIcon className="w-4 h-4" />
-                  <span className="font-medium">Last Updated:</span> 
-                  {new Date(project.planning.updatedAt).toLocaleDateString()}
-                </p>
-              </div>
+
+              {/* Fertilizer Schedules */}
+              {project.planning.fertilizerSchedules?.length > 0 && (
+                <div className="mt-4">
+                  <h5 className="font-medium text-sm mb-2">Fertilizer Schedule History</h5>
+                  <div className="space-y-2">
+                    {project.planning.fertilizerSchedules.map((schedule, index) => (
+                      <div key={index} className="bg-white p-2 rounded border border-gray-100">
+                        <p className="text-sm">
+                          <span className="font-medium">{schedule.type}</span> - {schedule.method}
+                          <span className="text-gray-500 text-xs ml-2">
+                            {new Date(schedule.date).toLocaleDateString()}
+                          </span>
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Pest Control History */}
+              {project.planning.pestControls?.length > 0 && (
+                <div className="mt-4">
+                  <h5 className="font-medium text-sm mb-2">Pest Control History</h5>
+                  <div className="space-y-2">
+                    {project.planning.pestControls.map((control, index) => (
+                      <div key={index} className="bg-white p-2 rounded border border-gray-100">
+                        <p className="text-sm">
+                          <span className="font-medium">{control.method}</span> - {control.product}
+                          <span className="text-gray-500 text-xs ml-2">
+                            {new Date(control.date).toLocaleDateString()}
+                          </span>
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           ) : (
             <p className="text-sm text-gray-500">No planning data available</p>
@@ -352,18 +410,47 @@ function PlantationDashboard() {
                     onClick={() => setSelectedProject(plantation)}
                     className="group flex items-center justify-between p-4 hover:bg-emerald-50 rounded-xl cursor-pointer border-l-4 border-emerald-100 hover:border-emerald-400 transition-all"
                   >
-                    <div>
-                      <p className="font-medium text-gray-800">
-                        {plantation.projectName}
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        Completed{" "}
-                        {new Date(
-                          plantation.completedDate
-                        ).toLocaleDateString()}
-                      </p>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="font-medium text-gray-800">
+                          {plantation.projectName}
+                        </p>
+                        <div className="flex items-center gap-2">
+                          {plantation.planning && (
+                            <>
+                              <span className="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded-full">
+                                {plantation.planning.fertilizerSchedules?.length || 0} Fertilizers
+                              </span>
+                              <span className="text-xs px-2 py-1 bg-purple-100 text-purple-800 rounded-full">
+                                {plantation.planning.pestControls?.length || 0} Pest Controls
+                              </span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-4 text-sm text-gray-500">
+                        <span className="flex items-center">
+                          <MapPinIcon className="h-4 w-4 mr-1" />
+                          {plantation.location}
+                        </span>
+                        <span className="flex items-center">
+                          <CalendarIcon className="h-4 w-4 mr-1" />
+                          Completed {new Date(plantation.completedDate).toLocaleDateString()}
+                        </span>
+                        {plantation.planning?.soilData?.quality && (
+                          <span className={`text-xs px-2 py-1 rounded-full ${
+                            plantation.planning.soilData.quality === 'High' 
+                              ? 'bg-green-100 text-green-800' 
+                              : plantation.planning.soilData.quality === 'Medium'
+                              ? 'bg-amber-100 text-amber-800'
+                              : 'bg-red-100 text-red-800'
+                          }`}>
+                            Soil: {plantation.planning.soilData.quality}
+                          </span>
+                        )}
+                      </div>
                     </div>
-                    <CheckCircleIcon className="h-6 w-6 text-emerald-600" />
+                    <CheckCircleIcon className="h-6 w-6 text-emerald-600 ml-4" />
                   </div>
                 ))}
               </div>

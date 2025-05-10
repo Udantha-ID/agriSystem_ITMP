@@ -46,14 +46,13 @@ function PlantationManagement() {
 const handleComplete = async (id) => {
   try {
     const response = await axios.put(
-      `http://localhost:5000/plantations/${id}/complete`
+      `http://localhost:5000/plantations/${id}/complete`,
+      { completedDate: new Date().toISOString() }
     );
 
     if (response.data?.completed) {
-      // Force refresh by refetching data
-      const updatedResponse = await axios.get("http://localhost:5000/plantations");
-      setPlantations(updatedResponse.data.filter((p) => !p.completed));
-      
+      // Remove the completed project from the current view
+      setPlantations(plantations.filter((p) => p._id !== id));
       alert("Project marked as completed successfully!");
     }
   } catch (error) {

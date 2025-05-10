@@ -29,12 +29,14 @@ useEffect(() => {
         axios.get("http://localhost:5000/plannings"),
       ]);
 
-      const mergedData = plantationsRes.data.map((plantation) => ({
-        ...plantation,
-        planning: planningsRes.data.find(
-          (p) => p.projectId === plantation._id
-        ),
-      }));
+      const mergedData = plantationsRes.data
+        .filter(plantation => !plantation.completed)
+        .map((plantation) => ({
+          ...plantation,
+          planning: planningsRes.data.find(
+            (p) => p.projectId === plantation._id
+          ),
+        }));
 
       setPlantations(mergedData);
     } catch (error) {
