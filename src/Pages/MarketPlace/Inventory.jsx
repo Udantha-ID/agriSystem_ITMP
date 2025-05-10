@@ -330,11 +330,12 @@ const Inventory = () => {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-blue-50">
-      <PlantationSidebar />
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-indigo-900 mb-2">Inventory Management</h1>
+   <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-blue-50 flex">
+  <PlantationSidebar />
+  <div className="flex-1 ml-[250px] px-4 py-8">
+    <div className="max-w-7xl mx-auto">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-indigo-900 mb-2">Inventory Management</h1>
           <p className="text-gray-600">Manage your products, track stock levels, and generate reports</p>
         </div>
 
@@ -683,6 +684,7 @@ const Inventory = () => {
           </div>
         </div>
       )}
+    </div>
     </div>
   );
 };
