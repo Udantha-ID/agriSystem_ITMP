@@ -95,6 +95,7 @@ const MonitoringReports = () => {
             <div className="relative mb-12">
               <div className="absolute -top-6 -left-6 w-24 h-24 bg-emerald-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
               <div className="absolute -bottom-8 -right-8 w-24 h-24 bg-cyan-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
               <div className="relative flex items-center justify-between">
                 <div>
                   <h1 className="text-4xl font-bold text-gray-900 mb-2 bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-cyan-600">
@@ -107,7 +108,7 @@ const MonitoringReports = () => {
                 <select 
                   value={filter}
                   onChange={(e) => setFilter(e.target.value)}
-                  className="bg-white/80 backdrop-blur-sm px-4 py-2.5 rounded-xl shadow-lg border border-gray-100 text-gray-700 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-300"
+                  className="bg-white/80 backdrop-blur-sm px-4 py-2.5 rounded-xl shadow-lg border border-gray-100 text-gray-700 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-300 hover:shadow-xl"
                 >
                   <option value="all">All Projects</option>
                   <option value="active">Active</option>
@@ -145,6 +146,7 @@ const MonitoringReports = () => {
           <div className="relative mb-12">
             <div className="absolute -top-6 -left-6 w-24 h-24 bg-emerald-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
             <div className="absolute -bottom-8 -right-8 w-24 h-24 bg-cyan-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
             <div className="relative flex items-center justify-between">
               <div>
                 <h1 className="text-4xl font-bold text-gray-900 mb-2 bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-cyan-600">
@@ -157,7 +159,7 @@ const MonitoringReports = () => {
               <select 
                 value={filter}
                 onChange={(e) => setFilter(e.target.value)}
-                className="bg-white/80 backdrop-blur-sm px-4 py-2.5 rounded-xl shadow-lg border border-gray-100 text-gray-700 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-300"
+                className="bg-white/80 backdrop-blur-sm px-4 py-2.5 rounded-xl shadow-lg border border-gray-100 text-gray-700 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-300 hover:shadow-xl"
               >
                 <option value="all">All Projects</option>
                 <option value="active">Active</option>
@@ -168,24 +170,24 @@ const MonitoringReports = () => {
 
           <div className="space-y-10">
             {plantations.map(project => (
-              <div key={project._id} className="space-y-6">
+              <div key={project._id} className="space-y-6 group">
                 <div className="flex items-center justify-between">
                   <h2 className="text-2xl font-semibold text-gray-800 group-hover:text-emerald-600 transition-colors duration-300">
                     {project.projectName}
                   </h2>
-                  <span className={`px-4 py-1.5 rounded-full text-sm font-medium shadow-sm ${
+                  <span className={`px-4 py-1.5 rounded-full text-sm font-medium shadow-sm transition-all duration-300 ${
                     project.completed 
-                      ? 'bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700' 
+                      ? 'bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 hover:shadow-md' 
                       : project.planning 
-                        ? 'bg-gradient-to-r from-emerald-100 to-emerald-200 text-emerald-700' 
-                        : 'bg-gradient-to-r from-amber-100 to-amber-200 text-amber-700'
+                        ? 'bg-gradient-to-r from-emerald-100 to-emerald-200 text-emerald-700 hover:shadow-md' 
+                        : 'bg-gradient-to-r from-amber-100 to-amber-200 text-amber-700 hover:shadow-md'
                   }`}>
                     {project.completed ? 'Completed' : project.planning ? 'Active' : 'No Plan'}
                   </span>
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-8">
-                  <div className="bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-xl border border-gray-100 hover:shadow-2xl transition-all duration-300">
+                  <div className="bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-xl border border-gray-100 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
                     <div className="flex items-center justify-between mb-6">
                       <h3 className="text-xl font-semibold flex items-center gap-3">
                         <div className="bg-gradient-to-br from-indigo-500 to-indigo-600 p-2.5 rounded-xl shadow-lg">
@@ -202,15 +204,16 @@ const MonitoringReports = () => {
                         </div>
                       )}
                     </div>
-                    <div className="h-56 bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-xl flex flex-col items-center justify-center border border-indigo-100">
-                      <span className="text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-indigo-800">
+                    <div className="h-56 bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-xl flex flex-col items-center justify-center border border-indigo-100 relative overflow-hidden">
+                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-indigo-100/50 to-transparent"></div>
+                      <span className="text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-indigo-800 relative z-10">
                         {calculateYield(project.planning)}
                       </span>
-                      <span className="text-gray-500 mt-3 font-medium">Estimated Harvest</span>
+                      <span className="text-gray-500 mt-3 font-medium relative z-10">Estimated Harvest</span>
                     </div>
                   </div>
 
-                  <div className="bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-xl border border-gray-100 hover:shadow-2xl transition-all duration-300">
+                  <div className="bg-white/80 backdrop-blur-sm p-8 rounded-2xl shadow-xl border border-gray-100 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
                     <div className="flex items-center justify-between mb-6">
                       <h3 className="text-xl font-semibold flex items-center gap-3">
                         <div className="bg-gradient-to-br from-emerald-500 to-emerald-600 p-2.5 rounded-xl shadow-lg">
@@ -236,8 +239,11 @@ const MonitoringReports = () => {
                         </div>
                         <div className="h-3 bg-gray-100 rounded-full overflow-hidden shadow-inner">
                           <div 
-                            className="h-full bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-full transition-all duration-500 ease-out" 
-                            style={{ width: `${(project.planning?.soilData?.phLevel / 14) * 100 || 0}%` }}
+                            className="h-full bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-full transition-all duration-500 ease-out"
+                            style={{ 
+                              width: `${(project.planning?.soilData?.phLevel / 14) * 100 || 0}%`,
+                              boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.1)'
+                            }}
                           />
                         </div>
                       </div>
@@ -250,10 +256,11 @@ const MonitoringReports = () => {
                         </div>
                         <div className="h-3 bg-gray-100 rounded-full overflow-hidden shadow-inner">
                           <div 
-                            className="h-full bg-gradient-to-r from-amber-400 to-amber-600 rounded-full transition-all duration-500 ease-out" 
+                            className="h-full bg-gradient-to-r from-amber-400 to-amber-600 rounded-full transition-all duration-500 ease-out"
                             style={{ 
                               width: project.planning?.soilData?.nutrients === 'High' ? '80%' :
-                              project.planning?.soilData?.nutrients === 'Medium' ? '50%' : '30%' 
+                              project.planning?.soilData?.nutrients === 'Medium' ? '50%' : '30%',
+                              boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.1)'
                             }}
                           />
                         </div>
