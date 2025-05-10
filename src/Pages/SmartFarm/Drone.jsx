@@ -125,7 +125,7 @@ function Drone() {
                         The Future of Farming
                     </motion.h1>
                     <motion.h2
-                        className="text-3xl md:text-4xl font-bold text-blue-300 mb-8"
+                        className="text-3xl md:text-4xl font-bold text-green-300 mb-8"
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 1, delay: 0.4 }}
@@ -145,7 +145,7 @@ function Drone() {
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ duration: 0.8, delay: 0.8 }}
                     >
-                        <a href="#applications" className="bg-green-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-full inline-block transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                        <a href="#applications" className="bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-8 rounded-full inline-block transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
                             Explore Applications
                         </a>
                     </motion.div>

@@ -1,67 +1,68 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ChevronRight, ChevronLeft, Info, Droplet, CloudRain, Sun, Thermometer, Wifi, AlertCircle, BarChart2, Zap } from 'lucide-react';
-import { ChevronDown } from 'lucide-react';
-import watersmart from "../../Images/SmartFarm/water_smart.png";
-import soilmoisture from "../../Images/SmartFarm/soil_moisure.jpg";
-import weatherstation from "../../Images/SmartFarm/Agri_Weather.jpg";
-import dripirrigation from "../../Images/SmartFarm/Drip_Irrigation.jpg";
-import aianalytics from "../../Images/SmartFarm/Dashboard.jpg";
-import iotirrigation from "../../Images/SmartFarm/remote.jpg";
-import flowsensor from "../../Images/SmartFarm/flow_sensor.jpeg";
+import { ChevronRight, ChevronLeft, Brain, Database, Cloud, Server, LineChart, Code, ChevronDown, AlertCircle, Cpu, BarChart2, Zap } from 'lucide-react';
 import Navbar from '../../Components/Navbar';
 import Footer from '../../Components/Footer';
 
-function Irrigation() {
+// Import image paths - these should match your project structure
+import aiHero from "../../Images/SmartFarm/ai_hero.png";
+import computerVision from "../../Images/SmartFarm/computer_vision.jpg";
+import machineLearning from "../../Images/SmartFarm/machine_learning.jpg";
+import predictiveAnalytics from "../../Images/SmartFarm/predictive_analytics.jpg";
+import aiRobotics from "../../Images/SmartFarm/ai_robotics.jpg";
+import nlpSystems from "../../Images/SmartFarm/nlp_systems.jpg";
+import cloudComputing from "../../Images/SmartFarm/cloud_computing.jpg";
+
+function AiSolutions() {
     const [activeSlide, setActiveSlide] = useState(0);
     const [isVisible, setIsVisible] = useState({});
     const observedElements = useRef({});
 
     // Stats for data visualization section
     const stats = [
-        { value: '30-50%', label: 'Water savings compared to traditional methods', icon: <Droplet /> },
-        { value: '25%', label: 'Increase in crop yields with optimized irrigation', icon: <BarChart2 /> },
-        { value: '70%', label: 'Of global freshwater used in agriculture', icon: <CloudRain /> },
-        { value: '90%', label: 'Reduction in runoff with smart systems', icon: <Zap /> },
+        { value: '35%', label: 'Increased crop yield with AI-powered farming', icon: <BarChart2 /> },
+        { value: '40%', label: 'Reduction in resource wastage with predictive analytics', icon: <Database /> },
+        { value: '60%', label: 'Time saved in decision-making processes', icon: <Brain /> },
+        { value: '85%', label: 'Accuracy in pest and disease identification', icon: <Zap /> },
     ];
 
     // Features data for carousel
     const features = [
         {
-            title: "Real-Time Soil Moisture Monitoring",
-            description: "Smart irrigation systems utilize advanced soil moisture sensors that are strategically placed throughout agricultural fields or landscaped areas. These sensors continuously measure the water content in the soil and transmit real-time data to a central irrigation controller. This technology ensures plants receive precisely the amount of water they need, when they need it.",
-            image: soilmoisture,
-            icon: <Droplet className="w-8 h-8" />
+            title: "Computer Vision for Plant Monitoring",
+            description: "Advanced computer vision algorithms analyze images from drones, satellites, and ground cameras to detect plant health issues, nutrient deficiencies, and pest infestations at their earliest stages. These systems can scan thousands of plants per hour with accuracy rates exceeding human capabilities, identifying problems days or even weeks before they would be visible to the naked eye.",
+            image: computerVision,
+            icon: <Brain className="w-8 h-8" />
         },
         {
-            title: "Weather-Adaptive Watering (ET-Based Systems)",
-            description: "Modern irrigation systems incorporate evapotranspiration (ET) data from local weather stations and satellite information to make intelligent watering decisions. These systems analyze multiple environmental factors including temperature, humidity, wind speed, and solar radiation to calculate the exact amount of water lost through evaporation and plant transpiration.",
-            image: weatherstation,
-            icon: <Sun className="w-8 h-8" />
+            title: "Machine Learning Crop Optimization",
+            description: "Machine learning models analyze vast datasets covering weather patterns, soil conditions, crop genetics, and historical yields to develop optimized growing recommendations. These systems continuously learn from each growing season, adapting their recommendations to improve outcomes for specific farm locations, crop varieties, and changing climate conditions.",
+            image: machineLearning,
+            icon: <Database className="w-8 h-8" />
         },
         {
-            title: "Automated Drip & Sprinkler Control",
-            description: "At the heart of smart irrigation systems are automated control valves that precisely regulate water delivery through either drip irrigation lines or sprinkler systems. These smart valves can be programmed to water specific zones at different rates and frequencies based on plant needs. Drip systems deliver water directly to the root zone through a network of tubes and emitters, minimizing evaporation and runoff.",
-            image: dripirrigation,
-            icon: <CloudRain className="w-8 h-8" />
+            title: "Predictive Analytics for Resource Management",
+            description: "AI-powered predictive analytics forecast future conditions to optimize resource allocation across the farm. These systems predict water needs, disease outbreaks, optimal harvest times, and market demands with remarkable accuracy. Farmers can proactively allocate resources rather than reacting to problems after they emerge, reducing waste and improving profitability.",
+            image: predictiveAnalytics,
+            icon: <LineChart className="w-8 h-8" />
         },
         {
-            title: "AI & Predictive Analytics",
-            description: "The most advanced irrigation systems now incorporate artificial intelligence and machine learning algorithms that analyze vast amounts of historical and real-time data. These systems process information about soil conditions, crop growth stages, weather patterns, and water usage to develop increasingly accurate irrigation models.",
-            image: aianalytics,
-            icon: <Thermometer className="w-8 h-8" />
+            title: "Autonomous Agricultural Robotics",
+            description: "AI-driven agricultural robots are revolutionizing labor-intensive tasks through autonomous operation. These machines handle planting, weeding, spraying, and harvesting with precision that reduces chemical use by up to 90% compared to traditional methods. Advanced robots can identify and treat individual plants differently based on their specific needs.",
+            image: aiRobotics,
+            icon: <Cpu className="w-8 h-8" />
         },
         {
-            title: "Remote Control & IoT Integration",
-            description: "Through Internet of Things (IoT) technology, modern irrigation systems can be monitored and controlled from anywhere using smartphones, tablets, or computers. Cloud-based platforms collect data from all system components and present it through user-friendly dashboards. Farmers receive instant alerts about system status, potential problems, or unusual water usage patterns.",
-            image: iotirrigation,
-            icon: <Wifi className="w-8 h-8" />
+            title: "Natural Language Processing for Knowledge Access",
+            description: "Natural Language Processing (NLP) systems allow farmers to access complex agricultural knowledge through simple voice commands or text queries. These AI assistants can interpret questions in plain language, delivering expert advice on crop management, pest control, weather implications, and market conditions tailored to the specific farm context.",
+            image: nlpSystems,
+            icon: <Code className="w-8 h-8" />
         },
         {
-            title: "Water Flow Sensors & Leak Detection",
-            description: "Smart irrigation systems incorporate high-precision flow meters that constantly monitor water movement through the entire network. These sensors can detect even small variations in flow rates that might indicate leaks, broken pipes, or clogged emitters. When abnormal water usage is detected, the system immediately alerts the operator and can automatically shut down affected sections to prevent water loss.",
-            image: flowsensor,
-            icon: <AlertCircle className="w-8 h-8" />
+            title: "Cloud-Based AI Analytics Platform",
+            description: "Cloud computing platforms integrate data from multiple sources across the farm and process it through sophisticated AI algorithms. These systems provide centralized intelligence, turning disconnected data points into actionable insights delivered through user-friendly dashboards. Farmers can make data-driven decisions from anywhere using smartphones or computers.",
+            image: cloudComputing,
+            icon: <Cloud className="w-8 h-8" />
         }
     ];
 
@@ -103,18 +104,18 @@ function Irrigation() {
             <Navbar />
             {/* Hero Section */}
             <section className="relative h-screen overflow-hidden bg-gradient-to-br from-green-600 to-green-800">
-            <div className="absolute inset-0 bg-black opacity-60 z-10"></div>
-            <motion.div
+                <div className="absolute inset-0 bg-black opacity-60 z-10"></div>
+                <motion.div
                     className="absolute inset-0 z-0"
                     initial={{ scale: 1.1 }}
                     animate={{ scale: 1 }}
                     transition={{ duration: 20, repeat: Infinity, repeatType: "reverse" }}
                 >
                     <img
-      src={watersmart}
-      alt="Smart irrigation system in field"
-      className="w-full h-full object-cover"
-    />
+                        src={aiHero}
+                        alt="AI technology in agriculture"
+                        className="w-full h-full object-cover"
+                    />
                 </motion.div>
                 <div className="relative z-20 flex flex-col items-center justify-center h-full text-center px-6">
                     <motion.h1
@@ -123,7 +124,7 @@ function Irrigation() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 1, delay: 0.2 }}
                     >
-                        Water Conservation Revolution
+                        Agricultural Intelligence
                     </motion.h1>
                     <motion.h2
                         className="text-3xl md:text-4xl font-bold text-green-300 mb-8"
@@ -131,7 +132,7 @@ function Irrigation() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 1, delay: 0.4 }}
                     >
-                        Smart Irrigation Systems
+                        AI-Powered Farming Solutions
                     </motion.h2>
                     <motion.p
                         className="text-xl text-gray-100 max-w-3xl mb-10"
@@ -139,7 +140,7 @@ function Irrigation() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 1, delay: 0.6 }}
                     >
-                        Agricultural irrigation accounts for 70% of global freshwater use. Smart systems can reduce water consumption by 30-50% while increasing crop yields by up to 25%.
+                        Artificial intelligence is transforming agriculture with data-driven insights, autonomous operations, and predictive capabilities that increase yields by up to 35% while dramatically reducing resource waste.
                     </motion.p>
                     <motion.div
                         initial={{ opacity: 0, scale: 0.8 }}
@@ -147,7 +148,7 @@ function Irrigation() {
                         transition={{ duration: 0.8, delay: 0.8 }}
                     >
                         <a href="#features" className="bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-8 rounded-full inline-block transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
-                            Explore Features
+                            Explore Technologies
                         </a>
                     </motion.div>
                 </div>
@@ -176,7 +177,7 @@ function Irrigation() {
                         animate={isVisible['stats-title'] ? "visible" : "hidden"}
                         id="stats-title"
                     >
-                        The Impact of Smart Irrigation
+                        The Impact of AI in Agriculture
                     </motion.h2>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -213,7 +214,7 @@ function Irrigation() {
                         initial="hidden"
                         animate={isVisible['features-title'] ? "visible" : "hidden"}
                     >
-                        Key Features of Smart Irrigation Systems
+                        Key AI Technologies for Smart Farming
                     </motion.h2>
 
                     <div className="relative">
@@ -290,7 +291,7 @@ function Irrigation() {
                         initial="hidden"
                         animate={isVisible['benefits-title'] ? "visible" : "hidden"}
                     >
-                        Why Smart Irrigation is a Game-Changer
+                        Why AI is Revolutionizing Agriculture
                     </motion.h2>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -304,12 +305,12 @@ function Irrigation() {
                         >
                             <div className="flex items-center gap-4 mb-4">
                                 <div className="bg-green-400 bg-opacity-20 p-3 rounded-full">
-                                    <Droplet className="w-6 h-6" />
+                                    <Brain className="w-6 h-6" />
                                 </div>
-                                <h3 className="text-xl font-bold">Water Conservation</h3>
+                                <h3 className="text-xl font-bold">Data-Driven Decisions</h3>
                             </div>
                             <p className="text-black text-opacity-90">
-                                Smart irrigation systems can reduce water usage by 30-50% compared to conventional methods, addressing one of agriculture's most pressing challenges - sustainable water use.
+                                AI systems analyze millions of data points to provide insights that would be impossible for humans to discover, enabling farmers to make precision decisions that optimize every aspect of crop production.
                             </p>
                         </motion.div>
 
@@ -324,12 +325,12 @@ function Irrigation() {
                         >
                             <div className="flex items-center gap-4 mb-4">
                                 <div className="bg-green-400 bg-opacity-20 p-3 rounded-full">
-                                    <BarChart2 className="w-6 h-6" />
+                                    <Server className="w-6 h-6" />
                                 </div>
-                                <h3 className="text-xl font-bold">Increased Yields</h3>
+                                <h3 className="text-xl font-bold">Autonomous Operations</h3>
                             </div>
                             <p className="text-black text-opacity-90">
-                                Farmers see increased crop yields (up to 25%) due to optimized growing conditions, while also benefiting from lower water and energy bills.
+                                AI-powered autonomous systems reduce labor requirements while improving precision, allowing farms to operate efficiently even with workforce shortages and increasing labor costs.
                             </p>
                         </motion.div>
 
@@ -344,12 +345,12 @@ function Irrigation() {
                         >
                             <div className="flex items-center gap-4 mb-4">
                                 <div className="bg-green-400 bg-opacity-20 p-3 rounded-full">
-                                    <CloudRain className="w-6 h-6" />
+                                    <Database className="w-6 h-6" />
                                 </div>
-                                <h3 className="text-xl font-bold">Environmental Protection</h3>
+                                <h3 className="text-xl font-bold">Sustainable Resource Use</h3>
                             </div>
                             <p className="text-black text-opacity-90">
-                                Minimizes water waste and reduces the runoff of fertilizers and pesticides into nearby waterways by up to 90%, protecting local ecosystems.
+                                Predictive AI models optimize the use of water, fertilizers, and pesticides, reducing environmental impact while maintaining or increasing yields to meet growing global food demands.
                             </p>
                         </motion.div>
                     </div>
@@ -366,7 +367,7 @@ function Irrigation() {
                         initial="hidden"
                         animate={isVisible['future-title'] ? "visible" : "hidden"}
                     >
-                        Future Trends & Innovations
+                        Emerging AI Agricultural Technologies
                     </motion.h2>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -379,12 +380,12 @@ function Irrigation() {
                             animate={isVisible['future-tech-1'] ? "visible" : "hidden"}
                         >
                             <div className="h-48 overflow-hidden bg-blue-100 flex items-center justify-center">
-                                <Zap className="w-20 h-20 text-green-400" />
+                                <Cpu className="w-20 h-20 text-green-400" />
                             </div>
                             <div className="p-6">
-                                <h3 className="text-xl font-bold text-gray-800 mb-3">Solar-Powered Systems</h3>
+                                <h3 className="text-xl font-bold text-gray-800 mb-3">Swarm Robotics</h3>
                                 <p className="text-gray-600">
-                                    Solar-powered systems are bringing irrigation capabilities to off-grid areas, particularly in developing countries, making smart irrigation accessible to more farmers worldwide.
+                                    Networks of small, specialized AI-powered robots are being developed to work collaboratively across fields, performing tasks like planting, weeding, and harvesting with unprecedented precision and efficiency.
                                 </p>
                             </div>
                         </motion.div>
@@ -399,12 +400,12 @@ function Irrigation() {
                             transition={{ delay: 0.2 }}
                         >
                             <div className="h-48 overflow-hidden bg-blue-100 flex items-center justify-center">
-                                <Wifi className="w-20 h-20 text-green-400" />
+                                <Code className="w-20 h-20 text-green-400" />
                             </div>
                             <div className="p-6">
-                                <h3 className="text-xl font-bold text-gray-800 mb-3">5G & Advanced AI</h3>
+                                <h3 className="text-xl font-bold text-gray-800 mb-3">Digital Twin Technology</h3>
                                 <p className="text-gray-600">
-                                    The integration of 5G networks will enable faster data transmission and real-time decision making. AI will become more sophisticated in predicting water needs and optimizing schedules.
+                                    AI-powered digital twins create virtual replicas of entire farms, allowing farmers to test different scenarios and management strategies in a simulated environment before implementing them in the real world.
                                 </p>
                             </div>
                         </motion.div>
@@ -422,7 +423,7 @@ function Irrigation() {
                         initial="hidden"
                         animate={isVisible['challenges-title'] ? "visible" : "hidden"}
                     >
-                        Current Challenges
+                        Implementation Challenges
                     </motion.h2>
 
                     <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
@@ -438,10 +439,10 @@ function Irrigation() {
                                 >
                                     <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
                                         <AlertCircle className="text-green-500" />
-                                        <span>Initial Investment</span>
+                                        <span>Integration Complexity</span>
                                     </h3>
                                     <p className="text-gray-600">
-                                        The upfront cost of smart irrigation systems can be prohibitive for small-scale farmers, despite long-term savings. Financing options and government subsidies are helping to address this barrier.
+                                        Integrating AI systems with existing farm equipment and practices requires significant planning and often custom solutions. Standardization efforts and plug-and-play AI modules are making adoption easier.
                                     </p>
                                 </motion.div>
 
@@ -456,10 +457,10 @@ function Irrigation() {
                                 >
                                     <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
                                         <AlertCircle className="text-green-500" />
-                                        <span>Technical Knowledge</span>
+                                        <span>Data Quality & Access</span>
                                     </h3>
                                     <p className="text-gray-600">
-                                        Farmers need training to effectively use and maintain these systems. Extension services and user-friendly interfaces are making the technology more accessible to non-technical users.
+                                        AI systems require large amounts of high-quality data, which can be difficult to collect in remote agricultural areas. Improving rural connectivity and developing offline AI capabilities are addressing this challenge.
                                     </p>
                                 </motion.div>
 
@@ -474,10 +475,10 @@ function Irrigation() {
                                 >
                                     <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
                                         <AlertCircle className="text-green-500" />
-                                        <span>Infrastructure Requirements</span>
+                                        <span>Training & Skills Gap</span>
                                     </h3>
                                     <p className="text-gray-600">
-                                        Reliable internet connectivity and power supply are essential for full functionality, which can be lacking in remote agricultural areas. Hybrid systems with offline capabilities are being developed.
+                                        Many farmers lack the technical background to fully leverage AI solutions. Educational programs and increasingly intuitive user interfaces are helping bridge this knowledge gap.
                                     </p>
                                 </motion.div>
 
@@ -492,10 +493,10 @@ function Irrigation() {
                                 >
                                     <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
                                         <AlertCircle className="text-green-500" />
-                                        <span>Maintenance</span>
+                                        <span>Investment Requirements</span>
                                     </h3>
                                     <p className="text-gray-600">
-                                        Sensors and automated components require regular calibration and maintenance. Newer systems are being designed with self-diagnostic capabilities and more durable components.
+                                        The initial cost of implementing comprehensive AI systems can be prohibitive for small and medium-sized farms. Emerging subscription models and government incentives are making these technologies more accessible.
                                     </p>
                                 </motion.div>
                             </div>
@@ -514,7 +515,7 @@ function Irrigation() {
                         initial="hidden"
                         animate={isVisible['cta-title'] ? "visible" : "hidden"}
                     >
-                        Ready to Transform Your Irrigation?
+                        Ready to Transform Your Farm with AI?
                     </motion.h2>
 
                     <motion.p
@@ -525,7 +526,7 @@ function Irrigation() {
                         animate={isVisible['cta-text'] ? "visible" : "hidden"}
                         transition={{ delay: 0.2 }}
                     >
-                        Smart irrigation technology offers a sustainable solution to water scarcity while improving crop yields and reducing costs. The future of agriculture is precise, efficient, and water-smart.
+                        The future of agriculture is intelligent, data-driven, and sustainable. Our AI solutions can help your farm increase productivity, reduce costs, and prepare for the challenges of tomorrow's agriculture.
                     </motion.p>
 
                     <motion.div
@@ -541,13 +542,13 @@ function Irrigation() {
                                 href="#contact"
                                 className="bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-8 rounded-full inline-block transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                             >
-                                Get a Consultation
+                                Request Assessment
                             </a>
                             <a
                                 href="#learn-more"
                                 className="bg-transparent hover:bg-gray-800 text-white font-bold py-4 px-8 rounded-full inline-block transition-all duration-300 border-2 border-white hover:border-blue-300"
                             >
-                                Download Brochure
+                                Download AI Guide
                             </a>
                         </div>
                     </motion.div>
@@ -559,4 +560,4 @@ function Irrigation() {
     );
 }
 
-export default Irrigation;
+export default AiSolutions;

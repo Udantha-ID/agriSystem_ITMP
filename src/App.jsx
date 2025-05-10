@@ -14,6 +14,9 @@ import SmartFarm from "./Pages/SmartFarm/SmartFarm.jsx";
 import UserProfile from "./Pages/SmartFarm/UserProfile.jsx";
 import Explore from "./Pages/SmartFarm/Explore.jsx";
 import Drone from "./Pages/SmartFarm/Drone.jsx";
+import AISolutions from "./Pages/SmartFarm/AISolutions.jsx";
+import GPSTracking from "./Pages/SmartFarm/GPSTracking.jsx";
+import VerticalFarming from "./Pages/SmartFarm/VerticalFarming.jsx";
 import Irrigation from "./pages/SmartFarm/Irrigation.jsx";
 import UserDashboard from "./pages/SmartFarm/UserDashboard.jsx";
 import PlantationDashboard from './Pages/PlantationManagement/PlantationDashboard.jsx'
@@ -92,6 +95,9 @@ function App() {
           <Route path="/drone" element={<Drone />} />
           <Route path="/irrigation" element={<Irrigation />} />
           <Route path="/user-dashboard" element={<UserDashboard />} />
+          <Route path="/ai" element={<AISolutions />} />
+          <Route path="/gps" element={<GPSTracking />} />
+          <Route path="/vertical" element={<VerticalFarming />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
