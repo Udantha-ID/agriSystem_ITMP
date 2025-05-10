@@ -124,7 +124,7 @@ const Marketplace = () => {
                     <>
                       {!failedImages[product._id] && (
                         <img
-                          src={`${product.imageUrl}?${new Date().getTime()}`}
+                          src={product.imageUrl}
                           alt={product.name}
                           className={`w-full h-full object-cover transition-opacity duration-300 ${
                             loadedImages[product._id] ? 'opacity-100' : 'opacity-0'
@@ -164,7 +164,7 @@ const Marketplace = () => {
                   <h3 className="font-semibold text-lg mb-1 truncate">{product.name}</h3>
                   <p className="text-gray-600 text-sm mb-2 capitalize">{product.category}</p>
                   <div className="flex justify-between items-center">
-                    <span className="font-bold">₹{product.price.toFixed(2)}</span>
+                    <span className="font-bold">Rs.{product.price.toFixed(2)}</span>
                     <button
                       onClick={() => addToCart(product)}
                       className="flex items-center gap-1 bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm"
@@ -210,12 +210,12 @@ const Marketplace = () => {
                         <div className="w-16 h-16 bg-gray-100 rounded overflow-hidden flex-shrink-0">
                           {item.product.imageUrl ? (
                             <img 
-                              src={`${item.product.imageUrl}?${new Date().getTime()}`}
+                              src={item.product.imageUrl}
                               alt={item.product.name}
                               className="w-full h-full object-cover"
                               onError={(e) => {
-                                e.target.src = 'https://via.placeholder.com/100?text=No+Image';
-                                e.target.className = 'w-full h-full object-contain p-2';
+                                e.target.className = 'w-full h-full flex items-center justify-center text-xs text-gray-400';
+                                e.target.innerText = 'Image not available';
                               }}
                             />
                           ) : (
