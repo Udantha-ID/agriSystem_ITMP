@@ -13,21 +13,47 @@ const AddProduct = () => {
     description: '',
     imageUrl: ''
   });
+  const [preview, setPreview] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
   const categories = ['coconuts', 'oil', 'beverages', 'baking', 'snacks', 'vegetables', 'fertilizers'];
 
+  const handleImageUrlChange = (e) => {
+    const url = e.target.value;
+    setNewProduct({...newProduct, imageUrl: url});
+    setPreview(url);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    setError('');
+    
     try {
+      const productData = {
+        name: newProduct.name,
+        category: newProduct.category,
+        price: parseFloat(newProduct.price),
+        stock: parseInt(newProduct.stock),
+        threshold: parseInt(newProduct.threshold),
+        description: newProduct.description,
+        imageUrl: newProduct.imageUrl
+      };
+
       const response = await fetch('http://localhost:5000/products', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newProduct)
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(productData)
       });
-      if (!response.ok) throw new Error('Failed to add product');
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to add product');
+      }
+      
       navigate('/inventory');
     } catch (err) {
       setError(err.message);
@@ -49,6 +75,12 @@ const AddProduct = () => {
             </button>
             <h1 className="text-xl font-semibold">Add New Product</h1>
           </div>
+
+          {error && (
+            <div className="mb-4 p-3 bg-red-100 text-red-700 rounded">
+              {error}
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
@@ -118,12 +150,32 @@ const AddProduct = () => {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Image URL</label>
               <input
-                type="text"
+                type="url"
                 className="w-full p-2 border rounded"
                 value={newProduct.imageUrl}
-                onChange={(e) => setNewProduct({...newProduct, imageUrl: e.target.value})}
+                onChange={handleImageUrlChange}
+                placeholder="https://example.com/image.jpg"
               />
+              <p className="text-xs text-gray-500 mt-1">Enter a direct link to an image (optional)</p>
             </div>
+
+            {preview && (
+              <div className="mt-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">Image Preview</label>
+                <div className="w-full h-48 bg-gray-100 rounded border flex items-center justify-center overflow-hidden">
+                  <img 
+                    src={preview} 
+                    alt="Preview" 
+                    className="max-h-full max-w-full object-contain"
+                    onError={(e) => {
+                      setPreview('');
+                      e.target.onerror = null;
+                      alert('Could not load the image. Please check the URL.');
+                    }}
+                  />
+                </div>
+              </div>
+            )}
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
@@ -135,12 +187,10 @@ const AddProduct = () => {
               />
             </div>
 
-            {error && <div className="text-red-500 text-sm">{error}</div>}
-
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-2 bg-green-600 text-white rounded hover:bg-green-700"
+              className="w-full py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:bg-green-400"
             >
               {isLoading ? 'Adding...' : 'Add Product'}
             </button>
