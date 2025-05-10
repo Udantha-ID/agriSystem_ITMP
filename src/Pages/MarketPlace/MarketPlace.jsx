@@ -288,11 +288,11 @@ const Marketplace = () => {
             {products.map(product => (
               <div key={product._id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition duration-300 flex flex-col h-full border border-gray-100">
                 <div className="relative h-48 bg-gradient-to-b from-gray-50 to-gray-100">
-                  <div className="w-full h-full flex items-center justify-center p-4">
+                  <div className="w-full h-full">
                     <img
                       src={product.imageUrl || `https://via.placeholder.com/300/f3f4f6/64748b?text=${encodeURIComponent(product.name)}`}
                       alt={product.name}
-                      className="max-h-full max-w-full object-contain drop-shadow-sm"
+                      className="w-full h-full object-contain"
                       onError={(e) => {
                         e.target.src = `https://via.placeholder.com/300/f3f4f6/64748b?text=${encodeURIComponent(product.name)}`;
                       }}
@@ -314,6 +314,9 @@ const Marketplace = () => {
                 </div>
                 <div className="p-4 flex-1 flex flex-col">
                   <h3 className="font-semibold text-lg mb-1 text-gray-800 truncate">{product.name}</h3>
+                  {product.description && (
+                    <p className="text-gray-600 text-sm mt-1 line-clamp-2">{product.description}</p>
+                  )}
                   <div className="mt-auto pt-3 flex justify-between items-center">
                     <span className="font-bold text-lg bg-gradient-to-r from-emerald-600 to-green-600 bg-clip-text text-transparent">Rs.{product.price.toFixed(2)}</span>
                     <button
@@ -364,11 +367,11 @@ const Marketplace = () => {
                     {cart.map(item => (
                       <div key={item.product._id} className="flex gap-4 py-4 border-b">
                         <div className="w-16 h-16 bg-gradient-to-b from-gray-50 to-gray-100 rounded-lg overflow-hidden flex-shrink-0 border border-gray-100">
-                          <div className="w-full h-full flex items-center justify-center">
+                          <div className="w-full h-full">
                             <img 
                               src={item.product.imageUrl || `https://via.placeholder.com/100/f3f4f6/64748b?text=${encodeURIComponent(item.product.name.substring(0, 10))}`}
                               alt={item.product.name}
-                              className="max-h-full max-w-full object-contain p-1"
+                              className="w-full h-full object-contain"
                               onError={(e) => {
                                 e.target.src = `https://via.placeholder.com/100/f3f4f6/64748b?text=${encodeURIComponent(item.product.name.substring(0, 10))}`;
                               }}
@@ -377,6 +380,9 @@ const Marketplace = () => {
                         </div>
                         <div className="flex-1 min-w-0">
                           <h3 className="font-medium text-gray-800 truncate">{item.product.name}</h3>
+                          {item.product.description && (
+                            <p className="text-gray-500 text-xs line-clamp-1 mb-1">{item.product.description}</p>
+                          )}
                           <p className="text-emerald-600 font-medium">Rs.{item.product.price.toFixed(2)}</p>
                           <div className="flex items-center gap-2 mt-2 bg-gray-100 rounded-lg p-1 inline-flex">
                             <button
