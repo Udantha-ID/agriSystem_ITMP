@@ -23,6 +23,9 @@ export const LandCanvas = ({ width, height, onBoundaryUpdate, drawingActive, sca
   const [isOutOfBounds, setIsOutOfBounds] = useState(false);
   const stageRef = useRef(null);
   const containerRef = useRef(null);
+  const [imageNaturalSize, setImageNaturalSize] = useState({ width: 0, height: 0 });
+  const [imageDrawSize, setImageDrawSize] = useState({ width: 0, height: 0 });
+  const [imageOffset, setImageOffset] = useState({ x: 0, y: 0 });
 
   // Constants for padding and boundary limits
   const CANVAS_PADDING = 20; // Padding from edge of canvas
@@ -57,7 +60,16 @@ export const LandCanvas = ({ width, height, onBoundaryUpdate, drawingActive, sca
       reader.onload = (e) => {
         const img = new window.Image();
         img.onload = () => {
-          const scale = Math.min(width / img.width, height / img.height);
+          // Calculate scale to fit image within canvas, but never scale up
+          const scale = Math.min(width / img.width, height / img.height, 1);
+          const drawWidth = img.width * scale;
+          const drawHeight = img.height * scale;
+          // Center the image
+          const offsetX = (width - drawWidth) / 2;
+          const offsetY = (height - drawHeight) / 2;
+          setImageNaturalSize({ width: img.width, height: img.height });
+          setImageDrawSize({ width: drawWidth, height: drawHeight });
+          setImageOffset({ x: offsetX, y: offsetY });
           setImageScale({ x: scale, y: scale });
         };
         img.src = e.target?.result;
@@ -538,8 +550,10 @@ export const LandCanvas = ({ width, height, onBoundaryUpdate, drawingActive, sca
             {image && (
               <KonvaImage
                 image={image}
-                width={width * imageScale.x}
-                height={height * imageScale.y}
+                x={imageOffset.x}
+                y={imageOffset.y}
+                width={imageDrawSize.width}
+                height={imageDrawSize.height}
                 opacity={0.4}
               />
             )}
