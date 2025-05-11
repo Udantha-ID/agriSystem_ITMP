@@ -60,11 +60,25 @@ export const TreeVisualization = ({
 
     const trees = [];
     
+    // Add minimum distance from boundary (in pixels)
+    const minDistanceFromBoundary = 10; // Minimum distance in pixels from boundary
+    
     for (let x = minX; x <= maxX; x += pixelSpacingH) {
       for (let y = minY; y <= maxY; y += pixelSpacingV) {
         const point = { x, y };
-        // Only plant if inside plantable area
-        if (isPointInPolygon(point, getPlantableArea)) {
+        
+        // Check if point is far enough from boundary
+        const isFarFromBoundary = boundary.every((boundaryPoint, index) => {
+          const nextIndex = (index + 1) % boundary.length;
+          const nextPoint = boundary[nextIndex];
+          
+          // Calculate distance from point to line segment
+          const distance = distanceToLineSegment(point, boundaryPoint, nextPoint);
+          return distance >= minDistanceFromBoundary;
+        });
+
+        // Only plant if inside plantable area and far enough from boundary
+        if (isPointInPolygon(point, getPlantableArea) && isFarFromBoundary) {
           trees.push({
             position: point,
             size: 3 + (Math.min(1, simulationYear / 5) * 4),
@@ -75,6 +89,40 @@ export const TreeVisualization = ({
     }
 
     return trees;
+  };
+
+  // Helper function to calculate distance from point to line segment
+  const distanceToLineSegment = (point, lineStart, lineEnd) => {
+    const A = point.x - lineStart.x;
+    const B = point.y - lineStart.y;
+    const C = lineEnd.x - lineStart.x;
+    const D = lineEnd.y - lineStart.y;
+
+    const dot = A * C + B * D;
+    const lenSq = C * C + D * D;
+    let param = -1;
+
+    if (lenSq !== 0) {
+      param = dot / lenSq;
+    }
+
+    let xx, yy;
+
+    if (param < 0) {
+      xx = lineStart.x;
+      yy = lineStart.y;
+    } else if (param > 1) {
+      xx = lineEnd.x;
+      yy = lineEnd.y;
+    } else {
+      xx = lineStart.x + param * C;
+      yy = lineStart.y + param * D;
+    }
+
+    const dx = point.x - xx;
+    const dy = point.y - yy;
+
+    return Math.sqrt(dx * dx + dy * dy);
   };
 
   const isPointInPolygon = (point, polygon) => {
