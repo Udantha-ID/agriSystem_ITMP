@@ -5,6 +5,8 @@ import Navbar from '../../Components/Navbar';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import Footer from '../../Components/Footer';
 import { useAuth } from '../../context/AuthContext';
+import Swal from 'sweetalert2';
+import 'sweetalert2/dist/sweetalert2.min.css';
 
 const UserLogin = () => {
   const navigate = useNavigate();
@@ -12,32 +14,25 @@ const UserLogin = () => {
   const { login, isAuthenticated, isInitialized } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   
-  // Pre-fill email if coming from registration
   const [formData, setFormData] = useState({
     email: location.state?.email || '',
     password: '',
   });
   
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(location.state?.registrationSuccess ? 
     'Account created successfully! Please log in.' : null);
   
-  // Get redirect path from location state if available
   const from = location.state?.from || '/';
   
-  // Only redirect when authentication is initialized and user is authenticated
   useEffect(() => {
     if (isInitialized && isAuthenticated) {
-      // Redirect to home page or dashboard instead of login
       navigate(from, { replace: true });
     }
   }, [isInitialized, isAuthenticated, navigate, from]);
 
-  // Clear location state after consuming it
   useEffect(() => {
     if (location.state?.registrationSuccess) {
-      // Clean up the location state
       window.history.replaceState({}, document.title);
     }
   }, [location]);
@@ -48,25 +43,81 @@ const UserLogin = () => {
       ...prevData,
       [name]: value,
     }));
-    // Clear error when user starts typing
-    if (error) setError(null);
+  };
+
+  const showSuccessAlert = (userName) => {
+    Swal.fire({
+      title: `Welcome ${userName}!`,
+      text: 'You have successfully logged in',
+      icon: 'success',
+      confirmButtonText: 'OK',
+      showCancelButton: false,
+      timer: 3000,
+      timerProgressBar: true,
+      customClass: {
+        popup: 'animated fadeInDown',
+        title: 'text-2xl font-bold text-green-600',
+        content: 'text-gray-600',
+        confirmButton: 'bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg'
+      },
+      background: '#ffffff',
+      backdrop: `
+        rgba(0,0,0,0.4)
+        left top
+        no-repeat
+      `
+    }).then(() => {
+      navigate("/");
+    });
+  };
+
+  const showErrorAlert = (errorMessage) => {
+    Swal.fire({
+      title: 'Login Failed',
+      text: errorMessage,
+      icon: 'error',
+      confirmButtonText: 'Try Again',
+      showCancelButton: false,
+      customClass: {
+        popup: 'animated fadeInDown',
+        title: 'text-2xl font-bold text-red-600',
+        content: 'text-gray-600',
+        confirmButton: 'bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-lg'
+      },
+      background: '#ffffff',
+      backdrop: `
+        rgba(0,0,0,0.4)
+        left top
+        no-repeat
+      `
+    });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    setError(null);
     setSuccessMessage(null);
     
     try {
-      // Call login from auth context
       const response = await login(formData.email, formData.password);
       if (response && response.user) {
-        // Navigate happens in the useEffect after auth state changes
-        navigate('/', { replace: true });
+        // Get user's name from the response or use email as fallback
+        const userName = response.user.name || response.user.email.split('@')[0];
+        showSuccessAlert(userName);
       }
     } catch (err) {
-      setError(err.message || 'Invalid credentials. Please try again.');
+      let errorMessage = 'Invalid credentials. Please try again.';
+      
+      // More specific error messages based on the error
+      if (err.message.includes('email')) {
+        errorMessage = 'Invalid email address. Please check and try again.';
+      } else if (err.message.includes('password')) {
+        errorMessage = 'Incorrect password. Please try again.';
+      } else if (err.message.includes('network')) {
+        errorMessage = 'Network error. Please check your connection and try again.';
+      }
+      
+      showErrorAlert(errorMessage);
       setIsLoading(false);
     }
   };
@@ -86,7 +137,7 @@ const UserLogin = () => {
           onSubmit={handleSubmit}
           className="bg-white bg-opacity-90 backdrop-blur-sm p-8 rounded-lg shadow-lg w-full max-w-md"
         >
-          {/* Display success message if there is one */}
+          {/* Registration Success Message */}
           {successMessage && (
             <motion.div 
               initial={{ opacity: 0, y: -10 }}
@@ -94,17 +145,6 @@ const UserLogin = () => {
               className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4"
             >
               {successMessage}
-            </motion.div>
-          )}
-
-          {/* Display error message if there is one */}
-          {error && (
-            <motion.div 
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4"
-            >
-              {error}
             </motion.div>
           )}
 

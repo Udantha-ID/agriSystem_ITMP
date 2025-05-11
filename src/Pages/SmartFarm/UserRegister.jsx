@@ -6,6 +6,8 @@ import Navbar from '../../Components/Navbar';
 import { useNavigate } from 'react-router-dom';
 import Footer from '../../Components/Footer';
 import authService from '../../services/authService';
+import Swal from 'sweetalert2';
+import 'sweetalert2/dist/sweetalert2.min.css';
 
 const UserRegister = () => {
   const navigate = useNavigate();
@@ -109,7 +111,21 @@ const UserRegister = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!agreed) return;
+    if (!agreed) {
+      Swal.fire({
+        title: 'Terms Required',
+        text: 'Please agree to the Terms of Service and Privacy Policy',
+        icon: 'warning',
+        confirmButtonText: 'OK',
+        customClass: {
+          popup: 'animated fadeInDown',
+          title: 'text-2xl font-bold text-yellow-600',
+          content: 'text-gray-600',
+          confirmButton: 'bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-2 rounded-lg'
+        }
+      });
+      return;
+    }
 
     // Form validation
     if (!validateEmail(formData.email)) {
@@ -136,23 +152,54 @@ const UserRegister = () => {
       // Call the register API directly instead of using the auth context
       await authService.registerOnly(userData);
       
-      // Set registration success state
-      setRegistrationSuccess(true);
-      
-      // Redirect to login page after 2 seconds with a success message
-      setTimeout(() => {
+      // Show success message with SweetAlert2
+      Swal.fire({
+        title: 'Success!',
+        text: 'Your account has been created successfully',
+        icon: 'success',
+        confirmButtonText: 'Continue to Login',
+        showCancelButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        customClass: {
+          popup: 'animated fadeInDown',
+          title: 'text-2xl font-bold text-green-600',
+          content: 'text-gray-600',
+          confirmButton: 'bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg'
+        },
+        background: '#ffffff',
+        backdrop: `
+          rgba(0,0,0,0.4)
+          left top
+          no-repeat
+        `
+      }).then(() => {
         navigate('/login', { 
           state: { 
             registrationSuccess: true,
             email: formData.email 
           }
         });
-      }, 2000);
+      });
     } catch (error) {
-      setErrors(prev => ({ 
-        ...prev, 
-        server: error.message || 'Registration failed. Please try again.' 
-      }));
+      Swal.fire({
+        title: 'Registration Failed',
+        text: error.message || 'Registration failed. Please try again.',
+        icon: 'error',
+        confirmButtonText: 'Try Again',
+        customClass: {
+          popup: 'animated fadeInDown',
+          title: 'text-2xl font-bold text-red-600',
+          content: 'text-gray-600',
+          confirmButton: 'bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-lg'
+        },
+        background: '#ffffff',
+        backdrop: `
+          rgba(0,0,0,0.4)
+          left top
+          no-repeat
+        `
+      });
       setIsLoading(false);
     }
   };
