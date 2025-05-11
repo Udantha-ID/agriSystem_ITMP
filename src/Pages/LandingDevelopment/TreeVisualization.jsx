@@ -14,11 +14,35 @@ export const TreeVisualization = ({
   const [simulationYear, setSimulationYear] = useState(0);
   const bufferDistance = 2; // 2 meter buffer
 
+  // --- Centering and Zoom Logic ---
+  const zoomFactor = 0.5; // 90% of canvas size for a little bigger
+  let minX = 0, minY = 0, maxX = 0, maxY = 0;
+  if (boundary.length > 0) {
+    minX = Math.min(...boundary.map(p => p.x));
+    maxX = Math.max(...boundary.map(p => p.x));
+    minY = Math.min(...boundary.map(p => p.y));
+    maxY = Math.max(...boundary.map(p => p.y));
+  }
+  const bboxWidth = maxX - minX;
+  const bboxHeight = maxY - minY;
+  const layoutScale = bboxWidth && bboxHeight
+    ? Math.min(width / bboxWidth, height / bboxHeight) * zoomFactor
+    : 1;
+  const offsetX = bboxWidth
+    ? (width - bboxWidth * layoutScale) / 2 - minX * layoutScale
+    : 0;
+  const offsetY = bboxHeight
+    ? (height - bboxHeight * layoutScale) / 2 - minY * layoutScale
+    : 0;
+  // Helper to transform points
+  const tx = (x) => x * layoutScale + offsetX;
+  const ty = (y) => y * layoutScale + offsetY;
+
+  // --- END Centering and Zoom Logic ---
+
   // Calculate the area where trees can be planted (inside boundary but away from edges)
   const getPlantableArea = useMemo(() => {
     if (boundary.length < 3) return boundary;
-    
-    // Calculate centroid
     let centroid = { x: 0, y: 0 };
     boundary.forEach(point => {
       centroid.x += point.x;
@@ -26,8 +50,6 @@ export const TreeVisualization = ({
     });
     centroid.x /= boundary.length;
     centroid.y /= boundary.length;
-
-    // Scale points inward to create buffer
     return boundary.map(point => {
       const vector = {
         x: centroid.x - point.x,
@@ -38,7 +60,6 @@ export const TreeVisualization = ({
         x: vector.x / length,
         y: vector.y / length
       };
-      
       const bufferInCanvasUnits = bufferDistance / scale;
       return {
         x: point.x + normalized.x * bufferInCanvasUnits,
@@ -49,35 +70,23 @@ export const TreeVisualization = ({
 
   const calculateTreePositions = () => {
     if (boundary.length < 3) return [];
-
     const minX = Math.min(...boundary.map(p => p.x));
     const maxX = Math.max(...boundary.map(p => p.x));
     const minY = Math.min(...boundary.map(p => p.y));
     const maxY = Math.max(...boundary.map(p => p.y));
-
     const pixelSpacingH = spacing.horizontal / scale;
     const pixelSpacingV = spacing.vertical / scale;
-
     const trees = [];
-    
-    // Add minimum distance from boundary (in pixels)
     const minDistanceFromBoundary = 10; // Minimum distance in pixels from boundary
-    
     for (let x = minX; x <= maxX; x += pixelSpacingH) {
       for (let y = minY; y <= maxY; y += pixelSpacingV) {
         const point = { x, y };
-        
-        // Check if point is far enough from boundary
         const isFarFromBoundary = boundary.every((boundaryPoint, index) => {
           const nextIndex = (index + 1) % boundary.length;
           const nextPoint = boundary[nextIndex];
-          
-          // Calculate distance from point to line segment
           const distance = distanceToLineSegment(point, boundaryPoint, nextPoint);
           return distance >= minDistanceFromBoundary;
         });
-
-        // Only plant if inside plantable area and far enough from boundary
         if (isPointInPolygon(point, getPlantableArea) && isFarFromBoundary) {
           trees.push({
             position: point,
@@ -87,7 +96,6 @@ export const TreeVisualization = ({
         }
       }
     }
-
     return trees;
   };
 
@@ -168,7 +176,7 @@ export const TreeVisualization = ({
 
           {/* Draw the original boundary line with enhanced styling */}
           <Line
-            points={boundary.flatMap(p => [p.x, p.y])}
+            points={boundary.flatMap(p => [tx(p.x), ty(p.y)])}
             stroke="#2563eb"
             strokeWidth={3}
             closed={true}
@@ -193,16 +201,16 @@ export const TreeVisualization = ({
             >
               {/* Tree shadow */}
               <Circle
-                x={tree.position.x + 2}
-                y={tree.position.y + 2}
+                x={tx(tree.position.x) + 2}
+                y={ty(tree.position.y) + 2}
                 radius={tree.size}
                 fill="rgba(0, 0, 0, 0.2)"
                 shadowBlur={5}
               />
               {/* Tree circle */}
               <Circle
-                x={tree.position.x}
-                y={tree.position.y}
+                x={tx(tree.position.x)}
+                y={ty(tree.position.y)}
                 radius={tree.size}
                 fill={tree.color}
                 shadowColor="black"
@@ -212,8 +220,8 @@ export const TreeVisualization = ({
               />
               {/* Tree highlight */}
               <Circle
-                x={tree.position.x - tree.size * 0.3}
-                y={tree.position.y - tree.size * 0.3}
+                x={tx(tree.position.x) - tree.size * 0.3}
+                y={ty(tree.position.y) - tree.size * 0.3}
                 radius={tree.size * 0.3}
                 fill="rgba(255, 255, 255, 0.3)"
               />
@@ -225,8 +233,8 @@ export const TreeVisualization = ({
             <Group>
               {/* Tooltip background */}
               <Rect
-                x={selectedTree.position.x + 15}
-                y={selectedTree.position.y - 30}
+                x={tx(selectedTree.position.x) + 15}
+                y={ty(selectedTree.position.y) - 30}
                 width={120}
                 height={40}
                 fill="white"
@@ -237,8 +245,8 @@ export const TreeVisualization = ({
               />
               {/* Tooltip border */}
               <Rect
-                x={selectedTree.position.x + 15}
-                y={selectedTree.position.y - 30}
+                x={tx(selectedTree.position.x) + 15}
+                y={ty(selectedTree.position.y) - 30}
                 width={120}
                 height={40}
                 stroke="#e5e7eb"
@@ -247,16 +255,16 @@ export const TreeVisualization = ({
               />
               {/* Tooltip text */}
               <Text
-                x={selectedTree.position.x + 20}
-                y={selectedTree.position.y - 20}
+                x={tx(selectedTree.position.x) + 20}
+                y={ty(selectedTree.position.y) - 20}
                 text={`Tree ${simulationYear} yrs`}
                 fontSize={14}
                 fill="#1a1a1a"
                 fontFamily="Arial"
               />
               <Text
-                x={selectedTree.position.x + 20}
-                y={selectedTree.position.y}
+                x={tx(selectedTree.position.x) + 20}
+                y={ty(selectedTree.position.y)}
                 text={`Size: ${(selectedTree.size * 2).toFixed(1)}m`}
                 fontSize={12}
                 fill="#4b5563"
