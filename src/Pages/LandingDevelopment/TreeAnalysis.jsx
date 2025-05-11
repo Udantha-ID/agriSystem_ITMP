@@ -13,7 +13,8 @@ export const TreeAnalysis = ({ boundary, spacing, scale }) => {
   const reportRef = useRef(null);
   const treeVisStageRef = useRef(null);
   const [loading, setLoading] = useState(true);
-  const [bufferDistance] = useState(5); // Buffer distance in meters
+  const [edgeBufferDistance] = useState(3); // 3 meter buffer from edges
+  const [cornerBufferDistance] = useState(5); // 5 meter buffer in corners
   const [saving, setSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState({ type: '', message: '' });
   const { user } = useAuth(); // Get user from auth context
@@ -34,20 +35,16 @@ export const TreeAnalysis = ({ boundary, spacing, scale }) => {
   }, [saveStatus]);
 
   // Function to create offset points for the buffer
-  const createOffsetPoints = (originalPoints, offset) => {
+  const createOffsetPoints = (originalPoints, edgeBuffer, cornerBuffer) => {
     if (originalPoints.length < 3) return originalPoints;
     
-    const offsetPoints = [];
-    const n = originalPoints.length;
-    
-    for (let i = 0; i < n; i++) {
-      const prev = originalPoints[(i - 1 + n) % n];
-      const curr = originalPoints[i];
-      const next = originalPoints[(i + 1) % n];
+    return originalPoints.map((point, index) => {
+      const prev = originalPoints[(index - 1 + originalPoints.length) % originalPoints.length];
+      const next = originalPoints[(index + 1) % originalPoints.length];
       
       // Calculate vectors
-      const v1 = { x: curr.x - prev.x, y: curr.y - prev.y };
-      const v2 = { x: next.x - curr.x, y: next.y - curr.y };
+      const v1 = { x: point.x - prev.x, y: point.y - prev.y };
+      const v2 = { x: next.x - point.x, y: next.y - point.y };
       
       // Normalize vectors
       const len1 = Math.sqrt(v1.x * v1.x + v1.y * v1.y);
@@ -55,30 +52,35 @@ export const TreeAnalysis = ({ boundary, spacing, scale }) => {
       const n1 = { x: v1.x / len1, y: v1.y / len1 };
       const n2 = { x: v2.x / len2, y: v2.y / len2 };
       
-      // Calculate bisector
-      const bisector = { x: n1.x + n2.x, y: n1.y + n2.y };
-      const bisectorLen = Math.sqrt(bisector.x * bisector.x + bisector.y * bisector.y);
-      const bisectorNormalized = {
-        x: bisector.x / bisectorLen,
-        y: bisector.y / bisectorLen
+      // Calculate angle between vectors
+      const angle = Math.acos((n1.x * n2.x + n1.y * n2.y) / (len1 * len2));
+      
+      // Determine if this is a corner (angle < 150 degrees)
+      const isCorner = angle < (150 * Math.PI / 180);
+      const bufferDist = isCorner ? cornerBuffer : edgeBuffer;
+      
+      // Calculate inward normal
+      const normal = {
+        x: -(n1.y + n2.y) / 2,
+        y: (n1.x + n2.x) / 2
       };
       
-      // Calculate offset point (inward offset)
-      const angle = Math.atan2(n2.y, n2.x) - Math.atan2(n1.y, n1.x);
-      const offsetDist = offset / Math.sin(angle / 2);
+      // Normalize the normal vector
+      const normalLen = Math.sqrt(normal.x * normal.x + normal.y * normal.y);
+      normal.x /= normalLen;
+      normal.y /= normalLen;
       
-      offsetPoints.push({
-        x: curr.x - bisectorNormalized.x * offsetDist,
-        y: curr.y - bisectorNormalized.y * offsetDist
-      });
-    }
-    
-    return offsetPoints;
+      // Apply buffer
+      return {
+        x: point.x + normal.x * (bufferDist / scale),
+        y: point.y + normal.y * (bufferDist / scale)
+      };
+    });
   };
 
   const bufferedBoundary = useMemo(() => {
-    return createOffsetPoints(boundary, bufferDistance / scale);
-  }, [boundary, bufferDistance, scale]);
+    return createOffsetPoints(boundary, edgeBufferDistance, cornerBufferDistance);
+  }, [boundary, edgeBufferDistance, cornerBufferDistance, scale]);
 
   const metrics = useMemo(() => {
     const calculateArea = (points) => {
@@ -113,7 +115,8 @@ export const TreeAnalysis = ({ boundary, spacing, scale }) => {
       maintenanceCost,
       estimatedRevenue,
       roi,
-      bufferDistance
+      edgeBufferDistance,
+      cornerBufferDistance
     };
   }, [boundary, bufferedBoundary, spacing, scale]);
 
@@ -695,8 +698,12 @@ export const TreeAnalysis = ({ boundary, spacing, scale }) => {
                   <span className="font-medium">{spacing.horizontal}m × {spacing.vertical}m</span>
                 </div>
                 <div className="flex justify-between mb-2">
-                  <span className="text-gray-600">Buffer Zone:</span>
-                  <span className="font-medium">{metrics.bufferDistance.toFixed(1)}m</span>
+                  <span className="text-gray-600">Edge Buffer:</span>
+                  <span className="font-medium">{edgeBufferDistance}m</span>
+                </div>
+                <div className="flex justify-between mb-2">
+                  <span className="text-gray-600">Corner Buffer:</span>
+                  <span className="font-medium">{cornerBufferDistance}m</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Total Trees:</span>
@@ -728,8 +735,8 @@ export const TreeAnalysis = ({ boundary, spacing, scale }) => {
               <p className="text-sm text-gray-600">Original boundary</p>
             </div>
             <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 rounded-full bg-green-600"></div>
-              <p className="text-sm text-gray-600">Planting area with buffer zone</p>
+              <div className="w-3 h-3 rounded-full bg-red-500"></div>
+              <p className="text-sm text-gray-600">Buffer zone (no planting)</p>
             </div>
             <div className="flex items-center space-x-2">
               <div className="w-3 h-3 rounded-full bg-green-400"></div>
@@ -758,8 +765,12 @@ export const TreeAnalysis = ({ boundary, spacing, scale }) => {
                 <span className="font-medium">{spacing.horizontal}m x {spacing.vertical}m</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">Buffer Distance:</span>
-                <span className="font-medium">{metrics.bufferDistance.toFixed(1)}m</span>
+                <span className="text-gray-600">Edge Buffer:</span>
+                <span className="font-medium">{edgeBufferDistance}m</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Corner Buffer:</span>
+                <span className="font-medium">{cornerBufferDistance}m</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Total Trees:</span>
