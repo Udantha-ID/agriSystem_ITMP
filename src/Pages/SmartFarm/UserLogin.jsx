@@ -46,29 +46,49 @@ const UserLogin = () => {
   };
 
   const showSuccessAlert = (userName) => {
-    Swal.fire({
-      title: `Welcome ${userName}!`,
-      text: 'You have successfully logged in',
-      icon: 'success',
-      confirmButtonText: 'OK',
-      showCancelButton: false,
-      timer: 3000,
-      timerProgressBar: true,
-      customClass: {
-        popup: 'animated fadeInDown',
-        title: 'text-2xl font-bold text-green-600',
-        content: 'text-gray-600',
-        confirmButton: 'bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg'
-      },
-      background: '#ffffff',
-      backdrop: `
-        rgba(0,0,0,0.4)
-        left top
-        no-repeat
-      `
-    }).then(() => {
-      navigate("/");
-    });
+Swal.fire({
+  title: `<span class="text-3xl font-extrabold text-green-700">Welcome, ${userName}!</span>`,
+  html: `
+    <p class="text-gray-700 text-lg mt-2">
+      You have <strong>successfully logged in</strong>.<br>
+      We're redirecting you to the homepage...
+    </p>
+    <div class="mt-4 flex justify-center">
+      <svg class="w-12 h-12 text-green-500 animate-bounce" fill="none" stroke="currentColor" stroke-width="2"
+        viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M9 19V6l-2 2m12 11v-9l-2 2m-4 4l-2 2m0 0l2 2m-2-2H5m14 0h-6" />
+      </svg>
+    </div>
+  `,
+  icon: 'success',
+  toast: false, // set to true for top-right toast
+  position: 'center',
+  showConfirmButton: true,
+  confirmButtonText: 'Let\'s Go!',
+  showCancelButton: false,
+  timer: 4000,
+  timerProgressBar: true,
+  background: '#f0fff4',
+  customClass: {
+    popup: 'animated fadeInDown shadow-2xl rounded-xl',
+    title: '',
+    htmlContainer: '',
+    confirmButton: 'bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-full text-lg transition-all duration-200',
+  },
+  didOpen: () => {
+    const audio = new Audio('/sounds/login-success.mp3'); // optional sound effect
+    audio.play().catch(() => {}); // catch autoplay errors
+  },
+  backdrop: `
+    rgba(0, 128, 0, 0.3)
+    center
+    no-repeat
+  `
+}).then(() => {
+  navigate("/");
+});
+
   };
 
   const showErrorAlert = (errorMessage) => {
