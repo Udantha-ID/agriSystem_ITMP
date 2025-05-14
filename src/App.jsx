@@ -24,7 +24,6 @@ import MonitoringReports from './Pages/PlantationManagement/MonitoringReports.js
 import AddPlantation from './Pages/PlantationManagement/AddPlantation.jsx'
 import UpdatePlantation from './Pages/PlantationManagement/UpdatePlantation.jsx'
 import ScrollToTop from './Components/ScrollToTop.js'
-import Dashboard from './Pages/LandingDevelopment/Dashboard.jsx'
 import LandBoundary from './Pages/LandingDevelopment/LandBoundary.jsx';
 import PlantationManagementAbout from './Pages/PlantationManagement/PlantationmanagementAbout.jsx'
 import SavedAnalyses from './Pages/Dashboard/SavedAnalyses.jsx'
@@ -50,14 +49,6 @@ function App() {
           <Route path="/contact" element={<Contact />} />
           
           {/* Protected routes */}
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
           <Route
             path="/analyses"
             element={
