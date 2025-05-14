@@ -59,6 +59,7 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className={`flex justify-between items-center ${scrolled ? 'bg-white/95 backdrop-blur-md' : 'bg-white'} rounded-2xl px-6 py-4 shadow-lg transition-all`}>
             {/* Logo Section */}
+            <Link to="/" className="flex items-center">
             <div className="flex items-center gap-2">
               <div className="p-2 bg-gradient-to-br from-green-500 to-emerald-700 rounded-lg">
                 <Leaf className="w-6 h-6 text-white" />
@@ -67,6 +68,7 @@ export default function Navbar() {
                 GREEN SOIL
               </h1>
             </div>
+            </Link>
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex gap-8">
