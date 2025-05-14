@@ -153,34 +153,52 @@ const UserRegister = () => {
       await authService.registerOnly(userData);
       
       // Show success message with SweetAlert2
-      Swal.fire({
-        title: 'Success!',
-        text: 'Your account has been created successfully',
-        icon: 'success',
-        confirmButtonText: 'Continue to Login',
-        showCancelButton: false,
-        timer: 3000,
-        timerProgressBar: true,
-        customClass: {
-          popup: 'animated fadeInDown',
-          title: 'text-2xl font-bold text-green-600',
-          content: 'text-gray-600',
-          confirmButton: 'bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg'
-        },
-        background: '#ffffff',
-        backdrop: `
-          rgba(0,0,0,0.4)
-          left top
-          no-repeat
-        `
-      }).then(() => {
-        navigate('/login', { 
-          state: { 
-            registrationSuccess: true,
-            email: formData.email 
-          }
-        });
-      });
+Swal.fire({
+  title: `<span class="text-3xl font-extrabold text-green-700">🎉 Account Created!</span>`,
+  html: `
+    <p class="text-gray-700 text-lg mt-2">
+      You’re all set!<br>
+      <span class="text-green-600 font-semibold">Now you can log in and get started.</span>
+    </p>
+    <div class="mt-4 flex justify-center">
+      <svg class="w-12 h-12 text-green-500 animate-bounce" fill="none" stroke="currentColor" stroke-width="2"
+        viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M9 19V6l-2 2m12 11v-9l-2 2m-4 4l-2 2m0 0l2 2m-2-2H5m14 0h-6" />
+      </svg>
+    </div>
+  `,
+  icon: 'success',
+  confirmButtonText: '🚀 Let’s Login!',
+  showCancelButton: false,
+  timer: 3500,
+  timerProgressBar: true,
+  customClass: {
+    popup: 'animated fadeInUp shadow-2xl rounded-2xl',
+    title: '',
+    htmlContainer: '',
+    confirmButton: 'bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-full text-lg transition-all duration-200',
+  },
+  background: '#f0fff4',
+  backdrop: `
+    rgba(0, 128, 0, 0.2)
+    center
+    no-repeat
+  `,
+  didOpen: () => {
+    // Optional: play a sound effect
+    const audio = new Audio('/sounds/success-chime.mp3');
+    audio.play().catch(() => {});
+  }
+}).then(() => {
+  navigate('/login', {
+    state: {
+      registrationSuccess: true,
+      email: formData.email
+    }
+  });
+});
+
     } catch (error) {
       Swal.fire({
         title: 'Registration Failed',
